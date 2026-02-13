@@ -44,3 +44,36 @@ export async function callOpenAI({ apiKey, payload }) {
 
   return { rawText, extractedOutputText: outText, strictJson };
 }
+
+export async function callOpenAIChat({ apiKey, model, messages }) {
+  const endpoint = (OPENAI_ENDPOINT || DEFAULT_ENDPOINT).trim();
+
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model,
+      input: messages,
+    }),
+  });
+
+  const rawText = await res.text();
+  if (!res.ok) throw new Error(`OpenAI ${res.status}: ${rawText}`);
+
+  let obj;
+  try {
+    obj = JSON.parse(rawText);
+  } catch {
+    return { rawText, extractedOutputText: '' };
+  }
+
+  const outText =
+    obj?.output_text ||
+    obj?.output?.[0]?.content?.find((c) => c?.type === 'output_text')?.text ||
+    '';
+
+  return { rawText, extractedOutputText: outText };
+}

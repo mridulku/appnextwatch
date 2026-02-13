@@ -28,3 +28,13 @@ export const OPENAI_MODEL = getEnv([
   'VITE_OPENAI_MODEL',
   'OPENAI_MODEL',
 ]);
+
+export const SUPABASE_URL = getEnv([
+  'EXPO_PUBLIC_SUPABASE_URL',
+  'VITE_SUPABASE_URL',
+]);
+
+export const SUPABASE_ANON_KEY = getEnv([
+  'EXPO_PUBLIC_SUPABASE_ANON_KEY',
+  'VITE_SUPABASE_ANON_KEY',
+]);

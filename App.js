@@ -5,23 +5,37 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 
 import COLORS from './theme/colors';
-import ExploreScreen from './screens/ExploreScreen';
+import ExploreReelsScreen from './screens/ExploreReelsScreen';
 import MoviesByYearScreen from './screens/MoviesByYearScreen';
-import SearchScreen from './screens/SearchScreen';
-import AwardsScreen from './screens/AwardsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import MovieDetailScreen from './screens/MovieDetailScreen';
-import PlaceholderScreen from './screens/PlaceholderScreen';
 import LoginScreen from './screens/LoginScreen';
+import ChatScreen from './screens/ChatScreen';
+import DataInspectorScreen from './screens/DataInspectorScreen';
+import ActorListScreen from './screens/ActorListScreen';
+import ActorDetailScreen from './screens/ActorDetailScreen';
+import DirectorListScreen from './screens/DirectorListScreen';
+import DirectorDetailScreen from './screens/DirectorDetailScreen';
+import AwardsHomeScreen from './screens/AwardsHomeScreen';
+import AwardYearsScreen from './screens/AwardYearsScreen';
+import AwardCategoriesScreen from './screens/AwardCategoriesScreen';
+import AwardNomineesScreen from './screens/AwardNomineesScreen';
+import DirectoryScreen from './screens/DirectoryScreen';
+import ListsHomeScreen from './screens/ListsHomeScreen';
+import ListDetailScreen from './screens/ListDetailScreen';
+import FilmsWatchedScreen from './screens/FilmsWatchedScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { PreferencesProvider } from './context/PreferencesContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-const MoreStack = createNativeStackNavigator();
+const ProfileStack = createNativeStackNavigator();
+const DirectoryStack = createNativeStackNavigator();
+const ListsStack = createNativeStackNavigator();
 
-function MoreStackScreens() {
+function ProfileStackScreens() {
   return (
-    <MoreStack.Navigator
+    <ProfileStack.Navigator
       screenOptions={{
         headerStyle: { backgroundColor: COLORS.bg },
         headerTintColor: COLORS.text,
@@ -29,43 +43,110 @@ function MoreStackScreens() {
         contentStyle: { backgroundColor: COLORS.bg },
       }}
     >
-      <MoreStack.Screen
-        name="PlaceholderOne"
-        component={PlaceholderScreen}
-        options={{ title: 'Placeholder 1' }}
-        initialParams={{
-          title: 'Placeholder 1',
-          description: 'This space is ready for a new feature.',
-        }}
+      <ProfileStack.Screen
+        name="ProfileHome"
+        component={ProfileScreen}
+        options={{ title: 'Profile' }}
       />
-      <MoreStack.Screen
-        name="PlaceholderTwo"
-        component={PlaceholderScreen}
-        options={{ title: 'Placeholder 2' }}
-        initialParams={{
-          title: 'Placeholder 2',
-          description: 'Drop in the next flow when you are ready.',
-        }}
+      <ProfileStack.Screen
+        name="FilmsWatched"
+        component={FilmsWatchedScreen}
+        options={{ title: 'Films Watched' }}
       />
-      <MoreStack.Screen
-        name="PlaceholderThree"
-        component={PlaceholderScreen}
-        options={{ title: 'Placeholder 3' }}
-        initialParams={{
-          title: 'Placeholder 3',
-          description: 'Reserved for future screens.',
-        }}
+      <ProfileStack.Screen
+        name="Data"
+        component={DataInspectorScreen}
+        options={{ title: 'Data' }}
       />
-      <MoreStack.Screen
-        name="PlaceholderFour"
-        component={PlaceholderScreen}
-        options={{ title: 'Placeholder 4' }}
-        initialParams={{
-          title: 'Placeholder 4',
-          description: 'Build the next idea here.',
-        }}
+    </ProfileStack.Navigator>
+  );
+}
+
+function DirectoryStackScreens() {
+  return (
+    <DirectoryStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: COLORS.bg },
+        headerTintColor: COLORS.text,
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: COLORS.bg },
+      }}
+    >
+      <DirectoryStack.Screen
+        name="DirectoryHome"
+        component={DirectoryScreen}
+        options={{ title: 'Directory', headerShown: false }}
       />
-    </MoreStack.Navigator>
+      <DirectoryStack.Screen
+        name="Movies"
+        component={MoviesByYearScreen}
+        options={{ title: 'Movies' }}
+      />
+      <DirectoryStack.Screen
+        name="ActorList"
+        component={ActorListScreen}
+        options={{ title: 'Actors' }}
+      />
+      <DirectoryStack.Screen
+        name="ActorDetail"
+        component={ActorDetailScreen}
+        options={{ title: 'Actor' }}
+      />
+      <DirectoryStack.Screen
+        name="DirectorList"
+        component={DirectorListScreen}
+        options={{ title: 'Directors' }}
+      />
+      <DirectoryStack.Screen
+        name="DirectorDetail"
+        component={DirectorDetailScreen}
+        options={{ title: 'Director' }}
+      />
+      <DirectoryStack.Screen
+        name="AwardsHome"
+        component={AwardsHomeScreen}
+        options={{ title: 'Awards' }}
+      />
+      <DirectoryStack.Screen
+        name="AwardYears"
+        component={AwardYearsScreen}
+        options={{ title: 'Years' }}
+      />
+      <DirectoryStack.Screen
+        name="AwardCategories"
+        component={AwardCategoriesScreen}
+        options={{ title: 'Categories' }}
+      />
+      <DirectoryStack.Screen
+        name="AwardNominees"
+        component={AwardNomineesScreen}
+        options={{ title: 'Nominees' }}
+      />
+    </DirectoryStack.Navigator>
+  );
+}
+
+function ListsStackScreens() {
+  return (
+    <ListsStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: COLORS.bg },
+        headerTintColor: COLORS.text,
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: COLORS.bg },
+      }}
+    >
+      <ListsStack.Screen
+        name="ListsHome"
+        component={ListsHomeScreen}
+        options={{ title: 'Lists', headerShown: false }}
+      />
+      <ListsStack.Screen
+        name="ListDetail"
+        component={ListDetailScreen}
+        options={({ route }) => ({ title: route.params?.title ?? 'List' })}
+      />
+    </ListsStack.Navigator>
   );
 }
 
@@ -82,25 +163,28 @@ function Tabs() {
         tabBarIcon: ({ color, size }) => {
           const icons = {
             Explore: 'compass',
-            ByYear: 'calendar',
-            Search: 'search',
-            Awards: 'trophy',
+            Directory: 'grid',
+            Chat: 'chatbubbles',
+            Lists: 'list',
             Profile: 'person',
-            More: 'grid',
           };
           return <Ionicons name={icons[route.name]} size={size} color={color} />;
         },
       })}
     >
-      <Tab.Screen name="Explore" component={ExploreScreen} />
       <Tab.Screen
-        name="ByYear"
-        component={MoviesByYearScreen}
-        options={{ title: 'Movies by Year', tabBarLabel: 'By Year' }}
+        name="Explore"
+        component={ExploreReelsScreen}
+        options={{ title: 'Explore', tabBarLabel: 'Explore' }}
       />
       <Tab.Screen
-        name="Search"
-        component={SearchScreen}
+        name="Directory"
+        component={DirectoryStackScreens}
+        options={{ title: 'Directory', tabBarLabel: 'Directory' }}
+      />
+      <Tab.Screen
+        name="Chat"
+        component={ChatScreen}
         options={{
           tabBarLabel: '',
           tabBarButton: ({
@@ -120,15 +204,18 @@ function Tabs() {
               activeOpacity={0.9}
             >
               <View style={styles.searchButton}>
-                <Ionicons name="search" size={24} color={COLORS.bg} />
+                <Ionicons name="chatbubbles" size={24} color={COLORS.bg} />
               </View>
             </TouchableOpacity>
           ),
         }}
       />
-      <Tab.Screen name="Awards" component={AwardsScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="More" component={MoreStackScreens} />
+      <Tab.Screen
+        name="Lists"
+        component={ListsStackScreens}
+        options={{ title: 'Lists', tabBarLabel: 'Lists' }}
+      />
+      <Tab.Screen name="Profile" component={ProfileStackScreens} />
     </Tab.Navigator>
   );
 }
@@ -153,9 +240,11 @@ function RootNavigator() {
 export default function App() {
   return (
     <AuthProvider>
-      <NavigationContainer>
-        <RootNavigator />
-      </NavigationContainer>
+      <PreferencesProvider>
+        <NavigationContainer>
+          <RootNavigator />
+        </NavigationContainer>
+      </PreferencesProvider>
     </AuthProvider>
   );
 }

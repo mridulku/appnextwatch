@@ -4,9 +4,9 @@ import {
   View,
   Text,
   StyleSheet,
-  Platform,
   ScrollView,
   TouchableOpacity,
+  Platform,
   ActivityIndicator,
 } from 'react-native';
 import { useEffect, useState } from 'react';
@@ -15,7 +15,18 @@ import COLORS from '../theme/colors';
 import { fetchMovies } from '../core/supabaseApi';
 import { MOVIES } from '../data/catalog';
 
-function MoviesByYearScreen({ navigation }) {
+function normalizeMovies(list) {
+  return list.map((movie) => ({
+    ...movie,
+    rating: movie.rating ? String(movie.rating) : '',
+    color:
+      Array.isArray(movie.color) && movie.color.length > 0
+        ? movie.color
+        : ['#23283A', '#0E0F14'],
+  }));
+}
+
+function FilmsWatchedScreen({ navigation }) {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,23 +41,14 @@ function MoviesByYearScreen({ navigation }) {
 
       if (error || !data?.length) {
         if (error) {
-          console.warn('Failed to load movies from Supabase.', error.message);
+          console.warn('Failed to load films watched.', error.message);
         }
-        setMovies(MOVIES);
+        setMovies(normalizeMovies(MOVIES).slice(0, 6));
         setIsLoading(false);
         return;
       }
 
-      const normalized = data.map((movie) => ({
-        ...movie,
-        rating: movie.rating ? String(movie.rating) : '',
-        color:
-          Array.isArray(movie.color) && movie.color.length > 0
-            ? movie.color
-            : ['#23283A', '#0E0F14'],
-      }));
-
-      setMovies(normalized);
+      setMovies(normalizeMovies(data).slice(0, 6));
       setIsLoading(false);
     };
 
@@ -61,20 +63,20 @@ function MoviesByYearScreen({ navigation }) {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Movies</Text>
+        <Text style={styles.title}>Films Watched</Text>
         <Text style={styles.body}>
-          Browse every film from your database. Tap a title to see the full profile.
+          A quick snapshot of recent watches and favorites.
         </Text>
 
         {isLoading ? (
           <View style={styles.loadingRow}>
             <ActivityIndicator color={COLORS.accent} />
-            <Text style={styles.loadingText}>Loading movies...</Text>
+            <Text style={styles.loadingText}>Loading films...</Text>
           </View>
         ) : null}
 
         {movies.length === 0 && !isLoading ? (
-          <Text style={styles.emptyText}>No movies yet. Add some in Supabase.</Text>
+          <Text style={styles.emptyText}>No films tracked yet.</Text>
         ) : null}
 
         {movies.map((movie) => (
@@ -82,7 +84,6 @@ function MoviesByYearScreen({ navigation }) {
             key={movie.id}
             style={styles.card}
             onPress={() => navigation.navigate('Movie', { movie })}
-            activeOpacity={0.9}
           >
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>{movie.title}</Text>
@@ -94,11 +95,6 @@ function MoviesByYearScreen({ navigation }) {
             <Text style={styles.cardMeta}>
               {movie.year} • {movie.genre} • {movie.minutes}
             </Text>
-            {movie.overview ? (
-              <Text style={styles.cardOverview} numberOfLines={2}>
-                {movie.overview}
-              </Text>
-            ) : null}
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -113,13 +109,13 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 24,
+    paddingBottom: 120,
     backgroundColor: COLORS.bg,
-    flexGrow: 1,
   },
   title: {
     color: COLORS.text,
     fontSize: 26,
-    marginBottom: 12,
+    marginBottom: 8,
     fontFamily: Platform.select({ ios: 'Palatino', android: 'serif' }),
   },
   body: {
@@ -141,7 +137,6 @@ const styles = StyleSheet.create({
   emptyText: {
     color: COLORS.muted,
     fontSize: 13,
-    marginTop: 8,
   },
   card: {
     backgroundColor: COLORS.card,
@@ -182,12 +177,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 8,
   },
-  cardOverview: {
-    color: COLORS.muted,
-    fontSize: 12,
-    marginTop: 10,
-    lineHeight: 18,
-  },
 });
 
-export default MoviesByYearScreen;
+export default FilmsWatchedScreen;

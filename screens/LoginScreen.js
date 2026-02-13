@@ -16,8 +16,8 @@ import { useAuth } from '../context/AuthContext';
 
 function LoginScreen() {
   const { login } = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('demo user');
+  const [password, setPassword] = useState('password123');
   const [error, setError] = useState('');
 
   const handleLogin = () => {

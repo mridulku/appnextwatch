@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import {
   View,
   Text,
@@ -9,12 +8,56 @@ import {
   TouchableOpacity,
   Platform,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 
 import COLORS from '../theme/colors';
-import { MOVIES } from '../data/catalog';
+import { fetchActors, fetchDirectors } from '../core/supabaseApi';
+
+import { useEffect, useState } from 'react';
 
 function ExploreScreen({ navigation }) {
+  const [actors, setActors] = useState([]);
+  const [actresses, setActresses] = useState([]);
+  const [directors, setDirectors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadTalent = async () => {
+      setIsLoading(true);
+      const [actorsRes, actressesRes, directorsRes] = await Promise.all([
+        fetchActors({ roleType: 'actor', limit: 4 }),
+        fetchActors({ roleType: 'actress', limit: 4 }),
+        fetchDirectors(4),
+      ]);
+
+      if (!isMounted) return;
+
+      if (actorsRes.error) {
+        console.warn('Failed to load actors.', actorsRes.error.message);
+      }
+      if (actressesRes.error) {
+        console.warn('Failed to load actresses.', actressesRes.error.message);
+      }
+      if (directorsRes.error) {
+        console.warn('Failed to load directors.', directorsRes.error.message);
+      }
+
+      setActors(actorsRes.data ?? []);
+      setActresses(actressesRes.data ?? []);
+      setDirectors(directorsRes.data ?? []);
+      setIsLoading(false);
+    };
+
+    loadTalent();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -24,57 +67,95 @@ function ExploreScreen({ navigation }) {
             colors={['#23283A', '#0E0F14']}
             style={styles.heroGradient}
           />
-          <Text style={styles.heroEyebrow}>MOVIE TASTE DISCOVERY</Text>
-          <Text style={styles.heroTitle}>Find films that match your mood.</Text>
+          <Text style={styles.heroEyebrow}>APPREEPE TALENT RADAR</Text>
+          <Text style={styles.heroTitle}>Explore the people shaping cinema.</Text>
           <Text style={styles.heroSubtitle}>
-            Curated by critics, shaped by your taste.
+            Discover actors, actresses, directors, and screenwriters in one place.
           </Text>
         </View>
 
+        {isLoading ? (
+          <View style={styles.loadingRow}>
+            <ActivityIndicator color={COLORS.accent} />
+            <Text style={styles.loadingText}>Loading talent...</Text>
+          </View>
+        ) : null}
+
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Top Picks</Text>
-          <Text style={styles.sectionAction}>See all</Text>
+          <Text style={styles.sectionTitle}>Actors</Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('ActorList', { title: 'Actors', roleType: 'actor' })
+            }
+          >
+            <Text style={styles.sectionAction}>Browse all</Text>
+          </TouchableOpacity>
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {MOVIES.map((movie) => (
+        <View style={styles.talentRow}>
+          {actors.map((person) => (
             <TouchableOpacity
-              key={movie.id}
-              style={styles.movieCard}
-              onPress={() => navigation.navigate('Movie', { movie })}
-              activeOpacity={0.9}
+              key={person.id}
+              style={styles.talentCard}
+              onPress={() => navigation.navigate('ActorDetail', { actorId: person.id })}
             >
-              <LinearGradient colors={movie.color} style={styles.movieGradient}>
-                <View style={styles.movieBadge}>
-                  <Text style={styles.movieBadgeText}>{movie.rating}</Text>
-                  <Text style={styles.movieBadgeLabel}>IMDb</Text>
-                </View>
-                <Text style={styles.movieTitle}>{movie.title}</Text>
-                <Text style={styles.movieMeta}>
-                  {movie.year} • {movie.genre} • {movie.minutes}
-                </Text>
-              </LinearGradient>
+              <Text style={styles.talentName}>{person.name}</Text>
+              <Text style={styles.talentMeta}>Actor</Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Critic Spotlight</Text>
-          <Text style={styles.sectionAction}>Listen</Text>
+          {!isLoading && actors.length === 0 ? (
+            <Text style={styles.emptyText}>No actors yet.</Text>
+          ) : null}
         </View>
 
-        <View style={styles.spotlightCard}>
-          <View style={styles.spotlightTag}>
-            <Text style={styles.spotlightTagText}>NEW</Text>
-          </View>
-          <Text style={styles.spotlightTitle}>The Quiet Power of Shawshank</Text>
-          <Text style={styles.spotlightMeta}>12 min read • by E. DuPont</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Actresses</Text>
           <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('Movie', { movie: MOVIES[0] })}
+            onPress={() =>
+              navigation.navigate('ActorList', { title: 'Actresses', roleType: 'actress' })
+            }
           >
-            <Text style={styles.primaryButtonText}>Open Review</Text>
+            <Text style={styles.sectionAction}>Browse all</Text>
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.talentRow}>
+          {actresses.map((person) => (
+            <TouchableOpacity
+              key={person.id}
+              style={styles.talentCard}
+              onPress={() => navigation.navigate('ActorDetail', { actorId: person.id })}
+            >
+              <Text style={styles.talentName}>{person.name}</Text>
+              <Text style={styles.talentMeta}>Actress</Text>
+            </TouchableOpacity>
+          ))}
+          {!isLoading && actresses.length === 0 ? (
+            <Text style={styles.emptyText}>No actresses yet.</Text>
+          ) : null}
+        </View>
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Directors</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('DirectorList')}>
+            <Text style={styles.sectionAction}>Browse all</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.talentRow}>
+          {directors.map((person) => (
+            <TouchableOpacity
+              key={person.id}
+              style={styles.talentCard}
+              onPress={() => navigation.navigate('DirectorDetail', { directorId: person.id })}
+            >
+              <Text style={styles.talentName}>{person.name}</Text>
+              <Text style={styles.talentMeta}>Director</Text>
+            </TouchableOpacity>
+          ))}
+          {!isLoading && directors.length === 0 ? (
+            <Text style={styles.emptyText}>No directors yet.</Text>
+          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -134,85 +215,39 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: 13,
   },
-  movieCard: {
-    width: 260,
-    marginRight: 16,
-    borderRadius: 20,
-    overflow: 'hidden',
-    backgroundColor: COLORS.card,
-    shadowColor: COLORS.shadow,
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 6,
-  },
-  movieGradient: {
-    padding: 16,
-    height: 190,
-    justifyContent: 'space-between',
-  },
-  movieBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(245,201,106,0.2)',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  movieBadgeText: {
-    color: COLORS.accent,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  movieBadgeLabel: {
-    color: COLORS.muted,
-    fontSize: 10,
-  },
-  movieTitle: {
-    color: COLORS.text,
-    fontSize: 18,
-    fontFamily: Platform.select({ ios: 'Palatino', android: 'serif' }),
-  },
-  movieMeta: {
-    color: COLORS.muted,
-    fontSize: 12,
-  },
-  spotlightCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 18,
-    marginTop: 8,
-  },
-  spotlightTag: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(90,209,232,0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  spotlightTagText: {
-    color: COLORS.accent2,
-    fontSize: 10,
-  },
-  spotlightTitle: {
-    color: COLORS.text,
-    fontSize: 18,
-    marginTop: 12,
-    fontFamily: Platform.select({ ios: 'Palatino', android: 'serif' }),
-  },
-  spotlightMeta: {
-    color: COLORS.muted,
-    marginTop: 6,
-    fontSize: 12,
-  },
-  primaryButton: {
-    backgroundColor: COLORS.accent,
-    borderRadius: 16,
-    paddingVertical: 12,
+  loadingRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
+    marginBottom: 12,
   },
-  primaryButtonText: {
-    color: COLORS.bg,
-    fontWeight: '600',
+  loadingText: {
+    color: COLORS.muted,
+    fontSize: 12,
+    marginLeft: 10,
+  },
+  talentRow: {
+    marginBottom: 16,
+  },
+  talentCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 10,
+  },
+  talentName: {
+    color: COLORS.text,
+    fontSize: 16,
+    marginBottom: 6,
+    fontFamily: Platform.select({ ios: 'Palatino', android: 'serif' }),
+  },
+  talentMeta: {
+    color: COLORS.muted,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  emptyText: {
+    color: COLORS.muted,
+    fontSize: 12,
   },
 });
 

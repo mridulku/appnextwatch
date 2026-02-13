@@ -1,42 +1,42 @@
-import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 import {
   SafeAreaView,
+  ScrollView,
   View,
   Text,
   StyleSheet,
+  TouchableOpacity,
   Platform,
-  ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { useEffect, useState } from 'react';
 
 import COLORS from '../theme/colors';
-import { fetchAwards } from '../core/supabaseApi';
+import { fetchAwardShows } from '../core/supabaseApi';
 
-function AwardsScreen() {
-  const [awards, setAwards] = useState([]);
+function AwardsHomeScreen({ navigation }) {
+  const [shows, setShows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
 
-    const loadAwards = async () => {
+    const loadShows = async () => {
       setIsLoading(true);
-      const { data, error } = await fetchAwards();
+      const { data, error } = await fetchAwardShows();
 
       if (!isMounted) return;
 
       if (error) {
-        console.warn('Failed to load awards from Supabase.', error.message);
+        console.warn('Failed to load award shows.', error.message);
         setIsLoading(false);
         return;
       }
 
-      setAwards(data ?? []);
+      setShows(data ?? []);
       setIsLoading(false);
     };
 
-    loadAwards();
+    loadShows();
 
     return () => {
       isMounted = false;
@@ -45,34 +45,32 @@ function AwardsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Awards</Text>
-        <Text style={styles.body}>
-          Track Oscar winners, nominees, and every spotlight category you care about.
+        <Text style={styles.subtitle}>
+          Explore award shows, years, and category winners.
         </Text>
 
         {isLoading ? (
           <View style={styles.loadingRow}>
             <ActivityIndicator color={COLORS.accent} />
-            <Text style={styles.loadingText}>Loading awards...</Text>
+            <Text style={styles.loadingText}>Loading award shows...</Text>
           </View>
         ) : null}
 
-        {awards.length === 0 && !isLoading ? (
-          <Text style={styles.emptyText}>No awards yet. Add your first entry in Supabase.</Text>
+        {!isLoading && shows.length === 0 ? (
+          <Text style={styles.emptyText}>No award shows yet.</Text>
         ) : null}
 
-        {awards.map((award) => (
-          <View key={award.id} style={styles.card}>
-            <Text style={styles.cardTitle}>
-              {award.year} • {award.category}
-            </Text>
-            <Text style={styles.cardWinner}>
-              Winner: {award.winner}
-              {award.movie?.title ? ` (${award.movie.title})` : ''}
-            </Text>
-          </View>
+        {shows.map((show) => (
+          <TouchableOpacity
+            key={show.id}
+            style={styles.card}
+            onPress={() => navigation.navigate('AwardYears', { show })}
+          >
+            <Text style={styles.cardTitle}>{show.name}</Text>
+            <Text style={styles.cardMeta}>Browse years and categories</Text>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -92,10 +90,10 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.text,
     fontSize: 26,
-    marginBottom: 12,
+    marginBottom: 8,
     fontFamily: Platform.select({ ios: 'Palatino', android: 'serif' }),
   },
-  body: {
+  subtitle: {
     color: COLORS.muted,
     fontSize: 14,
     lineHeight: 20,
@@ -114,7 +112,6 @@ const styles = StyleSheet.create({
   emptyText: {
     color: COLORS.muted,
     fontSize: 13,
-    marginTop: 8,
   },
   card: {
     backgroundColor: COLORS.card,
@@ -128,10 +125,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     fontFamily: Platform.select({ ios: 'Palatino', android: 'serif' }),
   },
-  cardWinner: {
+  cardMeta: {
     color: COLORS.muted,
-    fontSize: 13,
+    fontSize: 12,
   },
 });
 
-export default AwardsScreen;
+export default AwardsHomeScreen;
