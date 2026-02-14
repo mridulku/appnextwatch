@@ -20,6 +20,13 @@ function ProfileScreen({ navigation }) {
     usePreferences();
   const displayName = user?.name ?? 'Guest';
   const avatarLetter = displayName.charAt(0).toUpperCase();
+  const openCategorySelector = () => {
+    const rootNavigation = navigation.getParent()?.getParent();
+    rootNavigation?.reset({
+      index: 0,
+      routes: [{ name: 'CategorySelector' }],
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -101,6 +108,12 @@ function ProfileScreen({ navigation }) {
           onPress={() => navigation.navigate('Data')}
         >
           <Text style={styles.dataButtonText}>Open Data Inspector</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.changeCategoryButton}
+          onPress={openCategorySelector}
+        >
+          <Text style={styles.changeCategoryText}>Change Category</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Text style={styles.logoutButtonText}>Log out</Text>
@@ -254,6 +267,18 @@ const styles = StyleSheet.create({
   },
   dataButtonText: {
     color: COLORS.accent,
+    fontWeight: '600',
+  },
+  changeCategoryButton: {
+    marginTop: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  changeCategoryText: {
+    color: COLORS.text,
     fontWeight: '600',
   },
   logoutButton: {

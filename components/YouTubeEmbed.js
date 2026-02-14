@@ -4,7 +4,12 @@ import { WebView } from 'react-native-webview';
 
 import COLORS from '../theme/colors';
 
-function buildEmbedUrl(youtubeId, startSeconds, autoPlay = false) {
+function buildEmbedUrl(
+  youtubeId,
+  startSeconds,
+  autoPlay = false,
+  showControls = true,
+) {
   if (!youtubeId) return '';
   const params = new URLSearchParams();
   params.set('modestbranding', '1');
@@ -14,7 +19,7 @@ function buildEmbedUrl(youtubeId, startSeconds, autoPlay = false) {
   params.set('fs', '1');
   params.set('origin', 'https://www.youtube.com');
   params.set('enablejsapi', '1');
-  params.set('controls', '1');
+  params.set('controls', showControls ? '1' : '0');
   if (autoPlay) {
     params.set('autoplay', '1');
     params.set('mute', '1');
@@ -44,6 +49,10 @@ function YouTubeEmbed({
   forcePlay = false,
   autoPlay = false,
   rounded = true,
+  fill = false,
+  pressToPlay = true,
+  showPlayBadge = true,
+  showControls = true,
 }) {
   if (!youtubeId) return null;
   const [isPlaying, setIsPlaying] = React.useState(false);
@@ -53,9 +62,15 @@ function YouTubeEmbed({
     youtubeId,
     startSeconds,
     autoPlay || isPlaying || forcePlay,
+    showControls,
   );
   const thumbnailUrl = `https://i.ytimg.com/vi/${youtubeId}/${THUMBNAIL_FALLBACKS[thumbIndex]}.jpg`;
   const isVideoPlaying = forcePlay || isPlaying;
+  const frameStyles = [
+    styles.frame,
+    fill ? styles.frameFill : styles.frameDefault,
+    !rounded && styles.fullBleedFrame,
+  ];
 
   React.useEffect(() => {
     if (forcePlayRef.current && !forcePlay) {
@@ -65,12 +80,12 @@ function YouTubeEmbed({
   }, [forcePlay]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, fill && styles.containerFill]}>
       {isVideoPlaying ? (
-        <View style={[styles.playerFrame, !rounded && styles.fullBleedFrame]}>
+        <View style={frameStyles}>
           <WebView
             source={{ uri: embedUrl }}
-            style={[styles.video, !rounded && styles.fullBleedFrame]}
+            style={styles.video}
             javaScriptEnabled
             allowsInlineMediaPlayback
             allowsFullscreenVideo
@@ -90,15 +105,19 @@ function YouTubeEmbed({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={title ? `Play ${title}` : 'Play clip'}
-          onPress={() => {
-            setIsPlaying(true);
-            if (onPlay) {
-              onPlay({ youtubeId, startSeconds, title });
-            }
-          }}
+          disabled={!pressToPlay}
+          onPress={
+            pressToPlay
+              ? () => {
+                  setIsPlaying(true);
+                  if (onPlay) {
+                    onPlay({ youtubeId, startSeconds, title });
+                  }
+                }
+              : undefined
+          }
           style={({ pressed }) => [
-            styles.thumb,
-            !rounded && styles.fullBleedFrame,
+            frameStyles,
             pressed && styles.thumbPressed,
           ]}
         >
@@ -112,9 +131,11 @@ function YouTubeEmbed({
               );
             }}
           />
-          <View style={styles.playBadge}>
-            <Text style={styles.playIcon}>▶</Text>
-          </View>
+          {showPlayBadge ? (
+            <View style={styles.playBadge}>
+              <Text style={styles.playIcon}>▶</Text>
+            </View>
+          ) : null}
         </Pressable>
       )}
     </View>
@@ -125,12 +146,20 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
   },
-  thumb: {
+  containerFill: {
+    flex: 1,
+  },
+  frame: {
     width: '100%',
-    aspectRatio: 16 / 9,
-    borderRadius: 14,
     overflow: 'hidden',
     backgroundColor: COLORS.card,
+  },
+  frameDefault: {
+    aspectRatio: 16 / 9,
+    borderRadius: 14,
+  },
+  frameFill: {
+    flex: 1,
   },
   thumbPressed: {
     opacity: 0.9,
@@ -155,13 +184,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     marginLeft: 4,
-  },
-  playerFrame: {
-    width: '100%',
-    aspectRatio: 16 / 9,
-    borderRadius: 14,
-    overflow: 'hidden',
-    backgroundColor: COLORS.card,
   },
   video: {
     flex: 1,

@@ -1,8 +1,9 @@
+import { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import COLORS from './theme/colors';
 import ExploreReelsScreen from './screens/ExploreReelsScreen';
@@ -24,10 +25,16 @@ import DirectoryScreen from './screens/DirectoryScreen';
 import ListsHomeScreen from './screens/ListsHomeScreen';
 import ListDetailScreen from './screens/ListDetailScreen';
 import FilmsWatchedScreen from './screens/FilmsWatchedScreen';
+import FitnessScreen from './screens/FitnessScreen';
+import FitnessHistoryScreen from './screens/FitnessHistoryScreen';
+import FitnessSettingsScreen from './screens/FitnessSettingsScreen';
+import CategorySelectorScreen from './screens/CategorySelectorScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PreferencesProvider } from './context/PreferencesContext';
+import { APP_CATEGORY, getSavedCategory } from './core/categoryMode';
 
-const Tab = createBottomTabNavigator();
+const MovieTab = createBottomTabNavigator();
+const FitnessTab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
 const DirectoryStack = createNativeStackNavigator();
@@ -150,9 +157,9 @@ function ListsStackScreens() {
   );
 }
 
-function Tabs() {
+function MoviesAppNavigator() {
   return (
-    <Tab.Navigator
+    <MovieTab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: styles.tabBar,
@@ -172,17 +179,17 @@ function Tabs() {
         },
       })}
     >
-      <Tab.Screen
+      <MovieTab.Screen
         name="Explore"
         component={ExploreReelsScreen}
         options={{ title: 'Explore', tabBarLabel: 'Explore' }}
       />
-      <Tab.Screen
+      <MovieTab.Screen
         name="Directory"
         component={DirectoryStackScreens}
         options={{ title: 'Directory', tabBarLabel: 'Directory' }}
       />
-      <Tab.Screen
+      <MovieTab.Screen
         name="Chat"
         component={ChatScreen}
         options={{
@@ -210,29 +217,114 @@ function Tabs() {
           ),
         }}
       />
-      <Tab.Screen
+      <MovieTab.Screen
         name="Lists"
         component={ListsStackScreens}
         options={{ title: 'Lists', tabBarLabel: 'Lists' }}
       />
-      <Tab.Screen name="Profile" component={ProfileStackScreens} />
-    </Tab.Navigator>
+      <MovieTab.Screen name="Profile" component={ProfileStackScreens} />
+    </MovieTab.Navigator>
+  );
+}
+
+function FitnessAppNavigator() {
+  return (
+    <FitnessTab.Navigator
+      screenOptions={({ route }) => ({
+        headerStyle: { backgroundColor: COLORS.bg },
+        headerTintColor: COLORS.text,
+        headerShadowVisible: false,
+        headerTitleStyle: { color: COLORS.text },
+        tabBarStyle: styles.tabBar,
+        tabBarActiveTintColor: COLORS.accent,
+        tabBarInactiveTintColor: COLORS.muted,
+        tabBarLabelStyle: styles.tabLabel,
+        tabBarIcon: ({ color, size }) => {
+          const icons = {
+            Log: 'barbell-outline',
+            History: 'time-outline',
+            Settings: 'options-outline',
+          };
+          return <Ionicons name={icons[route.name]} size={size} color={color} />;
+        },
+      })}
+    >
+      <FitnessTab.Screen name="Log" component={FitnessScreen} options={{ title: 'Fitness Log' }} />
+      <FitnessTab.Screen
+        name="History"
+        component={FitnessHistoryScreen}
+        options={{ title: 'History' }}
+      />
+      <FitnessTab.Screen
+        name="Settings"
+        component={FitnessSettingsScreen}
+        options={{ title: 'Settings' }}
+      />
+    </FitnessTab.Navigator>
   );
 }
 
 function RootNavigator() {
   const { isAuthenticated } = useAuth();
+  const [isReady, setIsReady] = useState(false);
+  const [savedCategory, setSavedCategory] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!isAuthenticated) {
+      setSavedCategory(null);
+      setIsReady(true);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    setIsReady(false);
+    getSavedCategory().then((category) => {
+      if (!isMounted) return;
+      setSavedCategory(category);
+      setIsReady(true);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  if (!isReady) {
+    return (
+      <View style={styles.loadingRoot}>
+        <ActivityIndicator color={COLORS.accent} />
+      </View>
+    );
+  }
+
+  const initialRouteName =
+    savedCategory === APP_CATEGORY.MOVIES
+      ? 'MoviesApp'
+      : savedCategory === APP_CATEGORY.FITNESS
+        ? 'FitnessApp'
+        : 'CategorySelector';
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {isAuthenticated ? (
-        <>
-          <Stack.Screen name="Root" component={Tabs} />
-          <Stack.Screen name="Movie" component={MovieDetailScreen} />
-        </>
-      ) : (
-        <Stack.Screen name="Login" component={LoginScreen} />
-      )}
+    <Stack.Navigator
+      key={`auth-${initialRouteName}`}
+      screenOptions={{ headerShown: false }}
+      initialRouteName={initialRouteName}
+    >
+      <Stack.Screen name="CategorySelector" component={CategorySelectorScreen} />
+      <Stack.Screen name="MoviesApp" component={MoviesAppNavigator} />
+      <Stack.Screen name="FitnessApp" component={FitnessAppNavigator} />
+      <Stack.Screen name="Movie" component={MovieDetailScreen} />
     </Stack.Navigator>
   );
 }
@@ -274,5 +366,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 8,
+  },
+  loadingRoot: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

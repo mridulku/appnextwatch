@@ -98,6 +98,11 @@ const styles = StyleSheet.create({
   cardCinema: {
     backgroundColor: '#000',
   },
+  clipMeta: {
+    paddingHorizontal: 20,
+    paddingTop: 14,
+    paddingBottom: 10,
+  },
   clipTitle: {
     color: COLORS.text,
     fontSize: 14,
@@ -111,8 +116,3 @@ const styles = StyleSheet.create({
 });
 
 export default MovieClipsSection;
-  clipMeta: {
-    paddingHorizontal: 20,
-    paddingTop: 14,
-    paddingBottom: 10,
-  },
