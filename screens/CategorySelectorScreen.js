@@ -17,18 +17,11 @@ function CategorySelectorScreen({ navigation }) {
     },
     {
       id: APP_CATEGORY.FITNESS,
-      title: 'Fitness',
-      body: 'Workout logging mini-app and training notes.',
-      icon: 'barbell-outline',
-      routeName: 'FitnessApp',
+      title: 'Fitness / Food',
+      body: 'Unified wellness cockpit: sessions, home, library, and food.',
+      icon: 'sparkles-outline',
+      routeName: 'WellnessApp',
       enabled: true,
-    },
-    {
-      id: 'food',
-      title: 'Food',
-      body: 'Coming soon',
-      icon: 'restaurant-outline',
-      enabled: false,
     },
     {
       id: 'travel',

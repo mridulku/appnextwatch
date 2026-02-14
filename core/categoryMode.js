@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const APP_CATEGORY = {
   MOVIES: 'movies',
   FITNESS: 'fitness',
+  FOOD: 'food',
 };
 
 const CATEGORY_KEY = 'appnextwatch:selected_category';
@@ -11,7 +12,13 @@ export async function getSavedCategory() {
   try {
     const value = await AsyncStorage.getItem(CATEGORY_KEY);
     if (!value) return null;
-    if (value === APP_CATEGORY.MOVIES || value === APP_CATEGORY.FITNESS) return value;
+    if (
+      value === APP_CATEGORY.MOVIES ||
+      value === APP_CATEGORY.FITNESS ||
+      value === APP_CATEGORY.FOOD
+    ) {
+      return value;
+    }
     return null;
   } catch (error) {
     console.warn('Failed to load selected category.', error?.message ?? error);
@@ -20,7 +27,13 @@ export async function getSavedCategory() {
 }
 
 export async function saveCategory(category) {
-  if (category !== APP_CATEGORY.MOVIES && category !== APP_CATEGORY.FITNESS) return;
+  if (
+    category !== APP_CATEGORY.MOVIES &&
+    category !== APP_CATEGORY.FITNESS &&
+    category !== APP_CATEGORY.FOOD
+  ) {
+    return;
+  }
   try {
     await AsyncStorage.setItem(CATEGORY_KEY, category);
   } catch (error) {

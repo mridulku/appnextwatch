@@ -25,31 +25,43 @@ import DirectoryScreen from './screens/DirectoryScreen';
 import ListsHomeScreen from './screens/ListsHomeScreen';
 import ListDetailScreen from './screens/ListDetailScreen';
 import FilmsWatchedScreen from './screens/FilmsWatchedScreen';
-import FitnessScreen from './screens/FitnessScreen';
-import FitnessHistoryScreen from './screens/FitnessHistoryScreen';
-import FitnessSettingsScreen from './screens/FitnessSettingsScreen';
+import GymMachineDetailScreen from './screens/GymMachineDetailScreen';
+import ExerciseDetailScreen from './screens/ExerciseDetailScreen';
+import CookRecipeScreen from './screens/CookRecipeScreen';
+import LibraryHubScreen from './screens/LibraryHubScreen';
+import FoodHubScreen from './screens/FoodHubScreen';
+import WellnessHomeScreen from './screens/WellnessHomeScreen';
+import ExerciseSessionScreen from './screens/ExerciseSessionScreen';
+import CookingSessionHomeScreen from './screens/CookingSessionHomeScreen';
+import WellnessSettingsScreen from './screens/WellnessSettingsScreen';
 import CategorySelectorScreen from './screens/CategorySelectorScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PreferencesProvider } from './context/PreferencesContext';
 import { APP_CATEGORY, getSavedCategory } from './core/categoryMode';
 
 const MovieTab = createBottomTabNavigator();
-const FitnessTab = createBottomTabNavigator();
+const WellnessTab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
 const DirectoryStack = createNativeStackNavigator();
 const ListsStack = createNativeStackNavigator();
+const WellnessExerciseStack = createNativeStackNavigator();
+const WellnessCookingStack = createNativeStackNavigator();
+const WellnessHomeStack = createNativeStackNavigator();
+const WellnessLibraryStack = createNativeStackNavigator();
+const WellnessFoodStack = createNativeStackNavigator();
+const WellnessSettingsStack = createNativeStackNavigator();
+
+const SHARED_STACK_OPTIONS = {
+  headerStyle: { backgroundColor: COLORS.bg },
+  headerTintColor: COLORS.text,
+  headerShadowVisible: false,
+  contentStyle: { backgroundColor: COLORS.bg },
+};
 
 function ProfileStackScreens() {
   return (
-    <ProfileStack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: COLORS.bg },
-        headerTintColor: COLORS.text,
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: COLORS.bg },
-      }}
-    >
+    <ProfileStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
       <ProfileStack.Screen
         name="ProfileHome"
         component={ProfileScreen}
@@ -71,14 +83,7 @@ function ProfileStackScreens() {
 
 function DirectoryStackScreens() {
   return (
-    <DirectoryStack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: COLORS.bg },
-        headerTintColor: COLORS.text,
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: COLORS.bg },
-      }}
-    >
+    <DirectoryStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
       <DirectoryStack.Screen
         name="DirectoryHome"
         component={DirectoryScreen}
@@ -135,14 +140,7 @@ function DirectoryStackScreens() {
 
 function ListsStackScreens() {
   return (
-    <ListsStack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: COLORS.bg },
-        headerTintColor: COLORS.text,
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: COLORS.bg },
-      }}
-    >
+    <ListsStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
       <ListsStack.Screen
         name="ListsHome"
         component={ListsHomeScreen}
@@ -227,40 +225,181 @@ function MoviesAppNavigator() {
   );
 }
 
-function FitnessAppNavigator() {
+function ExerciseSessionStackScreens() {
   return (
-    <FitnessTab.Navigator
+    <WellnessExerciseStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessExerciseStack.Screen
+        name="ExerciseSessionHome"
+        component={ExerciseSessionScreen}
+        options={{ title: 'Exercise Session' }}
+      />
+    </WellnessExerciseStack.Navigator>
+  );
+}
+
+function CookingSessionStackScreens() {
+  return (
+    <WellnessCookingStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessCookingStack.Screen
+        name="CookingSessionHome"
+        component={CookingSessionHomeScreen}
+        options={{ title: 'Cooking Session' }}
+      />
+      <WellnessCookingStack.Screen
+        name="CookingSessionRun"
+        component={CookRecipeScreen}
+        options={({ route }) => ({ title: route?.params?.recipeName ?? 'Cooking Session' })}
+      />
+    </WellnessCookingStack.Navigator>
+  );
+}
+
+function WellnessHomeStackScreens() {
+  return (
+    <WellnessHomeStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessHomeStack.Screen
+        name="WellnessHome"
+        component={WellnessHomeScreen}
+        options={{ title: 'Home' }}
+      />
+    </WellnessHomeStack.Navigator>
+  );
+}
+
+function LibraryStackScreens() {
+  return (
+    <WellnessLibraryStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessLibraryStack.Screen
+        name="LibraryHome"
+        component={LibraryHubScreen}
+        options={{ title: 'Library', headerShown: false }}
+      />
+      <WellnessLibraryStack.Screen
+        name="GymMachineDetail"
+        component={GymMachineDetailScreen}
+        options={({ route }) => ({ title: route.params?.machineName ?? 'Machine Details' })}
+      />
+      <WellnessLibraryStack.Screen
+        name="ExerciseDetail"
+        component={ExerciseDetailScreen}
+        options={({ route }) => ({ title: route.params?.exerciseName ?? 'Exercise Detail' })}
+      />
+    </WellnessLibraryStack.Navigator>
+  );
+}
+
+function FoodStackScreens() {
+  return (
+    <WellnessFoodStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessFoodStack.Screen
+        name="FoodHome"
+        component={FoodHubScreen}
+        options={{ title: 'Food', headerShown: false }}
+      />
+      <WellnessFoodStack.Screen
+        name="CookRecipe"
+        component={CookRecipeScreen}
+        options={({ route }) => ({ title: route?.params?.recipeName ?? 'Recipe' })}
+      />
+    </WellnessFoodStack.Navigator>
+  );
+}
+
+function WellnessSettingsStackScreens() {
+  return (
+    <WellnessSettingsStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessSettingsStack.Screen
+        name="WellnessSettings"
+        component={WellnessSettingsScreen}
+        options={{ title: 'Settings' }}
+      />
+    </WellnessSettingsStack.Navigator>
+  );
+}
+
+function WellnessAppNavigator() {
+  return (
+    <WellnessTab.Navigator
       screenOptions={({ route }) => ({
-        headerStyle: { backgroundColor: COLORS.bg },
-        headerTintColor: COLORS.text,
-        headerShadowVisible: false,
-        headerTitleStyle: { color: COLORS.text },
-        tabBarStyle: styles.tabBar,
+        headerShown: false,
+        tabBarStyle: styles.wellnessTabBar,
         tabBarActiveTintColor: COLORS.accent,
         tabBarInactiveTintColor: COLORS.muted,
-        tabBarLabelStyle: styles.tabLabel,
-        tabBarIcon: ({ color, size }) => {
+        tabBarLabelStyle: styles.wellnessTabLabel,
+        tabBarIcon: ({ color, focused }) => {
           const icons = {
-            Log: 'barbell-outline',
-            History: 'time-outline',
+            ExerciseSession: 'barbell-outline',
+            CookingSession: 'flame-outline',
+            Home: 'home',
+            Library: 'library-outline',
+            Food: 'restaurant-outline',
             Settings: 'options-outline',
           };
-          return <Ionicons name={icons[route.name]} size={size} color={color} />;
+
+          if (route.name === 'Home') {
+            return (
+              <View style={[styles.homeTabIconWrap, focused && styles.homeTabIconWrapActive]}>
+                <Ionicons name={icons.Home} size={22} color={focused ? COLORS.bg : COLORS.text} />
+              </View>
+            );
+          }
+
+          const iconSize = route.name === 'Settings' ? 18 : 20;
+          return <Ionicons name={icons[route.name]} size={iconSize} color={color} />;
         },
       })}
     >
-      <FitnessTab.Screen name="Log" component={FitnessScreen} options={{ title: 'Fitness Log' }} />
-      <FitnessTab.Screen
-        name="History"
-        component={FitnessHistoryScreen}
-        options={{ title: 'History' }}
+      <WellnessTab.Screen
+        name="ExerciseSession"
+        component={ExerciseSessionStackScreens}
+        options={{
+          title: 'Exercise Session',
+          tabBarLabel: 'Exercise',
+        }}
       />
-      <FitnessTab.Screen
+      <WellnessTab.Screen
+        name="CookingSession"
+        component={CookingSessionStackScreens}
+        options={{
+          title: 'Cooking Session',
+          tabBarLabel: 'Cooking',
+        }}
+      />
+      <WellnessTab.Screen
+        name="Home"
+        component={WellnessHomeStackScreens}
+        options={{
+          title: 'Home',
+          tabBarLabel: 'Home',
+          tabBarItemStyle: styles.homeTabItem,
+        }}
+      />
+      <WellnessTab.Screen
+        name="Library"
+        component={LibraryStackScreens}
+        options={{
+          title: 'Library',
+          tabBarLabel: 'Library',
+        }}
+      />
+      <WellnessTab.Screen
+        name="Food"
+        component={FoodStackScreens}
+        options={{
+          title: 'Food',
+          tabBarLabel: 'Food',
+        }}
+      />
+      <WellnessTab.Screen
         name="Settings"
-        component={FitnessSettingsScreen}
-        options={{ title: 'Settings' }}
+        component={WellnessSettingsStackScreens}
+        options={{
+          title: 'Settings',
+          tabBarLabel: 'Settings',
+          tabBarLabelStyle: styles.wellnessTabLabelSubtle,
+        }}
       />
-    </FitnessTab.Navigator>
+    </WellnessTab.Navigator>
   );
 }
 
@@ -311,8 +450,8 @@ function RootNavigator() {
   const initialRouteName =
     savedCategory === APP_CATEGORY.MOVIES
       ? 'MoviesApp'
-      : savedCategory === APP_CATEGORY.FITNESS
-        ? 'FitnessApp'
+      : savedCategory === APP_CATEGORY.FITNESS || savedCategory === APP_CATEGORY.FOOD
+        ? 'WellnessApp'
         : 'CategorySelector';
 
   return (
@@ -323,7 +462,9 @@ function RootNavigator() {
     >
       <Stack.Screen name="CategorySelector" component={CategorySelectorScreen} />
       <Stack.Screen name="MoviesApp" component={MoviesAppNavigator} />
-      <Stack.Screen name="FitnessApp" component={FitnessAppNavigator} />
+      <Stack.Screen name="WellnessApp" component={WellnessAppNavigator} />
+      <Stack.Screen name="FitnessApp" component={WellnessAppNavigator} />
+      <Stack.Screen name="FoodApp" component={WellnessAppNavigator} />
       <Stack.Screen name="Movie" component={MovieDetailScreen} />
     </Stack.Navigator>
   );
@@ -351,6 +492,42 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     fontSize: 11,
+  },
+  wellnessTabBar: {
+    backgroundColor: '#11141D',
+    borderTopWidth: 0,
+    height: 84,
+    paddingBottom: 11,
+    paddingTop: 8,
+  },
+  wellnessTabLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  wellnessTabLabelSubtle: {
+    fontSize: 9,
+    fontWeight: '600',
+  },
+  homeTabItem: {
+    marginTop: -10,
+  },
+  homeTabIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(245,201,106,0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(245,201,106,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  homeTabIconWrapActive: {
+    backgroundColor: COLORS.accent,
+    borderColor: COLORS.accent,
+    shadowColor: COLORS.shadow,
+    shadowOpacity: 0.28,
+    shadowRadius: 8,
+    elevation: 6,
   },
   searchButtonWrapper: {
     top: -18,
