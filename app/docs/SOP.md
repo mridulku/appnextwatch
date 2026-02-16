@@ -8,8 +8,8 @@ Applies to all code, config, docs, and navigation/behavior updates inside this r
 
 ## Core Rules (Mandatory)
 1. Commit to `main` only.
-2. Whenever behavior changes, update `docs/prd/NEXTWATCH_PRD.md`.
-3. At end of every working session, append one entry to `docs/log/WORKLOG.md`.
+2. Whenever behavior changes, update `app/docs/prd/NEXTWATCH_PRD.md`.
+3. At end of every working session, append one entry to `app/docs/log/WORKLOG.md`.
 4. Determine a meaningful session tag name based on repo state + actual changes.
 5. Create and push the tag when possible; if not possible, print exact commands for user.
 6. Keep tags meaningful and not too frequent.
@@ -32,7 +32,7 @@ Suggested commit format:
 
 ## PRD Update Policy
 When behavior changes, always update:
-- `docs/prd/NEXTWATCH_PRD.md`
+- `app/docs/prd/NEXTWATCH_PRD.md`
 
 Minimum required PRD refresh:
 - Affected section(s) in Context / Broad Flow / User Stories / Constraints.
@@ -47,7 +47,7 @@ PRD update checklist:
 
 ## Worklog Policy
 Always append one new entry to:
-- `docs/log/WORKLOG.md`
+- `app/docs/log/WORKLOG.md`
 
 Recommended entry format:
 ```
@@ -61,16 +61,16 @@ Recommended entry format:
 - Tag:
 ```
 
-If `docs/log/WORKLOG.md` does not exist:
+If `app/docs/log/WORKLOG.md` does not exist:
 - Create it with a top-level heading `# Worklog` and append the current session entry.
 
 ## Session Notes Artifact
 Each session must create a markdown notes artifact at:
-- `docs/sessions/YYYY-MM-DD/HHMM_<slug>.md`
+- `app/docs/sessions/YYYY-MM-DD/HHMM_<slug>.md`
 
 Minimum requirement:
 - `<slug>` should be short and meaningful for the session focus.
-- Session notes must be linkable from both `docs/log/WORKLOG.md` and `docs/sessions/INDEX.md`.
+- Session notes must be linkable from both `app/docs/log/WORKLOG.md` and `app/docs/sessions/INDEX.md`.
 
 ## Tagging Policy
 ### Goal
@@ -153,8 +153,8 @@ If tag push is not possible (permissions/network/auth):
 
 ## End-of-Session Checklist
 - [ ] Changes are committed to `main`.
-- [ ] `docs/prd/NEXTWATCH_PRD.md` updated if behavior changed.
-- [ ] `docs/log/WORKLOG.md` appended.
+- [ ] `app/docs/prd/NEXTWATCH_PRD.md` updated if behavior changed.
+- [ ] `app/docs/log/WORKLOG.md` appended.
 - [ ] Session tag name chosen.
 - [ ] Tag created/pushed OR exact commands provided to user.
 - [ ] Validation steps documented in worklog.
@@ -174,7 +174,7 @@ If any mandatory step cannot be completed:
 1. Clearly state what failed.
 2. State why it failed.
 3. Provide exact manual commands for the user.
-4. Record the pending action in `docs/log/WORKLOG.md`.
+4. Record the pending action in `app/docs/log/WORKLOG.md`.
 
 > RISK:
 > Skipping PRD/worklog/tag hygiene causes drift between code, documentation, and release history.
