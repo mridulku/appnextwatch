@@ -52,3 +52,13 @@
 - Tag: nw-2026-02-16-1315-navigation-folderize
 - Commit: TBD
 - Notes: app/docs/sessions/2026-02-16/1315_navigation-folderize.md
+
+## 2026-02-16 - Session end-checkpoint
+- Summary: Finalized SOP end-of-session artifacts and checkpoint metadata.
+- Changes: PRD implementation note added; new session note created; sessions index/latest and worklog updated.
+- Files: app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/INDEX.md, app/docs/sessions/LATEST.md, app/docs/sessions/2026-02-16/1321_repo-structure-folderize-checkpoint.md, app/docs/log/WORKLOG.md.
+- Behavior impact: No intended user-visible behavior change.
+- Validation performed: Repo status/diff checks completed; git show/git status verification performed after push.
+- Follow-ups / risks: Backfill any stale path mentions in older docs if needed.
+- Tag: nw-2026-02-16-1321-docs-checkpoint
+- Notes: app/docs/sessions/2026-02-16/1321_repo-structure-folderize-checkpoint.md

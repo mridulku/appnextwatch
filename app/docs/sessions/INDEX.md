@@ -2,6 +2,7 @@
 
 | Date | Time | Tag | Commit | Title (1 line) | Notes link |
 |---|---|---|---|---|---|
+| 2026-02-16 | 13:21 | nw-2026-02-16-1321-docs-checkpoint | TBD | end-of-session checkpoint (docs + metadata) | [1321_repo-structure-folderize-checkpoint.md](2026-02-16/1321_repo-structure-folderize-checkpoint.md) |
 | 2026-02-16 | 13:15 | nw-2026-02-16-1315-navigation-folderize | TBD | folderize by navigation + core/data structure | [1315_navigation-folderize.md](2026-02-16/1315_navigation-folderize.md) |
 | 2026-02-16 | 12:59 | nw-2026-02-16-1259-docs-repo-structure | TBD | consolidate active code into app/ + archive unused screens | [1259_repo-consolidation.md](2026-02-16/1259_repo-consolidation.md) |
 | 2026-02-16 | 09:52 | nw-2026-02-16-0952-docs-session-ledger | TBD | SOP + session ledger scaffolding | [0952_sop-session-ledger.md](2026-02-16/0952_sop-session-ledger.md) |

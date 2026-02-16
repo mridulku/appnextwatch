@@ -4,6 +4,14 @@
 | Version | Date | Author | Notes |
 |---|---|---|---|
 | 0.1 | 2026-02-16 | Codex (code-grounded draft) | Initial PRD derived from current `appnextwatch` implementation |
+| 0.2 | 2026-02-16 | Codex | Repository folderization by navigation/domain (`app/features`, `app/core/*`, `app/data/*`); no intended user-visible behavior change |
+
+### Implementation Notes
+- 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
+  - Screen files grouped under `app/features/{movies,wellness,shared}`.
+  - Core modules grouped by responsibility under `app/core/{api,storage,integrations,utils,schema}`.
+  - Data files grouped by domain under `app/data/{movies,wellness,seeds,supabase}`.
+- Product behavior, route names, and user flows are intended to remain unchanged; this is a structural maintainability refactor.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.
