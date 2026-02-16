@@ -62,3 +62,13 @@
 - Follow-ups / risks: Backfill any stale path mentions in older docs if needed.
 - Tag: nw-2026-02-16-1321-docs-checkpoint
 - Notes: app/docs/sessions/2026-02-16/1321_repo-structure-folderize-checkpoint.md
+
+## 2026-02-16 - Session wellness-test-tab
+- Summary: Added Wellness `Test` tab with Supabase/OpenAI validation tools.
+- Changes: New Test stack and screens (`TestHome`, `TestTables`, `TestChat`), known Supabase tables helper, PRD implementation-note update.
+- Files: app/App.js, app/features/wellness/test/*, app/core/api/supabaseTables.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/log/WORKLOG.md, app/docs/sessions/*.
+- Behavior impact: Adds a new wellness bottom tab for diagnostic testing; existing product flows unchanged.
+- Validation performed: Static unresolved-import scan passed (`UNRESOLVED_NON_ARCHIVE 0`); `.env` confirmed ignored and untracked.
+- Follow-ups / risks: Full runtime smoke test on simulator/device still recommended.
+- Tag: nw-2026-02-16-1619-test-tab-supabase-openai
+- Notes: app/docs/sessions/2026-02-16/1619_test-tab-supabase-openai.md

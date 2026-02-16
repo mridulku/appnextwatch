@@ -5,6 +5,7 @@
 |---|---|---|---|
 | 0.1 | 2026-02-16 | Codex (code-grounded draft) | Initial PRD derived from current `appnextwatch` implementation |
 | 0.2 | 2026-02-16 | Codex | Repository folderization by navigation/domain (`app/features`, `app/core/*`, `app/data/*`); no intended user-visible behavior change |
+| 0.3 | 2026-02-16 | Codex | Added Wellness `Test` tab (Tables + Chat) for Supabase/OpenAI connectivity validation; existing product flows unchanged |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -12,6 +13,13 @@
   - Core modules grouped by responsibility under `app/core/{api,storage,integrations,utils,schema}`.
   - Data files grouped by domain under `app/data/{movies,wellness,seeds,supabase}`.
 - Product behavior, route names, and user flows are intended to remain unchanged; this is a structural maintainability refactor.
+- 2026-02-16: Added a new Wellness `Test` tab with a dedicated stack:
+  - `TestHome`: launcher for test tools.
+  - `TestTables`: Supabase env/config status, connection check, known-table probes, manual table sample fetch.
+  - `TestChat`: OpenAI env/config status and minimal chat connectivity test using existing OpenAI integration.
+- Security handling kept explicit:
+  - `.env` remains gitignored and not tracked.
+  - UI/logs surface key state only as `configured: yes/no` and never print secret values.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

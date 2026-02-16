@@ -38,6 +38,9 @@ import WellnessHomeScreen from './features/wellness/home/WellnessHomeScreen';
 import GymHubScreen from './features/wellness/gym/GymHubScreen';
 import HomeSettingsScreen from './features/wellness/home/HomeSettingsScreen';
 import CategorySelectorScreen from './features/shared/category/CategorySelectorScreen';
+import TestHomeScreen from './features/wellness/test/TestHomeScreen';
+import TestTablesScreen from './features/wellness/test/TestTablesScreen';
+import TestChatScreen from './features/wellness/test/TestChatScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PreferencesProvider } from './context/PreferencesContext';
 import { APP_CATEGORY, getSavedCategory } from './core/storage/categoryMode';
@@ -52,6 +55,7 @@ const WellnessSessionStack = createNativeStackNavigator();
 const WellnessHomeStack = createNativeStackNavigator();
 const WellnessGymStack = createNativeStackNavigator();
 const WellnessFoodStack = createNativeStackNavigator();
+const WellnessTestStack = createNativeStackNavigator();
 
 const SHARED_STACK_OPTIONS = {
   headerStyle: { backgroundColor: COLORS.bg },
@@ -332,6 +336,28 @@ function FoodStackScreens() {
   );
 }
 
+function TestStackScreens() {
+  return (
+    <WellnessTestStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessTestStack.Screen
+        name="TestHome"
+        component={TestHomeScreen}
+        options={{ title: 'Test Tools' }}
+      />
+      <WellnessTestStack.Screen
+        name="TestTables"
+        component={TestTablesScreen}
+        options={{ title: 'Tables' }}
+      />
+      <WellnessTestStack.Screen
+        name="TestChat"
+        component={TestChatScreen}
+        options={{ title: 'Chat' }}
+      />
+    </WellnessTestStack.Navigator>
+  );
+}
+
 function WellnessAppNavigator() {
   return (
     <WellnessTab.Navigator
@@ -348,6 +374,7 @@ function WellnessAppNavigator() {
             Sessions: 'pulse-outline',
             Gym: 'barbell-outline',
             Food: 'restaurant-outline',
+            Test: 'flask-outline',
           };
           return <Ionicons name={icons[route.name]} size={20} color={color} />;
         },
@@ -383,6 +410,14 @@ function WellnessAppNavigator() {
         options={{
           title: 'Food',
           tabBarLabel: 'Food',
+        }}
+      />
+      <WellnessTab.Screen
+        name="Test"
+        component={TestStackScreens}
+        options={{
+          title: 'Test',
+          tabBarLabel: 'Test',
         }}
       />
     </WellnessTab.Navigator>
