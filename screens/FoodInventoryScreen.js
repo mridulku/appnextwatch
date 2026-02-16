@@ -22,6 +22,7 @@ import {
   parseVoiceCommand,
   toCanonicalUnit,
 } from '../core/foodVoiceParser';
+import CollapsibleSection from '../components/CollapsibleSection';
 import { loadFoodInventory, saveFoodInventory } from '../core/foodInventoryStorage';
 import COLORS from '../theme/colors';
 
@@ -121,6 +122,7 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
   const insets = useSafeAreaInsets();
   const [inventory, setInventory] = useState([]);
   const [hydrated, setHydrated] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState({});
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [recognizedText, setRecognizedText] = useState('');
@@ -212,12 +214,22 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
 
     return sortedCategories.map((category) => ({
       title: category,
+      itemCount: grouped[category].length,
       data: grouped[category]
         .slice()
         .sort((a, b) => a.name.localeCompare(b.name)),
       meta: CATEGORY_META[category] ?? { emoji: '🧺', note: 'Kitchen inventory' },
     }));
   }, [inventory]);
+
+  const visibleSections = useMemo(
+    () =>
+      sections.map((section) => ({
+        ...section,
+        data: expandedCategories[section.title] ? section.data : [],
+      })),
+    [expandedCategories, sections],
+  );
 
   const showSnackbar = (message) => {
     setSnackbarMessage(message);
@@ -357,17 +369,24 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     showSnackbar('Item added');
   };
 
+  const toggleCategory = (title) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [title]: !prev[title],
+    }));
+  };
+
   const renderSectionHeader = ({ section }) => (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionEmoji}>{section.meta.emoji}</Text>
-      <View style={styles.sectionTextWrap}>
-        <Text style={styles.sectionTitle}>{section.title}</Text>
-        <Text style={styles.sectionSubtle}>{section.meta.note}</Text>
-      </View>
-      <View style={styles.sectionCountPill}>
-        <Text style={styles.sectionCountText}>{section.data.length}</Text>
-      </View>
-    </View>
+    <CollapsibleSection
+      title={section.title}
+      subtitle={section.meta.note}
+      icon={section.meta.emoji}
+      iconIsEmoji
+      expanded={Boolean(expandedCategories[section.title])}
+      onToggle={() => toggleCategory(section.title)}
+      countLabel={`${section.itemCount} items`}
+      style={styles.sectionCardWrap}
+    />
   );
 
   const renderItem = ({ item }) => {
@@ -454,7 +473,7 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
         ) : null}
 
         <SectionList
-          sections={sections}
+          sections={visibleSections}
           keyExtractor={(item) => item.id}
           renderSectionHeader={renderSectionHeader}
           renderItem={renderItem}
@@ -466,10 +485,12 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
             },
           ]}
           ListEmptyComponent={
-            <View style={styles.emptyWrap}>
-              <Text style={styles.emptyTitle}>No pantry items yet</Text>
-              <Text style={styles.emptySubtle}>Tap Add Item to create your first inventory entry.</Text>
-            </View>
+            inventory.length === 0 ? (
+              <View style={styles.emptyWrap}>
+                <Text style={styles.emptyTitle}>No pantry items yet</Text>
+                <Text style={styles.emptySubtle}>Tap Add Item to create your first inventory entry.</Text>
+              </View>
+            ) : null
           }
           showsVerticalScrollIndicator={false}
         />
@@ -767,6 +788,10 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 18,
+  },
+  sectionCardWrap: {
+    marginTop: 10,
+    marginBottom: 8,
   },
   sectionHeader: {
     marginTop: 10,

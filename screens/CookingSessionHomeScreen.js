@@ -6,7 +6,7 @@ import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity,
 import { FOOD_RECIPE_FILTERS, FOOD_RECIPES } from '../data/foodRecipes';
 import COLORS from '../theme/colors';
 
-function CookingSessionHomeScreen({ navigation }) {
+function CookingSessionHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const [selectedFilter, setSelectedFilter] = useState('All');
 
   const filteredRecipes = useMemo(() => {
@@ -58,17 +58,23 @@ function CookingSessionHomeScreen({ navigation }) {
     );
   };
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.headerWrap}>
-          <Text style={styles.title}>Cooking Session</Text>
-          <Text style={styles.subtitle}>Pick a recipe and run guided cooking with timer and chef chat.</Text>
+  const RootContainer = embedded ? View : SafeAreaView;
 
-          <View style={styles.helperCard}>
-            <Ionicons name="flame-outline" size={16} color={COLORS.accent} />
-            <Text style={styles.helperText}>Recipe browser remains under Food tab. This tab is for session running.</Text>
-          </View>
+  return (
+    <RootContainer style={styles.safeArea}>
+      <View style={[styles.container, embedded && styles.containerEmbedded]}>
+        <View style={[styles.headerWrap, !showHeader && styles.headerWrapCompact]}>
+          {showHeader ? (
+            <>
+              <Text style={styles.title}>Cooking Session</Text>
+              <Text style={styles.subtitle}>Pick a recipe and run guided cooking with timer and chef chat.</Text>
+
+              <View style={styles.helperCard}>
+                <Ionicons name="flame-outline" size={16} color={COLORS.accent} />
+                <Text style={styles.helperText}>Recipe browser remains under Food tab. This tab is for session running.</Text>
+              </View>
+            </>
+          ) : null}
 
           <ScrollView
             horizontal
@@ -105,7 +111,7 @@ function CookingSessionHomeScreen({ navigation }) {
           }
         />
       </View>
-    </SafeAreaView>
+    </RootContainer>
   );
 }
 
@@ -120,8 +126,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 10,
   },
+  containerEmbedded: {
+    paddingTop: 6,
+  },
   headerWrap: {
     marginBottom: 10,
+  },
+  headerWrapCompact: {
+    marginBottom: 8,
   },
   title: {
     color: COLORS.text,

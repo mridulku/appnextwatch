@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { addSessionToHistory, createSessionHistoryId } from '../core/sessionHistoryStorage';
 import { getFoodRecipeById } from '../data/foodRecipes';
 import COLORS from '../theme/colors';
 
@@ -68,9 +69,42 @@ function createChatMessage(role, text) {
   };
 }
 
-function CookRecipeScreen({ route }) {
+function normalizeSessionRecipe(rawRecipe) {
+  if (!rawRecipe || typeof rawRecipe !== 'object') return null;
+  if (!Array.isArray(rawRecipe.steps) || rawRecipe.steps.length === 0) return null;
+
+  return {
+    id: String(rawRecipe.id ?? `session_recipe_${Date.now()}`),
+    name: String(rawRecipe.name ?? 'Session Recipe'),
+    emoji: String(rawRecipe.emoji ?? '🍽️'),
+    imageColors: Array.isArray(rawRecipe.imageColors) && rawRecipe.imageColors.length >= 2
+      ? rawRecipe.imageColors
+      : ['#5D84B9', '#324A72'],
+    totalTimeMinutes: Math.max(5, Number(rawRecipe.totalTimeMinutes) || 20),
+    servings: Math.max(1, Number(rawRecipe.servings) || 2),
+    difficulty: String(rawRecipe.difficulty ?? 'Easy'),
+    tags: Array.isArray(rawRecipe.tags) ? rawRecipe.tags.map((tag) => String(tag)) : ['Session'],
+    ingredients: Array.isArray(rawRecipe.ingredients)
+      ? rawRecipe.ingredients.map((item) => String(item))
+      : [],
+    steps: rawRecipe.steps.map((step, index) => ({
+      id: String(step.id ?? `session_step_${index}`),
+      title: String(step.title ?? `Step ${index + 1}`),
+      instruction: String(step.instruction ?? ''),
+      suggestedMinutes: Math.max(1, Number(step.suggestedMinutes) || 2),
+      emoji: String(step.emoji ?? '🧑‍🍳'),
+    })),
+  };
+}
+
+function CookRecipeScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
-  const recipe = useMemo(() => getFoodRecipeById(route.params?.recipeId), [route.params?.recipeId]);
+  const isSessionMode = Boolean(route.params?.sessionMode);
+  const recipe = useMemo(() => {
+    const sessionRecipe = normalizeSessionRecipe(route.params?.sessionRecipe);
+    if (sessionRecipe) return sessionRecipe;
+    return getFoodRecipeById(route.params?.recipeId);
+  }, [route.params?.recipeId, route.params?.sessionRecipe]);
 
   const totalRecipeSeconds = recipe.totalTimeMinutes * 60;
 
@@ -79,6 +113,9 @@ function CookRecipeScreen({ route }) {
   const [expandedStepMap, setExpandedStepMap] = useState({});
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [sessionStartedAt, setSessionStartedAt] = useState(
+    route.params?.startedAt ?? new Date().toISOString(),
+  );
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
@@ -98,6 +135,13 @@ function CookRecipeScreen({ route }) {
 
   const voiceTimeoutRef = useRef(null);
   const toastTimeoutRef = useRef(null);
+  const hasSessionLoggedRef = useRef(false);
+  const latestSnapshotRef = useRef({
+    elapsedSeconds: 0,
+    stepStates: createInitialStepStates(recipe),
+    completedCount: 0,
+    sessionStartedAt: route.params?.startedAt ?? new Date().toISOString(),
+  });
 
   useEffect(() => {
     if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -111,13 +155,15 @@ function CookRecipeScreen({ route }) {
     setExpandedStepMap({ [recipe.steps[0]?.id]: true });
     setElapsedSeconds(0);
     setIsTimerRunning(false);
+    setSessionStartedAt(route.params?.startedAt ?? new Date().toISOString());
     setChatOpen(false);
     setChatInput('');
     setChatMessages([
       createChatMessage('chef', `Starting ${recipe.name}. Ask for next step, timer updates, or substitutions.`),
     ]);
     progressAnim.setValue(0);
-  }, [recipe, progressAnim]);
+    hasSessionLoggedRef.current = false;
+  }, [progressAnim, recipe, route.params?.startedAt]);
 
   useFocusEffect(
     useCallback(() => {
@@ -212,12 +258,65 @@ function CookRecipeScreen({ route }) {
     return () => clearTimeout(timeout);
   }, [chatMessages, chatOpen]);
 
+  const createHistoryRecord = useCallback(
+    (status, snapshot) => ({
+      id: String(route.params?.sessionId ?? createSessionHistoryId('cooking')),
+      type: 'cooking',
+      title: String(route.params?.sessionTitle ?? `Cooked: ${recipe.name}`),
+      startedAt:
+        snapshot.sessionStartedAt ??
+        new Date(Date.now() - Math.max(0, snapshot.elapsedSeconds) * 1000).toISOString(),
+      endedAt: new Date().toISOString(),
+      durationSeconds: Math.max(0, Number(snapshot.elapsedSeconds) || 0),
+      status,
+      summary: {
+        recipeName: recipe.name,
+        stepsCompleted: snapshot.completedCount,
+        totalSteps: recipe.steps.length,
+        activeTimeMinutes: Math.round((Number(snapshot.elapsedSeconds) || 0) / 60),
+        timeline: recipe.steps.map((step, index) => ({
+          title: step.title,
+          status: snapshot.stepStates[index]?.status ?? 'pending',
+          note: `Step ${index + 1}`,
+        })),
+      },
+    }),
+    [recipe.name, recipe.steps, route.params?.sessionId, route.params?.sessionTitle],
+  );
+
+  const persistSessionRecord = useCallback(
+    async (status, shouldOpenSummary = true) => {
+      if (!isSessionMode || hasSessionLoggedRef.current) return null;
+      const snapshot = latestSnapshotRef.current;
+      if ((snapshot.elapsedSeconds ?? 0) <= 0 && status === 'abandoned') return null;
+
+      const record = createHistoryRecord(status, snapshot);
+      hasSessionLoggedRef.current = true;
+      await addSessionToHistory(record);
+
+      if (shouldOpenSummary && navigation?.navigate) {
+        navigation.navigate('SessionSummary', { sessionRecord: record });
+      }
+
+      return record;
+    },
+    [createHistoryRecord, isSessionMode, navigation],
+  );
+
   useEffect(
     () => () => {
       if (voiceTimeoutRef.current) clearTimeout(voiceTimeoutRef.current);
       if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+
+      if (isSessionMode && !hasSessionLoggedRef.current) {
+        const snapshot = latestSnapshotRef.current;
+        if ((snapshot.elapsedSeconds ?? 0) > 0) {
+          void addSessionToHistory(createHistoryRecord('abandoned', snapshot));
+          hasSessionLoggedRef.current = true;
+        }
+      }
     },
-    [],
+    [createHistoryRecord, isSessionMode],
   );
 
   const currentStepIndex = useMemo(
@@ -230,6 +329,15 @@ function CookRecipeScreen({ route }) {
   const completedCount = stepStates.filter((step) => step.status === 'done').length;
   const allStepsDone = completedCount === recipe.steps.length;
   const inProgressIndex = stepStates.findIndex((step) => step.status === 'in_progress');
+
+  useEffect(() => {
+    latestSnapshotRef.current = {
+      elapsedSeconds,
+      stepStates,
+      completedCount,
+      sessionStartedAt,
+    };
+  }, [completedCount, elapsedSeconds, sessionStartedAt, stepStates]);
 
   const progressWidth = progressAnim.interpolate({
     inputRange: [0, 1],
@@ -383,6 +491,20 @@ function CookRecipeScreen({ route }) {
     if (result.completed) return 'Great finish. Recipe complete 🎉';
     return `Step ${targetIndex + 1} done. Continue with Step ${result.nextIndex + 1}.`;
   }, [allStepsDone, currentStepIndex, markStepDone, showToast, stepStates]);
+
+  const finishSession = useCallback(() => {
+    if (!isSessionMode) return;
+    if (allStepsDone) {
+      void persistSessionRecord('completed', true);
+      return;
+    }
+    void persistSessionRecord('abandoned', true);
+  }, [allStepsDone, isSessionMode, persistSessionRecord]);
+
+  useEffect(() => {
+    if (!isSessionMode || !allStepsDone || hasSessionLoggedRef.current) return;
+    void persistSessionRecord('completed', true);
+  }, [allStepsDone, isSessionMode, persistSessionRecord]);
 
   const toggleTimer = useCallback(() => {
     if (allStepsDone) {
@@ -777,6 +899,23 @@ function CookRecipeScreen({ route }) {
               <Ionicons name="checkmark-done" size={14} color={COLORS.text} />
               <Text style={styles.controlText}>Done</Text>
             </TouchableOpacity>
+
+            {isSessionMode ? (
+              <TouchableOpacity
+                style={[styles.controlButton, allStepsDone ? styles.controlButtonPrimary : null]}
+                activeOpacity={0.9}
+                onPress={finishSession}
+              >
+                <Ionicons
+                  name={allStepsDone ? 'checkmark-circle' : 'stop-circle-outline'}
+                  size={14}
+                  color={allStepsDone ? COLORS.bg : COLORS.text}
+                />
+                <Text style={allStepsDone ? styles.controlPrimaryText : styles.controlText}>
+                  Finish
+                </Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
 
@@ -1247,6 +1386,7 @@ const styles = StyleSheet.create({
   controlButtonsRow: {
     marginTop: 8,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 7,
   },
   controlButton: {

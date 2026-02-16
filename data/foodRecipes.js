@@ -10,6 +10,7 @@ export const FOOD_RECIPES = [
     servings: 2,
     difficulty: 'Easy',
     tags: ['Quick', 'Protein'],
+    mealCategory: 'Breakfast',
     ingredients: [
       '4 eggs',
       '1 onion (finely chopped)',
@@ -68,6 +69,7 @@ export const FOOD_RECIPES = [
     servings: 2,
     difficulty: 'Medium',
     tags: ['Protein', 'Veg'],
+    mealCategory: 'Lunch',
     ingredients: [
       '200 g paneer cubes',
       '1 capsicum',
@@ -132,6 +134,7 @@ export const FOOD_RECIPES = [
     servings: 3,
     difficulty: 'Medium',
     tags: ['Veg'],
+    mealCategory: 'Lunch',
     ingredients: [
       '1 cup toor dal',
       '1 tomato',
@@ -189,6 +192,7 @@ export const FOOD_RECIPES = [
     servings: 2,
     difficulty: 'Medium',
     tags: ['Protein'],
+    mealCategory: 'Dinner',
     ingredients: [
       '250 g chicken breast',
       '2 cups cooked rice',
@@ -253,6 +257,7 @@ export const FOOD_RECIPES = [
     servings: 1,
     difficulty: 'Easy',
     tags: ['Quick', 'Veg'],
+    mealCategory: 'Breakfast',
     ingredients: [
       '1/2 cup oats',
       '1 cup milk or water',
@@ -294,6 +299,7 @@ export const FOOD_RECIPES = [
     servings: 2,
     difficulty: 'Easy',
     tags: ['Quick', 'Veg', 'Snacks'],
+    mealCategory: 'Snacks',
     ingredients: [
       '2 cups poha',
       '1 onion',

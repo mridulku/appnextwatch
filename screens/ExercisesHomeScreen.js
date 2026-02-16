@@ -12,12 +12,14 @@ import {
   View,
 } from 'react-native';
 
+import CollapsibleSection from '../components/CollapsibleSection';
 import { FITNESS_EXERCISES } from '../data/fitnessExercises';
 import COLORS from '../theme/colors';
 
 const TYPE_FILTERS = ['All', 'Compound', 'Isolation', 'Cardio', 'Mobility'];
 const MUSCLE_FILTERS = ['All', 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core'];
 const EQUIPMENT_FILTERS = ['All', 'Dumbbell', 'Barbell', 'Cable', 'Machine', 'Bodyweight'];
+const MUSCLE_GROUP_ORDER = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio / Mobility', 'Other'];
 
 const EQUIPMENT_ICONS = {
   dumbbell: 'barbell-outline',
@@ -25,6 +27,17 @@ const EQUIPMENT_ICONS = {
   cable: 'git-branch-outline',
   machine: 'apps-outline',
   bodyweight: 'body-outline',
+};
+
+const MUSCLE_GROUP_META = {
+  Chest: { icon: 'heart-outline', note: 'Press and fly movement patterns.' },
+  Back: { icon: 'body-outline', note: 'Rows, pulls, and posterior-chain back work.' },
+  Legs: { icon: 'walk-outline', note: 'Squat, hinge, and lower body drive patterns.' },
+  Shoulders: { icon: 'fitness-outline', note: 'Deltoid-focused presses and raises.' },
+  Arms: { icon: 'barbell-outline', note: 'Biceps, triceps, and forearm isolation.' },
+  Core: { icon: 'shield-outline', note: 'Bracing, anti-rotation, and trunk control.' },
+  'Cardio / Mobility': { icon: 'pulse-outline', note: 'Conditioning and mobility-focused work.' },
+  Other: { icon: 'albums-outline', note: 'Mixed and uncategorized movements.' },
 };
 
 function getIntensityTone(intensity) {
@@ -51,11 +64,36 @@ function getIntensityTone(intensity) {
   };
 }
 
+function normalizeMuscleToken(token) {
+  return String(token ?? '').trim().toLowerCase();
+}
+
+function resolvePrimaryMuscleGroup(exercise) {
+  const type = String(exercise?.type ?? '').toLowerCase();
+  const tokens = [
+    ...(Array.isArray(exercise?.primaryMuscles) ? exercise.primaryMuscles : []),
+    ...(Array.isArray(exercise?.secondaryMuscles) ? exercise.secondaryMuscles : []),
+  ].map(normalizeMuscleToken);
+
+  const hasToken = (parts) => tokens.some((token) => parts.some((part) => token.includes(part)));
+
+  if (type === 'cardio' || type === 'mobility' || hasToken(['cardio', 'mobility'])) return 'Cardio / Mobility';
+  if (hasToken(['chest', 'pec'])) return 'Chest';
+  if (hasToken(['back', 'lat', 'trap', 'rhomboid'])) return 'Back';
+  if (hasToken(['leg', 'quad', 'hamstring', 'glute', 'calf'])) return 'Legs';
+  if (hasToken(['shoulder', 'delt'])) return 'Shoulders';
+  if (hasToken(['arm', 'bicep', 'tricep', 'forearm'])) return 'Arms';
+  if (hasToken(['core', 'ab', 'oblique'])) return 'Core';
+
+  return 'Other';
+}
+
 function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const [searchText, setSearchText] = useState('');
   const [selectedType, setSelectedType] = useState('All');
   const [selectedMuscle, setSelectedMuscle] = useState('All');
   const [selectedEquipment, setSelectedEquipment] = useState('All');
+  const [expandedGroups, setExpandedGroups] = useState({});
 
   const filteredExercises = useMemo(() => {
     const needle = searchText.trim().toLowerCase();
@@ -81,6 +119,26 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
     });
   }, [searchText, selectedType, selectedMuscle, selectedEquipment]);
 
+  const hasSearchQuery = searchText.trim().length > 0;
+
+  const groupedExercises = useMemo(() => {
+    if (hasSearchQuery) return [];
+
+    const grouped = filteredExercises.reduce((acc, exercise) => {
+      const group = resolvePrimaryMuscleGroup(exercise);
+      if (!acc[group]) acc[group] = [];
+      acc[group].push(exercise);
+      return acc;
+    }, {});
+
+    return MUSCLE_GROUP_ORDER.filter((group) => grouped[group]?.length > 0).map((group) => ({
+      group,
+      icon: MUSCLE_GROUP_META[group]?.icon ?? MUSCLE_GROUP_META.Other.icon,
+      note: MUSCLE_GROUP_META[group]?.note ?? MUSCLE_GROUP_META.Other.note,
+      exercises: grouped[group].slice().sort((a, b) => a.name.localeCompare(b.name)),
+    }));
+  }, [filteredExercises, hasSearchQuery]);
+
   const openExercise = (exercise) => {
     navigation.navigate('ExerciseDetail', {
       exerciseId: exercise.id,
@@ -88,17 +146,24 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
     });
   };
 
-  const renderExerciseCard = ({ item }) => {
-    const intensityTone = getIntensityTone(item.intensity);
+  const toggleGroup = (group) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [group]: !prev[group],
+    }));
+  };
+
+  const renderExerciseCard = (exercise) => {
+    const intensityTone = getIntensityTone(exercise.intensity);
 
     return (
       <TouchableOpacity
         style={styles.exerciseCard}
         activeOpacity={0.9}
-        onPress={() => openExercise(item)}
+        onPress={() => openExercise(exercise)}
       >
         <LinearGradient
-          colors={item.imageColors}
+          colors={exercise.imageColors}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.exerciseHero}
@@ -110,34 +175,34 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
                 { backgroundColor: intensityTone.bg, borderColor: intensityTone.border },
               ]}
             >
-              <Text style={[styles.intensityText, { color: intensityTone.text }]}>Intensity {item.intensity}/5</Text>
+              <Text style={[styles.intensityText, { color: intensityTone.text }]}>Intensity {exercise.intensity}/5</Text>
             </View>
-            <Text style={styles.heroEmoji}>{item.emoji}</Text>
+            <Text style={styles.heroEmoji}>{exercise.emoji}</Text>
           </View>
 
           <View style={styles.heroBottomRow}>
             <View style={styles.typeChip}>
-              <Text style={styles.typeChipText}>{item.type}</Text>
+              <Text style={styles.typeChipText}>{exercise.type}</Text>
             </View>
             <View style={styles.equipmentChip}>
               <Ionicons
-                name={EQUIPMENT_ICONS[item.equipment] ?? 'fitness-outline'}
+                name={EQUIPMENT_ICONS[exercise.equipment] ?? 'fitness-outline'}
                 size={13}
                 color={COLORS.text}
               />
-              <Text style={styles.equipmentChipText}>{item.equipment}</Text>
+              <Text style={styles.equipmentChipText}>{exercise.equipment}</Text>
             </View>
           </View>
         </LinearGradient>
 
         <View style={styles.exerciseBody}>
           <View style={styles.titleRow}>
-            <Text style={styles.exerciseName}>{item.name}</Text>
+            <Text style={styles.exerciseName}>{exercise.name}</Text>
             <Ionicons name="chevron-forward" size={16} color={COLORS.muted} />
           </View>
           <Text style={styles.muscleLine}>
-            {item.primaryMuscles.join(' • ')}
-            {item.secondaryMuscles.length ? `  ·  ${item.secondaryMuscles.slice(0, 2).join(' • ')}` : ''}
+            {exercise.primaryMuscles.join(' • ')}
+            {exercise.secondaryMuscles.length ? `  ·  ${exercise.secondaryMuscles.slice(0, 2).join(' • ')}` : ''}
           </Text>
         </View>
       </TouchableOpacity>
@@ -238,19 +303,54 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
           </ScrollView>
         </View>
 
-        <FlatList
-          data={filteredExercises}
-          keyExtractor={(item) => item.id}
-          renderItem={renderExerciseCard}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <View style={styles.emptyWrap}>
-              <Text style={styles.emptyTitle}>No exercises found</Text>
-              <Text style={styles.emptySubtle}>Adjust search text or reset one of the filters.</Text>
-            </View>
-          }
-        />
+        {hasSearchQuery ? (
+          <FlatList
+            style={styles.groupsScroll}
+            data={filteredExercises}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => renderExerciseCard(item)}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContent}
+            ListEmptyComponent={
+              <View style={styles.emptyWrap}>
+                <Text style={styles.emptyTitle}>No exercises found</Text>
+                <Text style={styles.emptySubtle}>Adjust search text or reset one of the filters.</Text>
+              </View>
+            }
+          />
+        ) : (
+          <ScrollView
+            style={styles.groupsScroll}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {groupedExercises.length === 0 ? (
+              <View style={styles.emptyWrap}>
+                <Text style={styles.emptyTitle}>No exercises in this filter</Text>
+                <Text style={styles.emptySubtle}>Try updating type, muscle, or equipment filters.</Text>
+              </View>
+            ) : (
+              groupedExercises.map((group) => (
+                <CollapsibleSection
+                  key={group.group}
+                  title={group.group}
+                  subtitle={group.note}
+                  icon={group.icon}
+                  iconIsEmoji={false}
+                  expanded={Boolean(expandedGroups[group.group])}
+                  onToggle={() => toggleGroup(group.group)}
+                  countLabel={`${group.exercises.length} ${group.exercises.length === 1 ? 'exercise' : 'exercises'}`}
+                  style={styles.groupSection}
+                  contentStyle={styles.groupContent}
+                >
+                  {group.exercises.map((exercise) => (
+                    <View key={exercise.id}>{renderExerciseCard(exercise)}</View>
+                  ))}
+                </CollapsibleSection>
+              ))
+            )}
+          </ScrollView>
+        )}
       </View>
     </RootContainer>
   );
@@ -382,8 +482,17 @@ const styles = StyleSheet.create({
   equipmentFilterTextActive: {
     color: COLORS.text,
   },
+  groupsScroll: {
+    flex: 1,
+  },
   listContent: {
     paddingBottom: 24,
+  },
+  groupSection: {
+    marginTop: 0,
+  },
+  groupContent: {
+    paddingTop: 8,
   },
   exerciseCard: {
     backgroundColor: COLORS.card,

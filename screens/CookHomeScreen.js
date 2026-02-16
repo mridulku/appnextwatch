@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState } from 'react';
 import {
-  FlatList,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -11,8 +10,17 @@ import {
   View,
 } from 'react-native';
 
+import CollapsibleSection from '../components/CollapsibleSection';
 import { FOOD_RECIPE_FILTERS, FOOD_RECIPES } from '../data/foodRecipes';
 import COLORS from '../theme/colors';
+
+const MEAL_CATEGORY_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
+const MEAL_CATEGORY_META = {
+  Breakfast: { icon: '🌅', note: 'Start light and balanced.' },
+  Lunch: { icon: '🍛', note: 'Midday meals and bowls.' },
+  Dinner: { icon: '🌙', note: 'Evening plates and warm comfort food.' },
+  Snacks: { icon: '🍿', note: 'Quick bites and fillers.' },
+};
 
 function formatDifficultyTone(difficulty) {
   if (difficulty === 'Easy') {
@@ -32,6 +40,7 @@ function formatDifficultyTone(difficulty) {
 
 function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [expandedCategories, setExpandedCategories] = useState({});
 
   const filteredRecipes = useMemo(() => {
     if (selectedFilter === 'All') return FOOD_RECIPES;
@@ -45,8 +54,25 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
     [],
   );
 
+  const groupedRecipes = useMemo(() => {
+    return MEAL_CATEGORY_ORDER.map((category) => ({
+      title: category,
+      meta: MEAL_CATEGORY_META[category],
+      recipes: filteredRecipes.filter(
+        (recipe) => (recipe.mealCategory ?? 'Dinner') === category,
+      ),
+    })).filter((group) => group.recipes.length > 0);
+  }, [filteredRecipes]);
+
   const openRecipe = (recipe) => {
     navigation.navigate('CookRecipe', { recipeId: recipe.id, recipeName: recipe.name });
+  };
+
+  const toggleCategory = (category) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
   };
 
   const renderRecipeCard = ({ item }) => {
@@ -151,19 +177,37 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
           </ScrollView>
         </View>
 
-        <FlatList
-          data={filteredRecipes}
-          keyExtractor={(item) => item.id}
-          renderItem={renderRecipeCard}
+        <ScrollView
+          style={styles.groupsScroll}
+          contentContainerStyle={styles.groupsContent}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
+        >
+          {groupedRecipes.length === 0 ? (
             <View style={styles.emptyWrap}>
               <Text style={styles.emptyTitle}>No recipes in this filter</Text>
               <Text style={styles.emptySubtle}>Try another category to continue cooking.</Text>
             </View>
-          }
-        />
+          ) : (
+            groupedRecipes.map((group) => (
+              <CollapsibleSection
+                key={group.title}
+                title={group.title}
+                subtitle={group.meta.note}
+                icon={group.meta.icon}
+                iconIsEmoji
+                expanded={Boolean(expandedCategories[group.title])}
+                onToggle={() => toggleCategory(group.title)}
+                countLabel={`${group.recipes.length} recipes`}
+                style={styles.groupSection}
+                contentStyle={styles.groupContent}
+              >
+                {group.recipes.map((recipe) => (
+                  <View key={recipe.id}>{renderRecipeCard({ item: recipe })}</View>
+                ))}
+              </CollapsibleSection>
+            ))
+          )}
+        </ScrollView>
       </View>
     </RootContainer>
   );
@@ -251,8 +295,17 @@ const styles = StyleSheet.create({
   filterTextActive: {
     color: COLORS.accent,
   },
-  listContent: {
+  groupsScroll: {
+    flex: 1,
+  },
+  groupsContent: {
     paddingBottom: 24,
+  },
+  groupSection: {
+    marginTop: 0,
+  },
+  groupContent: {
+    paddingTop: 8,
   },
   recipeCard: {
     backgroundColor: COLORS.card,

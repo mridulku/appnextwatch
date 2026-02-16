@@ -28,12 +28,15 @@ import FilmsWatchedScreen from './screens/FilmsWatchedScreen';
 import GymMachineDetailScreen from './screens/GymMachineDetailScreen';
 import ExerciseDetailScreen from './screens/ExerciseDetailScreen';
 import CookRecipeScreen from './screens/CookRecipeScreen';
-import LibraryHubScreen from './screens/LibraryHubScreen';
 import FoodHubScreen from './screens/FoodHubScreen';
-import WellnessHomeScreen from './screens/WellnessHomeScreen';
+import SessionsHomeScreen from './screens/SessionsHomeScreen';
+import WorkoutSessionSetupScreen from './screens/WorkoutSessionSetupScreen';
+import CookingSessionSetupScreen from './screens/CookingSessionSetupScreen';
+import SessionSummaryScreen from './screens/SessionSummaryScreen';
 import ExerciseSessionScreen from './screens/ExerciseSessionScreen';
-import CookingSessionHomeScreen from './screens/CookingSessionHomeScreen';
-import WellnessSettingsScreen from './screens/WellnessSettingsScreen';
+import WellnessHomeScreen from './screens/WellnessHomeScreen';
+import GymHubScreen from './screens/GymHubScreen';
+import HomeSettingsScreen from './screens/HomeSettingsScreen';
 import CategorySelectorScreen from './screens/CategorySelectorScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PreferencesProvider } from './context/PreferencesContext';
@@ -45,12 +48,10 @@ const Stack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
 const DirectoryStack = createNativeStackNavigator();
 const ListsStack = createNativeStackNavigator();
-const WellnessExerciseStack = createNativeStackNavigator();
-const WellnessCookingStack = createNativeStackNavigator();
+const WellnessSessionStack = createNativeStackNavigator();
 const WellnessHomeStack = createNativeStackNavigator();
-const WellnessLibraryStack = createNativeStackNavigator();
+const WellnessGymStack = createNativeStackNavigator();
 const WellnessFoodStack = createNativeStackNavigator();
-const WellnessSettingsStack = createNativeStackNavigator();
 
 const SHARED_STACK_OPTIONS = {
   headerStyle: { backgroundColor: COLORS.bg },
@@ -225,32 +226,42 @@ function MoviesAppNavigator() {
   );
 }
 
-function ExerciseSessionStackScreens() {
+function SessionStackScreens() {
   return (
-    <WellnessExerciseStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
-      <WellnessExerciseStack.Screen
-        name="ExerciseSessionHome"
+    <WellnessSessionStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessSessionStack.Screen
+        name="SessionHome"
+        component={SessionsHomeScreen}
+        options={{ title: 'Sessions', headerShown: false }}
+      />
+      <WellnessSessionStack.Screen
+        name="WorkoutSessionSetup"
+        component={WorkoutSessionSetupScreen}
+        options={{ title: 'Workout Setup' }}
+      />
+      <WellnessSessionStack.Screen
+        name="CookingSessionSetup"
+        component={CookingSessionSetupScreen}
+        options={{ title: 'Cooking Setup' }}
+      />
+      <WellnessSessionStack.Screen
+        name="WorkoutSessionRun"
         component={ExerciseSessionScreen}
-        options={{ title: 'Exercise Session' }}
+        options={({ route }) => ({
+          title: route?.params?.sessionTitle ?? route?.params?.sessionTemplate?.name ?? 'Workout Session',
+        })}
       />
-    </WellnessExerciseStack.Navigator>
-  );
-}
-
-function CookingSessionStackScreens() {
-  return (
-    <WellnessCookingStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
-      <WellnessCookingStack.Screen
-        name="CookingSessionHome"
-        component={CookingSessionHomeScreen}
-        options={{ title: 'Cooking Session' }}
-      />
-      <WellnessCookingStack.Screen
+      <WellnessSessionStack.Screen
         name="CookingSessionRun"
         component={CookRecipeScreen}
         options={({ route }) => ({ title: route?.params?.recipeName ?? 'Cooking Session' })}
       />
-    </WellnessCookingStack.Navigator>
+      <WellnessSessionStack.Screen
+        name="SessionSummary"
+        component={SessionSummaryScreen}
+        options={{ title: 'Session Summary' }}
+      />
+    </WellnessSessionStack.Navigator>
   );
 }
 
@@ -260,31 +271,47 @@ function WellnessHomeStackScreens() {
       <WellnessHomeStack.Screen
         name="WellnessHome"
         component={WellnessHomeScreen}
-        options={{ title: 'Home' }}
+        options={({ navigation }) => ({
+          title: 'Home',
+          headerRight: () => (
+            <TouchableOpacity
+              style={styles.homeHeaderSettingsButton}
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('HomeSettings')}
+            >
+              <Ionicons name="settings-outline" size={17} color={COLORS.text} />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <WellnessHomeStack.Screen
+        name="HomeSettings"
+        component={HomeSettingsScreen}
+        options={{ title: 'Settings' }}
       />
     </WellnessHomeStack.Navigator>
   );
 }
 
-function LibraryStackScreens() {
+function GymStackScreens() {
   return (
-    <WellnessLibraryStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
-      <WellnessLibraryStack.Screen
-        name="LibraryHome"
-        component={LibraryHubScreen}
-        options={{ title: 'Library', headerShown: false }}
+    <WellnessGymStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessGymStack.Screen
+        name="GymHome"
+        component={GymHubScreen}
+        options={{ title: 'Gym', headerShown: false }}
       />
-      <WellnessLibraryStack.Screen
+      <WellnessGymStack.Screen
         name="GymMachineDetail"
         component={GymMachineDetailScreen}
         options={({ route }) => ({ title: route.params?.machineName ?? 'Machine Details' })}
       />
-      <WellnessLibraryStack.Screen
+      <WellnessGymStack.Screen
         name="ExerciseDetail"
         component={ExerciseDetailScreen}
         options={({ route }) => ({ title: route.params?.exerciseName ?? 'Exercise Detail' })}
       />
-    </WellnessLibraryStack.Navigator>
+    </WellnessGymStack.Navigator>
   );
 }
 
@@ -305,81 +332,49 @@ function FoodStackScreens() {
   );
 }
 
-function WellnessSettingsStackScreens() {
-  return (
-    <WellnessSettingsStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
-      <WellnessSettingsStack.Screen
-        name="WellnessSettings"
-        component={WellnessSettingsScreen}
-        options={{ title: 'Settings' }}
-      />
-    </WellnessSettingsStack.Navigator>
-  );
-}
-
 function WellnessAppNavigator() {
   return (
     <WellnessTab.Navigator
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: styles.wellnessTabBar,
         tabBarActiveTintColor: COLORS.accent,
         tabBarInactiveTintColor: COLORS.muted,
         tabBarLabelStyle: styles.wellnessTabLabel,
-        tabBarIcon: ({ color, focused }) => {
+        tabBarIcon: ({ color }) => {
           const icons = {
-            ExerciseSession: 'barbell-outline',
-            CookingSession: 'flame-outline',
-            Home: 'home',
-            Library: 'library-outline',
+            Home: 'home-outline',
+            Sessions: 'pulse-outline',
+            Gym: 'barbell-outline',
             Food: 'restaurant-outline',
-            Settings: 'options-outline',
           };
-
-          if (route.name === 'Home') {
-            return (
-              <View style={[styles.homeTabIconWrap, focused && styles.homeTabIconWrapActive]}>
-                <Ionicons name={icons.Home} size={22} color={focused ? COLORS.bg : COLORS.text} />
-              </View>
-            );
-          }
-
-          const iconSize = route.name === 'Settings' ? 18 : 20;
-          return <Ionicons name={icons[route.name]} size={iconSize} color={color} />;
+          return <Ionicons name={icons[route.name]} size={20} color={color} />;
         },
       })}
     >
-      <WellnessTab.Screen
-        name="ExerciseSession"
-        component={ExerciseSessionStackScreens}
-        options={{
-          title: 'Exercise Session',
-          tabBarLabel: 'Exercise',
-        }}
-      />
-      <WellnessTab.Screen
-        name="CookingSession"
-        component={CookingSessionStackScreens}
-        options={{
-          title: 'Cooking Session',
-          tabBarLabel: 'Cooking',
-        }}
-      />
       <WellnessTab.Screen
         name="Home"
         component={WellnessHomeStackScreens}
         options={{
           title: 'Home',
           tabBarLabel: 'Home',
-          tabBarItemStyle: styles.homeTabItem,
         }}
       />
       <WellnessTab.Screen
-        name="Library"
-        component={LibraryStackScreens}
+        name="Sessions"
+        component={SessionStackScreens}
         options={{
-          title: 'Library',
-          tabBarLabel: 'Library',
+          title: 'Sessions',
+          tabBarLabel: 'Sessions',
+        }}
+      />
+      <WellnessTab.Screen
+        name="Gym"
+        component={GymStackScreens}
+        options={{
+          title: 'Gym',
+          tabBarLabel: 'Gym',
         }}
       />
       <WellnessTab.Screen
@@ -388,15 +383,6 @@ function WellnessAppNavigator() {
         options={{
           title: 'Food',
           tabBarLabel: 'Food',
-        }}
-      />
-      <WellnessTab.Screen
-        name="Settings"
-        component={WellnessSettingsStackScreens}
-        options={{
-          title: 'Settings',
-          tabBarLabel: 'Settings',
-          tabBarLabelStyle: styles.wellnessTabLabelSubtle,
         }}
       />
     </WellnessTab.Navigator>
@@ -501,33 +487,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   wellnessTabLabel: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '600',
-  },
-  wellnessTabLabelSubtle: {
-    fontSize: 9,
-    fontWeight: '600',
-  },
-  homeTabItem: {
-    marginTop: -10,
-  },
-  homeTabIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(245,201,106,0.2)',
-    borderWidth: 1,
-    borderColor: 'rgba(245,201,106,0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  homeTabIconWrapActive: {
-    backgroundColor: COLORS.accent,
-    borderColor: COLORS.accent,
-    shadowColor: COLORS.shadow,
-    shadowOpacity: 0.28,
-    shadowRadius: 8,
-    elevation: 6,
   },
   searchButtonWrapper: {
     top: -18,
@@ -543,6 +504,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 8,
+  },
+  homeHeaderSettingsButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.28)',
+    backgroundColor: COLORS.card,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingRoot: {
     flex: 1,

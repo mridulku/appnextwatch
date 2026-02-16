@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 
+import { addSessionToHistory, createSessionHistoryId } from '../core/sessionHistoryStorage';
 import COLORS from '../theme/colors';
 
 const SAMPLE_SESSION = {
@@ -30,8 +31,24 @@ const SAMPLE_SESSION = {
 
 const VOICE_COMMANDS = ['next exercise', 'pause timer', 'repeat cue', 'how much remaining?', 'start timer'];
 
-function createExerciseState() {
-  return SAMPLE_SESSION.exercises.map((exercise) => ({
+function normalizeSessionTemplate(rawTemplate) {
+  if (!rawTemplate || typeof rawTemplate !== 'object') return SAMPLE_SESSION;
+  if (!Array.isArray(rawTemplate.exercises) || rawTemplate.exercises.length === 0) return SAMPLE_SESSION;
+
+  return {
+    name: String(rawTemplate.name ?? SAMPLE_SESSION.name),
+    totalMinutes: Math.max(5, Number(rawTemplate.totalMinutes) || SAMPLE_SESSION.totalMinutes),
+    exercises: rawTemplate.exercises.map((exercise, index) => ({
+      id: String(exercise.id ?? `exercise_${index}`),
+      name: String(exercise.name ?? `Exercise ${index + 1}`),
+      targetSets: Math.max(1, Number(exercise.targetSets) || 1),
+      targetReps: String(exercise.targetReps ?? '8-10'),
+    })),
+  };
+}
+
+function createExerciseState(sessionTemplate) {
+  return sessionTemplate.exercises.map((exercise) => ({
     ...exercise,
     status: 'pending',
     loggedSets: [],
@@ -45,11 +62,17 @@ function formatClock(seconds) {
   return `${min}:${String(sec).padStart(2, '0')}`;
 }
 
-function ExerciseSessionScreen() {
+function ExerciseSessionScreen({ embedded = false, route, navigation }) {
+  const sessionTemplate = useMemo(
+    () => normalizeSessionTemplate(route?.params?.sessionTemplate),
+    [route?.params?.sessionTemplate],
+  );
+
   const [sessionStarted, setSessionStarted] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [exerciseStates, setExerciseStates] = useState(() => createExerciseState());
+  const [exerciseStates, setExerciseStates] = useState(() => createExerciseState(sessionTemplate));
+  const [sessionStartedAt, setSessionStartedAt] = useState(route?.params?.startedAt ?? null);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
@@ -65,12 +88,37 @@ function ExerciseSessionScreen() {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const chatAnim = useRef(new Animated.Value(0)).current;
   const voiceTimeoutRef = useRef(null);
+  const hasSessionLoggedRef = useRef(false);
+  const latestSnapshotRef = useRef({
+    sessionStarted: false,
+    elapsedSeconds: 0,
+    exerciseStates: createExerciseState(sessionTemplate),
+    sessionStartedAt: route?.params?.startedAt ?? null,
+  });
 
   useEffect(() => {
     if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
   }, []);
+
+  useEffect(() => {
+    setSessionStarted(false);
+    setIsTimerRunning(false);
+    setElapsedSeconds(0);
+    setExerciseStates(createExerciseState(sessionTemplate));
+    setSessionStartedAt(route?.params?.startedAt ?? null);
+    setChatOpen(false);
+    setChatInput('');
+    setMessages([
+      {
+        id: 'coach_intro',
+        role: 'coach',
+        text: `Workout assistant ready. Session loaded: ${sessionTemplate.name}.`,
+      },
+    ]);
+    hasSessionLoggedRef.current = false;
+  }, [route?.params?.startedAt, sessionTemplate]);
 
   useEffect(() => {
     if (!isTimerRunning) return undefined;
@@ -122,6 +170,15 @@ function ExerciseSessionScreen() {
     [],
   );
 
+  useEffect(() => {
+    latestSnapshotRef.current = {
+      sessionStarted,
+      elapsedSeconds,
+      exerciseStates,
+      sessionStartedAt,
+    };
+  }, [elapsedSeconds, exerciseStates, sessionStarted, sessionStartedAt]);
+
   const completedCount = useMemo(
     () => exerciseStates.filter((exercise) => exercise.status === 'done').length,
     [exerciseStates],
@@ -138,14 +195,15 @@ function ExerciseSessionScreen() {
     currentExerciseIndex >= 0 ? exerciseStates[currentExerciseIndex] : exerciseStates[exerciseStates.length - 1];
 
   const remainingSeconds = useMemo(
-    () => Math.max(0, SAMPLE_SESSION.totalMinutes * 60 - elapsedSeconds),
-    [elapsedSeconds],
+    () => Math.max(0, sessionTemplate.totalMinutes * 60 - elapsedSeconds),
+    [elapsedSeconds, sessionTemplate.totalMinutes],
   );
 
   const progressRatio = useMemo(
-    () => (SAMPLE_SESSION.exercises.length ? completedCount / SAMPLE_SESSION.exercises.length : 0),
-    [completedCount],
+    () => (sessionTemplate.exercises.length ? completedCount / sessionTemplate.exercises.length : 0),
+    [completedCount, sessionTemplate.exercises.length],
   );
+  const allExercisesDone = sessionTemplate.exercises.length > 0 && completedCount === sessionTemplate.exercises.length;
 
   const appendMessage = (role, text) => {
     setMessages((prev) => [
@@ -158,6 +216,57 @@ function ExerciseSessionScreen() {
     ]);
   };
 
+  const createHistoryRecord = (status, snapshot) => {
+    const endedAt = new Date().toISOString();
+    const startedAt =
+      snapshot.sessionStartedAt ??
+      new Date(Date.now() - Math.max(0, snapshot.elapsedSeconds) * 1000).toISOString();
+    const setsCount = snapshot.exerciseStates.reduce(
+      (sum, exercise) => sum + exercise.loggedSets.length,
+      0,
+    );
+    const exercisesCount = snapshot.exerciseStates.length;
+    const volumeKg = Math.round(snapshot.exerciseStates.reduce((sum, exercise) => {
+      const exerciseVolume = exercise.loggedSets.reduce((inner, loggedSet) => {
+        const weightNumber = Number.parseFloat(String(loggedSet.weight).replace(/[^\d.]/g, ''));
+        if (Number.isNaN(weightNumber)) return inner;
+        return inner + weightNumber;
+      }, 0);
+      return sum + exerciseVolume;
+    }, 0));
+
+    return {
+      id: String(route?.params?.sessionId ?? createSessionHistoryId('workout')),
+      type: 'workout',
+      title: String(route?.params?.sessionTitle ?? sessionTemplate.name),
+      startedAt,
+      endedAt,
+      durationSeconds: Math.max(0, Number(snapshot.elapsedSeconds) || 0),
+      status,
+      summary: {
+        exercisesCount,
+        setsCount,
+        volumeKg,
+        timeline: snapshot.exerciseStates.map((exercise) => ({
+          title: exercise.name,
+          status: exercise.status,
+          note: `${exercise.loggedSets.length}/${exercise.targetSets} sets`,
+        })),
+      },
+    };
+  };
+
+  const persistSessionRecord = async (status) => {
+    if (hasSessionLoggedRef.current) return null;
+    const snapshot = latestSnapshotRef.current;
+    if (!snapshot.sessionStarted) return null;
+
+    const record = createHistoryRecord(status, snapshot);
+    hasSessionLoggedRef.current = true;
+    await addSessionToHistory(record);
+    return record;
+  };
+
   const startSession = () => {
     if (sessionStarted) {
       setIsTimerRunning(true);
@@ -165,6 +274,7 @@ function ExerciseSessionScreen() {
     }
 
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setSessionStartedAt((prev) => prev ?? new Date().toISOString());
     setSessionStarted(true);
     setIsTimerRunning(true);
     setExerciseStates((prev) =>
@@ -172,7 +282,7 @@ function ExerciseSessionScreen() {
         index === 0 ? { ...exercise, status: 'in_progress' } : exercise,
       ),
     );
-    appendMessage('coach', 'Session started. Begin with your first movement and log each set.');
+    appendMessage('coach', `Session started: ${sessionTemplate.name}. Begin with your first movement and log each set.`);
   };
 
   const pauseOrResume = () => {
@@ -236,6 +346,15 @@ function ExerciseSessionScreen() {
     const nextExercise = exerciseStates[nextIndex];
     setExerciseInProgress(nextExercise.id);
     appendMessage('coach', `Next up: ${nextExercise.name}. Keep your tempo clean.`);
+  };
+
+  const finishSession = async (status = 'completed') => {
+    const record = await persistSessionRecord(status);
+    if (!record) return;
+
+    if (!embedded && navigation?.navigate) {
+      navigation.navigate('SessionSummary', { sessionRecord: record });
+    }
   };
 
   const handleCoachCommand = (rawText) => {
@@ -304,17 +423,37 @@ function ExerciseSessionScreen() {
     outputRange: [22, 0],
   });
 
+  const RootContainer = embedded ? View : SafeAreaView;
+
+  useEffect(() => {
+    if (!sessionStarted || !allExercisesDone) return;
+    setIsTimerRunning(false);
+    appendMessage('coach', 'All exercises completed. Session saved to history.');
+    void finishSession('completed');
+  }, [allExercisesDone, sessionStarted]);
+
+  useEffect(
+    () => () => {
+      if (hasSessionLoggedRef.current) return;
+      const snapshot = latestSnapshotRef.current;
+      if (!snapshot?.sessionStarted) return;
+      void addSessionToHistory(createHistoryRecord('abandoned', snapshot));
+      hasSessionLoggedRef.current = true;
+    },
+    [],
+  );
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+    <RootContainer style={styles.safeArea}>
+      <View style={[styles.container, embedded && styles.containerEmbedded]}>
         <View style={styles.dashboardCard}>
           <View style={styles.dashboardTopRow}>
             <View>
               <Text style={styles.sessionTitle}>Exercise Session</Text>
-              <Text style={styles.sessionSubtitle}>{SAMPLE_SESSION.name}</Text>
+              <Text style={styles.sessionSubtitle}>{sessionTemplate.name}</Text>
             </View>
             <View style={styles.progressPill}>
-              <Text style={styles.progressPillText}>{completedCount}/{SAMPLE_SESSION.exercises.length} done</Text>
+              <Text style={styles.progressPillText}>{completedCount}/{sessionTemplate.exercises.length} done</Text>
             </View>
           </View>
 
@@ -496,7 +635,7 @@ function ExerciseSessionScreen() {
           </Animated.View>
         ) : null}
       </View>
-    </SafeAreaView>
+    </RootContainer>
   );
 }
 
@@ -510,6 +649,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg,
     paddingHorizontal: 16,
     paddingTop: 10,
+  },
+  containerEmbedded: {
+    paddingTop: 6,
   },
   dashboardCard: {
     borderRadius: 18,

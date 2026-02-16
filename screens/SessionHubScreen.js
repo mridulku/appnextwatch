@@ -2,23 +2,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { FOOD_RECIPES } from '../data/foodRecipes';
-import CookHomeScreen from './CookHomeScreen';
-import FoodInventoryScreen from './FoodInventoryScreen';
-import FoodMyStatsScreen from './FoodMyStatsScreen';
-import FoodUtensilsScreen from './FoodUtensilsScreen';
+import CookingSessionHomeScreen from './CookingSessionHomeScreen';
+import ExerciseSessionScreen from './ExerciseSessionScreen';
 import COLORS from '../theme/colors';
 
-const SEGMENTS = ['Inventory', 'Recipes', 'Utensils', 'My Stats'];
+const SEGMENTS = ['Workout', 'Cooking'];
 
 function normalizeSegment(value) {
-  if (value === 'Recipes') return 'Recipes';
-  if (value === 'Utensils') return 'Utensils';
-  if (value === 'My Stats') return 'My Stats';
-  return 'Inventory';
+  if (value === 'Cooking') return 'Cooking';
+  if (value === 'Exercise' || value === 'Workout') return 'Workout';
+  return 'Workout';
 }
 
-function FoodHubScreen({ navigation, route }) {
+function SessionHubScreen({ navigation, route }) {
   const [segment, setSegment] = useState(normalizeSegment(route.params?.initialSegment));
 
   useEffect(() => {
@@ -27,26 +23,18 @@ function FoodHubScreen({ navigation, route }) {
 
   const summary = useMemo(
     () => ({
-      recipes: FOOD_RECIPES.length,
       mode: segment,
+      status: segment === 'Workout' ? 'Workout logger active' : 'Guided cook session ready',
     }),
     [segment],
   );
 
   const renderContent = () => {
-    if (segment === 'Recipes') {
-      return <CookHomeScreen navigation={navigation} embedded showHeader={false} />;
+    if (segment === 'Cooking') {
+      return <CookingSessionHomeScreen navigation={navigation} embedded showHeader={false} />;
     }
 
-    if (segment === 'Utensils') {
-      return <FoodUtensilsScreen embedded showHero={false} />;
-    }
-
-    if (segment === 'My Stats') {
-      return <FoodMyStatsScreen />;
-    }
-
-    return <FoodInventoryScreen embedded showHero={false} />;
+    return <ExerciseSessionScreen embedded />;
   };
 
   return (
@@ -55,25 +43,16 @@ function FoodHubScreen({ navigation, route }) {
         <View style={styles.topCard}>
           <View style={styles.topTitleRow}>
             <View>
-              <Text style={styles.title}>Food</Text>
-              <Text style={styles.subtitle}>Pantry inventory and recipe browsing in one cockpit.</Text>
+              <Text style={styles.title}>Sessions</Text>
+              <Text style={styles.subtitle}>Run exercise and cooking sessions from one control room.</Text>
             </View>
             <View style={styles.badgePill}>
-              <Ionicons name="sparkles-outline" size={13} color={COLORS.accent2} />
+              <Ionicons name="pulse-outline" size={13} color={COLORS.accent2} />
               <Text style={styles.badgeText}>{summary.mode}</Text>
             </View>
           </View>
 
-          <View style={styles.quickStatsRow}>
-            <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatValue}>{summary.recipes}</Text>
-              <Text style={styles.quickStatLabel}>recipes</Text>
-            </View>
-            <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatValue}>Live</Text>
-              <Text style={styles.quickStatLabel}>voice command</Text>
-            </View>
-          </View>
+          <Text style={styles.statusLine}>{summary.status}</Text>
 
           <View style={styles.segmentWrap}>
             {SEGMENTS.map((item) => {
@@ -149,31 +128,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
   },
-  quickStatsRow: {
+  statusLine: {
     marginTop: 10,
-    flexDirection: 'row',
-    gap: 8,
-  },
-  quickStatCard: {
-    flex: 1,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.18)',
-    backgroundColor: COLORS.card,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  quickStatValue: {
-    color: COLORS.text,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  quickStatLabel: {
     color: COLORS.muted,
-    fontSize: 10,
-    marginTop: 2,
-    textTransform: 'uppercase',
-    letterSpacing: 0.3,
+    fontSize: 11,
   },
   segmentWrap: {
     marginTop: 10,
@@ -209,4 +167,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FoodHubScreen;
+export default SessionHubScreen;

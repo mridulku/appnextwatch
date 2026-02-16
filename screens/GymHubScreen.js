@@ -2,51 +2,52 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { FOOD_RECIPES } from '../data/foodRecipes';
-import CookHomeScreen from './CookHomeScreen';
-import FoodInventoryScreen from './FoodInventoryScreen';
-import FoodMyStatsScreen from './FoodMyStatsScreen';
-import FoodUtensilsScreen from './FoodUtensilsScreen';
+import { FITNESS_EXERCISES } from '../data/fitnessExercises';
+import { GYM_MACHINES } from '../data/gymMachines';
+import ExercisesHomeScreen from './ExercisesHomeScreen';
+import GymHomeScreen from './GymHomeScreen';
+import GymMyStatsScreen from './GymMyStatsScreen';
 import COLORS from '../theme/colors';
 
-const SEGMENTS = ['Inventory', 'Recipes', 'Utensils', 'My Stats'];
+const SEGMENTS = ['Machines', 'Exercises', 'My Stats'];
 
-function normalizeSegment(value) {
-  if (value === 'Recipes') return 'Recipes';
-  if (value === 'Utensils') return 'Utensils';
-  if (value === 'My Stats') return 'My Stats';
-  return 'Inventory';
-}
-
-function FoodHubScreen({ navigation, route }) {
-  const [segment, setSegment] = useState(normalizeSegment(route.params?.initialSegment));
+function GymHubScreen({ navigation, route }) {
+  const initialSegment = route.params?.initialSegment;
+  const [segment, setSegment] = useState(initialSegment === 'Exercises' ? 'Exercises' : initialSegment === 'My Stats' ? 'My Stats' : 'Machines');
 
   useEffect(() => {
-    setSegment(normalizeSegment(route.params?.initialSegment));
+    if (route.params?.initialSegment === 'Exercises') {
+      setSegment('Exercises');
+      return;
+    }
+    if (route.params?.initialSegment === 'My Stats') {
+      setSegment('My Stats');
+      return;
+    }
+    if (route.params?.initialSegment === 'Machines') {
+      setSegment('Machines');
+    }
   }, [route.params?.initialSegment]);
 
   const summary = useMemo(
     () => ({
-      recipes: FOOD_RECIPES.length,
-      mode: segment,
+      machines: GYM_MACHINES.length,
+      exercises: FITNESS_EXERCISES.length,
+      active: segment,
     }),
     [segment],
   );
 
   const renderContent = () => {
-    if (segment === 'Recipes') {
-      return <CookHomeScreen navigation={navigation} embedded showHeader={false} />;
-    }
-
-    if (segment === 'Utensils') {
-      return <FoodUtensilsScreen embedded showHero={false} />;
+    if (segment === 'Exercises') {
+      return <ExercisesHomeScreen navigation={navigation} embedded showHeader={false} />;
     }
 
     if (segment === 'My Stats') {
-      return <FoodMyStatsScreen />;
+      return <GymMyStatsScreen />;
     }
 
-    return <FoodInventoryScreen embedded showHero={false} />;
+    return <GymHomeScreen navigation={navigation} embedded showHeader={false} />;
   };
 
   return (
@@ -55,23 +56,23 @@ function FoodHubScreen({ navigation, route }) {
         <View style={styles.topCard}>
           <View style={styles.topTitleRow}>
             <View>
-              <Text style={styles.title}>Food</Text>
-              <Text style={styles.subtitle}>Pantry inventory and recipe browsing in one cockpit.</Text>
+              <Text style={styles.title}>Gym</Text>
+              <Text style={styles.subtitle}>Machines, exercises, and your body stats in one hub.</Text>
             </View>
             <View style={styles.badgePill}>
-              <Ionicons name="sparkles-outline" size={13} color={COLORS.accent2} />
-              <Text style={styles.badgeText}>{summary.mode}</Text>
+              <Ionicons name="barbell-outline" size={13} color={COLORS.accent2} />
+              <Text style={styles.badgeText}>{summary.active}</Text>
             </View>
           </View>
 
           <View style={styles.quickStatsRow}>
             <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatValue}>{summary.recipes}</Text>
-              <Text style={styles.quickStatLabel}>recipes</Text>
+              <Text style={styles.quickStatValue}>{summary.machines}</Text>
+              <Text style={styles.quickStatLabel}>machines</Text>
             </View>
             <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatValue}>Live</Text>
-              <Text style={styles.quickStatLabel}>voice command</Text>
+              <Text style={styles.quickStatValue}>{summary.exercises}</Text>
+              <Text style={styles.quickStatLabel}>exercises</Text>
             </View>
           </View>
 
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     color: COLORS.muted,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
   },
   segmentTextActive: {
@@ -209,4 +210,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FoodHubScreen;
+export default GymHubScreen;

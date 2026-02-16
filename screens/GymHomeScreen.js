@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState } from 'react';
 import {
-  FlatList,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -11,11 +10,13 @@ import {
   View,
 } from 'react-native';
 
+import CollapsibleSection from '../components/CollapsibleSection';
 import { GYM_MACHINES } from '../data/gymMachines';
 import COLORS from '../theme/colors';
 
 const MUSCLE_FILTERS = ['All', 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio'];
 const ZONE_FILTERS = ['All Zones', 'Free Weights', 'Machines', 'Cable', 'Cardio', 'Functional'];
+const MACHINE_ZONE_ORDER = ['Free Weights', 'Machines', 'Cable', 'Cardio', 'Functional', 'Other'];
 
 const ZONE_ICONS = {
   'Free Weights': 'barbell-outline',
@@ -23,6 +24,16 @@ const ZONE_ICONS = {
   Cable: 'git-branch-outline',
   Cardio: 'pulse-outline',
   Functional: 'flash-outline',
+  Other: 'albums-outline',
+};
+
+const ZONE_NOTES = {
+  'Free Weights': 'Benches, racks, and free movement stations.',
+  Machines: 'Guided path machines for controlled lifts.',
+  Cable: 'Pulley stations for versatile resistance angles.',
+  Cardio: 'Steady-state and interval conditioning machines.',
+  Functional: 'Accessory stations for mobility and conditioning.',
+  Other: 'Unmapped stations and special equipment.',
 };
 
 function getBusyTone(level) {
@@ -41,16 +52,31 @@ function getBusyTone(level) {
   };
 }
 
+function normalizeMachineZone(zone) {
+  const value = String(zone ?? '').trim().toLowerCase();
+
+  if (!value) return 'Other';
+  if (value.includes('free')) return 'Free Weights';
+  if (value.includes('machine')) return 'Machines';
+  if (value.includes('cable')) return 'Cable';
+  if (value.includes('cardio')) return 'Cardio';
+  if (value.includes('functional')) return 'Functional';
+
+  return 'Other';
+}
+
 function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const [selectedMuscle, setSelectedMuscle] = useState('All');
   const [selectedZone, setSelectedZone] = useState('All Zones');
+  const [expandedZones, setExpandedZones] = useState({});
 
   const filteredMachines = useMemo(() => {
     return GYM_MACHINES.filter((machine) => {
       const matchesMuscle =
         selectedMuscle === 'All' ||
         machine.tags.some((tag) => tag.toLowerCase() === selectedMuscle.toLowerCase());
-      const matchesZone = selectedZone === 'All Zones' || machine.zone === selectedZone;
+      const machineZone = normalizeMachineZone(machine.zone);
+      const matchesZone = selectedZone === 'All Zones' || machineZone === selectedZone;
 
       return matchesMuscle && matchesZone;
     });
@@ -58,12 +84,29 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
 
   const zoneCount = useMemo(() => {
     const counts = GYM_MACHINES.reduce((acc, machine) => {
-      acc[machine.zone] = (acc[machine.zone] || 0) + 1;
+      const zone = normalizeMachineZone(machine.zone);
+      acc[zone] = (acc[zone] || 0) + 1;
       return acc;
     }, {});
 
     return Object.keys(counts).length;
   }, []);
+
+  const groupedMachines = useMemo(() => {
+    const grouped = filteredMachines.reduce((acc, machine) => {
+      const zone = normalizeMachineZone(machine.zone);
+      if (!acc[zone]) acc[zone] = [];
+      acc[zone].push(machine);
+      return acc;
+    }, {});
+
+    return MACHINE_ZONE_ORDER.filter((zone) => grouped[zone]?.length > 0).map((zone) => ({
+      zone,
+      icon: ZONE_ICONS[zone] ?? ZONE_ICONS.Other,
+      note: ZONE_NOTES[zone] ?? ZONE_NOTES.Other,
+      machines: grouped[zone].slice().sort((a, b) => a.name.localeCompare(b.name)),
+    }));
+  }, [filteredMachines]);
 
   const openMachine = (machine) => {
     navigation.navigate('GymMachineDetail', {
@@ -72,17 +115,25 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
     });
   };
 
-  const renderMachineCard = ({ item }) => {
-    const busyTone = getBusyTone(item.busyLevel);
+  const toggleZone = (zone) => {
+    setExpandedZones((prev) => ({
+      ...prev,
+      [zone]: !prev[zone],
+    }));
+  };
+
+  const renderMachineCard = (machine) => {
+    const busyTone = getBusyTone(machine.busyLevel);
+    const machineZone = normalizeMachineZone(machine.zone);
 
     return (
       <TouchableOpacity
         style={styles.machineCard}
         activeOpacity={0.9}
-        onPress={() => openMachine(item)}
+        onPress={() => openMachine(machine)}
       >
         <LinearGradient
-          colors={item.imageColors}
+          colors={machine.imageColors}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.machineHero}
@@ -90,11 +141,11 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
           <View style={styles.heroTopRow}>
             <View style={styles.zoneChip}>
               <Ionicons
-                name={ZONE_ICONS[item.zone] ?? 'fitness-outline'}
+                name={ZONE_ICONS[machineZone] ?? 'fitness-outline'}
                 size={12}
                 color={COLORS.text}
               />
-              <Text style={styles.zoneChipText}>{item.zone}</Text>
+              <Text style={styles.zoneChipText}>{machineZone}</Text>
             </View>
             <View
               style={[
@@ -102,7 +153,7 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
                 { backgroundColor: busyTone.bg, borderColor: busyTone.border },
               ]}
             >
-              <Text style={[styles.busyChipText, { color: busyTone.text }]}>{item.busyLevel}</Text>
+              <Text style={[styles.busyChipText, { color: busyTone.text }]}>{machine.busyLevel}</Text>
             </View>
           </View>
           <View style={styles.heroBottomRow}>
@@ -113,21 +164,21 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
 
         <View style={styles.machineBody}>
           <View style={styles.nameRow}>
-            <Text style={styles.machineName}>{item.name}</Text>
+            <Text style={styles.machineName}>{machine.name}</Text>
             <Ionicons name="chevron-forward" size={16} color={COLORS.muted} />
           </View>
 
           <Text style={styles.muscleLine}>
-            {item.primaryMuscles.join(' • ')}
-            {item.secondaryMuscles.length ? `  ·  ${item.secondaryMuscles.slice(0, 2).join(' • ')}` : ''}
+            {machine.primaryMuscles.join(' • ')}
+            {machine.secondaryMuscles.length ? `  ·  ${machine.secondaryMuscles.slice(0, 2).join(' • ')}` : ''}
           </Text>
 
           <View style={styles.metaRow}>
-            <Text style={styles.metaText}>{item.zone} Zone</Text>
+            <Text style={styles.metaText}>{machineZone} Zone</Text>
             <Text style={styles.metaDot}>•</Text>
-            <Text style={styles.metaText}>{item.riskLevel} risk</Text>
+            <Text style={styles.metaText}>{machine.riskLevel} risk</Text>
             <Text style={styles.metaDot}>•</Text>
-            <Text style={styles.metaText}>{item.difficulty}</Text>
+            <Text style={styles.metaText}>{machine.difficulty}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -203,19 +254,37 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
           </ScrollView>
         </View>
 
-        <FlatList
-          data={filteredMachines}
-          keyExtractor={(item) => item.id}
-          renderItem={renderMachineCard}
+        <ScrollView
+          style={styles.groupsScroll}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
+        >
+          {groupedMachines.length === 0 ? (
             <View style={styles.emptyWrap}>
               <Text style={styles.emptyTitle}>No machines in this filter</Text>
               <Text style={styles.emptySubtle}>Try changing muscle or zone filters.</Text>
             </View>
-          }
-        />
+          ) : (
+            groupedMachines.map((group) => (
+              <CollapsibleSection
+                key={group.zone}
+                title={group.zone}
+                subtitle={group.note}
+                icon={group.icon}
+                iconIsEmoji={false}
+                expanded={Boolean(expandedZones[group.zone])}
+                onToggle={() => toggleZone(group.zone)}
+                countLabel={`${group.machines.length} ${group.machines.length === 1 ? 'machine' : 'machines'}`}
+                style={styles.groupSection}
+                contentStyle={styles.groupContent}
+              >
+                {group.machines.map((machine) => (
+                  <View key={machine.id}>{renderMachineCard(machine)}</View>
+                ))}
+              </CollapsibleSection>
+            ))
+          )}
+        </ScrollView>
       </View>
     </RootContainer>
   );
@@ -328,8 +397,17 @@ const styles = StyleSheet.create({
   zoneFilterTextActive: {
     color: COLORS.accent2,
   },
+  groupsScroll: {
+    flex: 1,
+  },
   listContent: {
     paddingBottom: 26,
+  },
+  groupSection: {
+    marginTop: 0,
+  },
+  groupContent: {
+    paddingTop: 8,
   },
   machineCard: {
     backgroundColor: COLORS.card,
