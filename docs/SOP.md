@@ -64,6 +64,14 @@ Recommended entry format:
 If `docs/log/WORKLOG.md` does not exist:
 - Create it with a top-level heading `# Worklog` and append the current session entry.
 
+## Session Notes Artifact
+Each session must create a markdown notes artifact at:
+- `docs/sessions/YYYY-MM-DD/HHMM_<slug>.md`
+
+Minimum requirement:
+- `<slug>` should be short and meaningful for the session focus.
+- Session notes must be linkable from both `docs/log/WORKLOG.md` and `docs/sessions/INDEX.md`.
+
 ## Tagging Policy
 ### Goal
 Tags should represent stable, meaningful milestones.
@@ -74,30 +82,33 @@ Tags should represent stable, meaningful milestones.
 
 ### Tag Naming Convention
 Use a descriptive, time-aware format:
-- `nw-YYYYMMDD-<area>-<milestone>`
+- `nw-YYYY-MM-DD-HHMM-<slug>`
 
 Tag fields must be evidence-based:
-- `<area>` must be selected from this fixed enum only:
+- `HHMM` must use `Asia/Kolkata` local time.
+- `<slug>` must be max 2-3 tokens.
+- `<slug>` must start with `<area>`, where `<area>` is selected from this fixed enum only:
   - `movies | feed | search | watchlist | profile | navigation | data | storage | ui | docs`
-- `<milestone>` must be derived from:
+- Remaining slug token(s) should be derived from:
   1. main commit message slug (preferred), or
   2. highest-impact changed folder slug (fallback).
-- Do not invent area/milestone names not supported by actual changes.
+- Do not invent slug tokens not supported by actual changes.
 
 Examples:
-- `nw-20260216-feed-reels-detail-polish`
-- `nw-20260216-watchlist-list-detail-flow`
-- `nw-20260217-navigation-home-tab-reorder`
+- `nw-2026-02-16-0951-feed-taste-polish`
+- `nw-2026-02-16-1030-watchlist-flow`
+- `nw-2026-02-17-0915-navigation-home-reorder`
 
 Tag naming decision inputs:
-- Current date
+- Current date + time (`Asia/Kolkata`)
 - Primary area changed (must match the fixed enum above)
-- Milestone source (commit-message slug first, folder slug fallback)
+- Slug source (commit-message slug first, folder slug fallback)
 
 ### Tag Decision Algorithm (Deterministic)
 Rules:
-- By default, at most **exactly 1 tag per calendar day** in `Asia/Kolkata`.
-- Recommend/create a tag only if at least one trigger is true:
+- Tag at most once per **session checkpoint**.
+- If a tag for the same date exists, additional tags are allowed only when `HHMM` differs.
+- Tag when user explicitly asks for a checkpoint, provided at least one trigger is true:
   - `T1` Any user-facing flow changed (navigation/screens/core behavior)
   - `T2` Storage/persistence behavior changed
   - `T3` API/data source integration changed
@@ -110,10 +121,12 @@ Rules:
 
 Deterministic steps:
 1. Resolve current date in `Asia/Kolkata`.
-2. Check if a tag for the same date already exists.
-3. Classify changes against `T#` / `N#`.
-4. Recommend `YES` only when `(any T# true) AND (daily tag limit not exceeded)`.
-5. If daily limit is exceeded, recommend `NO` and document rationale.
+2. Resolve current `HHMM` in `Asia/Kolkata`.
+3. Check if a tag with same date+HHMM already exists.
+4. Classify changes against `T#` / `N#`.
+5. Recommend `YES` only when `(any T# true) AND (user requested checkpoint or milestone checkpoint is required)`.
+6. If date+HHMM collision occurs, bump HHMM to current minute and re-evaluate.
+7. If only `N#` conditions are true, recommend `NO` and document rationale.
 
 ### Tag Execution
 Preferred flow:
@@ -151,8 +164,9 @@ Codex must always output a final structured block containing:
 - Commit(s) created (`hash + message`) OR explicit statement that commit was not created.
 - PRD updated: `yes/no`; if yes, list changed section names.
 - Worklog appended: `yes/no`.
-- Tag recommendation: `YES/NO`.
-- If `YES`: include `tag name + triggering T# reason(s) + exact copy-paste commands`.
+- Tag name (or `TBD`) and tag recommendation: `YES/NO`.
+- Push status for `main` and tag: `success/failed/not-attempted` (truthful).
+- If `YES`: include `triggering T# reason(s) + exact copy-paste commands`.
 - If `NO`: include one-line rationale.
 
 ## Failure Handling
