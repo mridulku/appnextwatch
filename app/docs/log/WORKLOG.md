@@ -41,3 +41,14 @@
 - Tag: nw-2026-02-16-1259-docs-repo-structure
 - Commit: TBD
 - Notes: app/docs/sessions/2026-02-16/1259_repo-consolidation.md
+
+## 2026-02-16 - Session navigation-folderize
+- Summary: Reorganized active code to mirror app navigation and module responsibilities.
+- Changes: Moved screens into `app/features/{movies,wellness,shared}`, core into responsibility folders, data into domain folders; rewired imports.
+- Files: app/App.js, app/features/**, app/core/**, app/data/**, app/docs/README.md, app/docs/AI_CONTEXT.md.
+- Behavior impact: No intended runtime behavior change.
+- Validation performed: Static unresolved import scan (excluding archive) passed with zero unresolved imports.
+- Follow-ups / risks: Runtime Expo boot not executed in this environment.
+- Tag: nw-2026-02-16-1315-navigation-folderize
+- Commit: TBD
+- Notes: app/docs/sessions/2026-02-16/1315_navigation-folderize.md

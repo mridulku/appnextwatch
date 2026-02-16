@@ -10,11 +10,11 @@
 - [`app/docs/sessions/LATEST.md`](./sessions/LATEST.md)
 
 ## 2) Main Code Surfaces
-- [`screens/`](../screens/) - Primary feature screens and user-facing flows.
+- [`features/`](../features/) - Screen code grouped by mode (`movies`, `wellness`) and shared flows.
 - [`components/`](../components/) - Reusable UI primitives and shared visual building blocks.
-- [`core/`](../core/) - APIs, storage wrappers, parsers, env helpers, and app utilities.
+- [`core/`](../core/) - Runtime modules split by responsibility (`api`, `storage`, `integrations`, `utils`, `schema`).
 - [`context/`](../context/) - Cross-screen React Context state (auth and preferences).
-- [`data/`](../data/) - Seed datasets and SQL bootstrapping files.
+- [`data/`](../data/) - Domain-grouped data (`movies`, `wellness`, `seeds`, `supabase`).
 - [`theme/`](../theme/) - Shared theme tokens (colors).
 - [`scripts/`](../../scripts/) - One-off repo scripts (data import helpers).
 
@@ -22,22 +22,22 @@
 - [`App.js`](../App.js)
 - [`context/AuthContext.js`](../context/AuthContext.js)
 - [`context/PreferencesContext.js`](../context/PreferencesContext.js)
-- [`core/categoryMode.js`](../core/categoryMode.js)
-- [`core/supabaseApi.js`](../core/supabaseApi.js)
-- [`core/sessionHistoryStorage.js`](../core/sessionHistoryStorage.js)
-- [`core/foodInventoryStorage.js`](../core/foodInventoryStorage.js)
-- [`core/foodUtensilsStorage.js`](../core/foodUtensilsStorage.js)
-- [`core/wellnessProfileStorage.js`](../core/wellnessProfileStorage.js)
-- [`core/fitnessLogStorage.js`](../core/fitnessLogStorage.js)
+- [`core/storage/categoryMode.js`](../core/storage/categoryMode.js)
+- [`core/api/supabaseApi.js`](../core/api/supabaseApi.js)
+- [`core/storage/sessionHistoryStorage.js`](../core/storage/sessionHistoryStorage.js)
+- [`core/storage/foodInventoryStorage.js`](../core/storage/foodInventoryStorage.js)
+- [`core/storage/foodUtensilsStorage.js`](../core/storage/foodUtensilsStorage.js)
+- [`core/storage/wellnessProfileStorage.js`](../core/storage/wellnessProfileStorage.js)
+- [`core/storage/fitnessLogStorage.js`](../core/storage/fitnessLogStorage.js)
 
 ## 4) “Where is X?” (quick answers)
 - Where are screens wired? -> [`App.js`](../App.js)
 - Where is auth login state handled? -> [`context/AuthContext.js`](../context/AuthContext.js)
-- Where is category mode saved/routed? -> [`core/categoryMode.js`](../core/categoryMode.js)
-- Where is persistence logic? -> [`core/`](../core/) (see `*Storage.js` files)
-- Where is wellness profile stored? -> [`core/wellnessProfileStorage.js`](../core/wellnessProfileStorage.js)
-- Where is session history stored? -> [`core/sessionHistoryStorage.js`](../core/sessionHistoryStorage.js)
-- Where is Supabase data access? -> [`core/supabaseApi.js`](../core/supabaseApi.js)
+- Where is category mode saved/routed? -> [`core/storage/categoryMode.js`](../core/storage/categoryMode.js)
+- Where is persistence logic? -> [`core/storage/`](../core/storage/) (storage modules)
+- Where is wellness profile stored? -> [`core/storage/wellnessProfileStorage.js`](../core/storage/wellnessProfileStorage.js)
+- Where is session history stored? -> [`core/storage/sessionHistoryStorage.js`](../core/storage/sessionHistoryStorage.js)
+- Where is Supabase data access? -> [`core/api/supabaseApi.js`](../core/api/supabaseApi.js)
 
 ## 5) Repo Commands (run from repo root)
 - `cd /Users/mridulpant/Documents/DevFiles/appnextwatch`

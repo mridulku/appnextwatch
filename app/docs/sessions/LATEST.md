@@ -1,1 +1,1 @@
-[Latest session notes](2026-02-16/1259_repo-consolidation.md)
+[Latest session notes](2026-02-16/1315_navigation-folderize.md)

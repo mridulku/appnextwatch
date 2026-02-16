@@ -11,7 +11,7 @@
 - **State management approach:**
   - Local component state (`useState`, `useMemo`, `useEffect`) is primary.
   - Lightweight context state for auth and movie preferences (`app/context/AuthContext.js`, `app/context/PreferencesContext.js`).
-  - Local persistence via AsyncStorage wrappers in `app/core/*Storage.js`.
+  - Local persistence via AsyncStorage wrappers in `app/core/storage/`.
 - **Navigation structure type:** React Navigation nested architecture:
   - Root stack -> category selector + app-mode containers.
   - Bottom tabs for mode-level navigation.
@@ -23,11 +23,21 @@
 |------|---------------|-------|
 | `app/App.js` | Root navigation composition and auth/category-based app entry | Defines Movies + Wellness tab stacks and shared stack options |
 | `index.js` | Expo bootstrap | Registers `App` via `registerRootComponent` |
-| `app/screens/` | UI screens + feature flows | Contains both Movies and Wellness feature screens |
+| `app/features/movies/` | Movies-mode screen modules | Grouped by tab/flow: `explore`, `directory`, `lists`, `chat`, `profile`, `shared` |
+| `app/features/wellness/` | Wellness-mode screen modules | Grouped by tab/flow: `home`, `sessions`, `gym`, `food`, `shared` |
+| `app/features/shared/` | Shared cross-mode screens | Auth/category/debug/settings routing surfaces |
 | `app/components/` | Reusable UI building blocks | Includes `CollapsibleSection`, `YouTubeEmbed`, media helpers |
 | `app/context/` | Global React Context providers | `AuthContext` and `PreferencesContext` only |
-| `app/core/` | Data access, environment, storage, parsing utilities | Supabase API client, OpenAI client, wiki API, AsyncStorage wrappers |
-| `app/data/` | Seed/static datasets + SQL bootstrap | Movies, lists, recipes, machines, exercises, session templates |
+| `app/core/api/` | API-facing modules | Supabase query API + Wiki API + sheet API helpers |
+| `app/core/storage/` | AsyncStorage persistence modules | Category mode, inventory, utensils, profile, session history, fitness log |
+| `app/core/integrations/` | Client integrations | OpenAI and Supabase client setup |
+| `app/core/utils/` | Utility helpers | CSV and general helper functions |
+| `app/core/schema/` | Schema/payload helper modules | Prompt/debug schema helpers |
+| `app/core/env.js` | Runtime env resolution | Reads Expo/Vite env keys |
+| `app/data/movies/` | Movies domain seed/static data | Catalog, lists, streaming metadata |
+| `app/data/wellness/` | Wellness domain seed/static data | Exercises, recipes, gym machines |
+| `app/data/seeds/` | Cross-domain seed fixtures | Session templates, demo users |
+| `app/data/supabase/` | SQL bootstrap assets | schema + seed SQL files |
 | `app/theme/` | Design tokens | Single color palette file used app-wide |
 | `scripts/` | One-off data import scripts | Example: awards import script |
 | `app/docs/` | Product/ops/project docs | PRD, SOP, worklog, session notes, and this context file |
@@ -48,7 +58,7 @@
 4. **Mode entry**
    - Category selector (`CategorySelectorScreen`) persists chosen mode via `saveCategory()` and resets navigation to target app container.
 5. **Feature data hydration**
-   - Movies screens primarily call `core/supabaseApi.js`; fallback to local `data/catalog.js` when unavailable.
+   - Movies screens primarily call `core/api/supabaseApi.js`; fallback to local `data/movies/catalog.js` when unavailable.
    - Wellness screens load local AsyncStorage-backed domain state (inventory, utensils, profile, session history).
 6. **Persistence write-back**
    - Wellness feature screens write updated local state to AsyncStorage through dedicated storage modules.
@@ -63,24 +73,24 @@
   - Defined/used: `context/AuthContext.js`.
 - **Movie domain**
   - Core entities: `movies`, `actors`, `directors`, awards (`award_shows`, `award_years`, `award_entries`).
-  - Source priority: Supabase tables via `core/supabaseApi.js` with local catalog fallback in some screens.
+  - Source priority: Supabase tables via `core/api/supabaseApi.js` with local catalog fallback in some screens.
   - Example movie fields: `id, title, year, genre, minutes, rating, overview, trailer_url, clips, wiki_*`.
 - **Wellness profile**
   - Persistent object key: `appnextwatch:wellness_profile`.
-  - Shape: `{ body, food, settings }` from `core/wellnessProfileStorage.js`.
+  - Shape: `{ body, food, settings }` from `core/storage/wellnessProfileStorage.js`.
   - Body: height/weight/body fat/targets/trend. Food: macro targets + weekly history. Settings: units/preferences/reminders.
 - **Food inventory**
   - Persistent key: `food_inventory_v1`.
   - Item fields: `id, name, category, unitType, quantity, lowStockThreshold, icon`.
-  - Seed + storage: `core/foodInventoryStorage.js`.
+  - Seed + storage: `core/storage/foodInventoryStorage.js`.
 - **Food utensils inventory**
   - Persistent key: `appnextwatch:food_utensils_inventory`.
   - Item fields: `id, name, category, count, note, icon`.
-  - Seed + storage: `core/foodUtensilsStorage.js`.
+  - Seed + storage: `core/storage/foodUtensilsStorage.js`.
 - **Session history (workout/cooking)**
   - Persistent key: `appnextwatch:session_history_v1`.
   - Record fields: `id, type, title, startedAt, endedAt, durationSeconds, status, summary`.
-  - Storage API: `core/sessionHistoryStorage.js`.
+  - Storage API: `core/storage/sessionHistoryStorage.js`.
 - **Workout templates + meal session options**
   - `data/sessionSeeds.js` (`WORKOUT_SESSION_TEMPLATES`, `TODAY_COOKING_MEAL_OPTIONS`).
 
@@ -113,12 +123,12 @@
   - UI actions mutate local state, then persist using AsyncStorage wrappers in `core`.
   - Session runners synthesize history records and append via `addSessionToHistory()`.
 - **Persistence modules and keys**
-  - `core/categoryMode.js` -> `appnextwatch:selected_category`.
-  - `core/wellnessProfileStorage.js` -> `appnextwatch:wellness_profile`.
-  - `core/foodInventoryStorage.js` -> `food_inventory_v1`.
-  - `core/foodUtensilsStorage.js` -> `appnextwatch:food_utensils_inventory`.
-  - `core/sessionHistoryStorage.js` -> `appnextwatch:session_history_v1`.
-  - `core/fitnessLogStorage.js` -> `fitness_workout_log_v1` (legacy/secondary usage).
+  - `core/storage/categoryMode.js` -> `appnextwatch:selected_category`.
+  - `core/storage/wellnessProfileStorage.js` -> `appnextwatch:wellness_profile`.
+  - `core/storage/foodInventoryStorage.js` -> `food_inventory_v1`.
+  - `core/storage/foodUtensilsStorage.js` -> `appnextwatch:food_utensils_inventory`.
+  - `core/storage/sessionHistoryStorage.js` -> `appnextwatch:session_history_v1`.
+  - `core/storage/fitnessLogStorage.js` -> `fitness_workout_log_v1` (legacy/secondary usage).
 - **Known coupling points**
   - `CookRecipeScreen` doubles as recipe detail and cooking session runner (controlled by `route.params?.sessionMode`).
   - Some screens still contain navigation fallbacks referencing route names like `Library` in parent navigation traversal.
@@ -131,7 +141,7 @@
 > Category selection drives initial post-login route and is persisted via `appnextwatch:selected_category`.
 
 > INVARIANT:
-> Wellness session records must stay appendable/readable by `core/sessionHistoryStorage.js` normalized shape.
+> Wellness session records must stay appendable/readable by `core/storage/sessionHistoryStorage.js` normalized shape.
 
 > CONSTRAINT:
 > Supabase features depend on `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`; without them, many movie/directory screens fall back partially or warn.
@@ -159,14 +169,14 @@
 
 ## 9. How to Safely Modify This Repo (For Future AI)
 - **When adding a new screen**
-  - Add screen under `screens/`.
+  - Add screen under `features/<mode>/<flow>/`.
   - Wire route explicitly in the correct stack/tab inside `App.js`.
   - Pass params by stable IDs, not large mutable objects when avoidable.
 - **When modifying navigation**
   - Validate root auth/category flow (`Login` -> `CategorySelector`/mode entry) first.
   - Preserve existing route names consumed by `navigation.navigate(...)` calls.
 - **When updating data models**
-  - Update corresponding storage normalizers in `core/*Storage.js` to keep backward compatibility.
+  - Update corresponding storage normalizers in `core/storage/*` to keep backward compatibility.
   - Preserve required fields for session summaries (`summary.timeline`, counts, status).
 - **When touching state logic**
   - Keep hydration (`load*`) and persistence (`save*`) guards (`hydrated` flags) to avoid writing defaults before load.
@@ -182,7 +192,7 @@
 > Production auth model beyond demo credentials is not present in repo code (`data/users.js` is static).
 
 > ASSUMPTION:
-> The active product direction is the merged Movies + Wellness app in `App.js`; older screens left in `screens/` but not routed are considered inactive unless re-wired.
+> The active product direction is the merged Movies + Wellness app in `app/App.js`; archived legacy screens remain under `archive/unused_screens/` unless re-wired.
 
 > ASSUMPTION:
 > Analytics/event tracking is currently not implemented as a dedicated layer; no explicit analytics module or event schema was found in runtime code paths.

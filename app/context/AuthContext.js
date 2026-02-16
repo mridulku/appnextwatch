@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 
-import { USERS } from '../data/users';
+import { USERS } from '../data/seeds/users';
 
 const AuthContext = createContext(null);
 
