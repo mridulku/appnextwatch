@@ -90,3 +90,15 @@
 - Follow-ups / risks: Optional helper can be added later (`scripts/db/apply_seed_via_psql.sh`) for direct session-pooler runs.
 - Tag: nw-20260217-1629-db-seed-applied
 - Notes: app/docs/sessions/2026-02-17/1629_db-seed-applied.md
+
+## 2026-02-17 - Session db-seed-verified
+- Summary: Applied seed_catalog.sql to remote Supabase via session pooler and completed SOP closeout.
+- Changes: Ran required psql verification commands; updated session ledger/worklog; cleaned untracked Supabase temp artifacts via gitignore rule.
+- DB migration/seed status: Migration+seed present and verified by live DB queries.
+- Verification outputs (counts): catalog_ingredients=30, catalog_utensils=10, catalog_recipes=5, catalog_recipe_ingredients=15, catalog_exercises=10, catalog_machines=10, metric_definitions=7.
+- Tables checked: catalog_ingredients, catalog_utensils, catalog_recipes, catalog_recipe_ingredients, catalog_exercises, catalog_machines, metric_definitions.
+- Files touched: .gitignore, app/docs/log/WORKLOG.md, app/docs/sessions/INDEX.md, app/docs/sessions/LATEST.md, app/docs/sessions/2026-02-17/1639_db-seed-verified.md.
+- Validation performed: psql identity check, public table listing, seeded-count query.
+- Follow-ups / risks: Optional helper script `scripts/db/apply_seed_via_psql.sh` can reduce manual repetition.
+- Tag: nw-20260217-1639-db-seed-verified
+- Notes: app/docs/sessions/2026-02-17/1639_db-seed-verified.md
