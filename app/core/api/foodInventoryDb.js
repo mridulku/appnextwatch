@@ -34,76 +34,81 @@ export async function getOrCreateAppUser({ username, name }) {
   return inserted.data;
 }
 
-export async function fetchCatalogIngredients() {
+export async function listCatalogIngredients({ search = '', category = 'All' } = {}) {
   const client = getClientOrThrow();
-  const response = await client
+  let query = client
     .from('catalog_ingredients')
     .select('id,name,category,unit_type')
     .order('name', { ascending: true });
 
+  const normalizedSearch = String(search || '').trim();
+  if (normalizedSearch) {
+    query = query.ilike('name', `%${normalizedSearch}%`);
+  }
+
+  const normalizedCategory = String(category || 'All').trim();
+  if (normalizedCategory && normalizedCategory !== 'All') {
+    query = query.ilike('category', `%${normalizedCategory}%`);
+  }
+
+  const response = await query;
   if (response.error) throw response.error;
   return response.data ?? [];
 }
 
-export async function fetchUserInventoryRows(appUserId) {
+export async function listUserIngredients(userId) {
   const client = getClientOrThrow();
-
   const response = await client
     .from('user_ingredients')
     .select('id,user_id,ingredient_id,custom_name,quantity,unit_type,low_stock_threshold,catalog_ingredient:catalog_ingredients(id,name,category,unit_type)')
-    .eq('user_id', appUserId)
+    .eq('user_id', userId)
     .order('created_at', { ascending: true });
 
   if (response.error) throw response.error;
   return response.data ?? [];
 }
 
-export async function upsertUserIngredient({
-  appUserId,
-  ingredient,
-  amount,
-  unitType,
-}) {
+export async function upsertUserIngredient({ userId, ingredientId, quantity }) {
   const client = getClientOrThrow();
+  const numericQuantity = Number(quantity) || 0;
+  if (numericQuantity <= 0) throw new Error('Quantity should be greater than 0');
+
+  const catalogResponse = await client
+    .from('catalog_ingredients')
+    .select('id,unit_type')
+    .eq('id', ingredientId)
+    .single();
+  if (catalogResponse.error) throw catalogResponse.error;
+
+  const catalogUnit = catalogResponse.data?.unit_type || 'pcs';
 
   const existing = await client
     .from('user_ingredients')
-    .select('id,quantity,unit_type')
-    .eq('user_id', appUserId)
-    .eq('ingredient_id', ingredient.id)
+    .select('id')
+    .eq('user_id', userId)
+    .eq('ingredient_id', ingredientId)
     .maybeSingle();
-
   if (existing.error) throw existing.error;
 
-  const numericAmount = Number(amount) || 0;
-  if (numericAmount <= 0) throw new Error('Amount must be greater than 0');
-
   if (existing.data?.id) {
-    const currentQty = Number(existing.data.quantity) || 0;
-    const nextQty = currentQty + numericAmount;
-
     const updated = await client
       .from('user_ingredients')
-      .update({
-        quantity: nextQty,
-        unit_type: unitType || existing.data.unit_type || ingredient.unit_type || 'pcs',
-      })
+      .update({ quantity: numericQuantity, unit_type: catalogUnit })
       .eq('id', existing.data.id)
       .select('id')
       .single();
-
     if (updated.error) throw updated.error;
-    return { mode: 'increment' };
+    return { mode: 'update' };
   }
 
   const inserted = await client
     .from('user_ingredients')
     .insert({
-      user_id: appUserId,
-      ingredient_id: ingredient.id,
-      quantity: numericAmount,
-      unit_type: unitType || ingredient.unit_type || 'pcs',
-      low_stock_threshold: getDefaultThreshold(unitType || ingredient.unit_type || 'pcs'),
+      user_id: userId,
+      ingredient_id: ingredientId,
+      quantity: numericQuantity,
+      unit_type: catalogUnit,
+      low_stock_threshold: getDefaultThreshold(catalogUnit),
     })
     .select('id')
     .single();
@@ -125,6 +130,18 @@ export async function updateUserIngredientQuantity({ rowId, quantity }) {
 
   if (response.error) throw response.error;
   return response.data;
+}
+
+export async function deleteUserIngredient({ userId, ingredientId }) {
+  const client = getClientOrThrow();
+  const response = await client
+    .from('user_ingredients')
+    .delete()
+    .eq('user_id', userId)
+    .eq('ingredient_id', ingredientId);
+
+  if (response.error) throw response.error;
+  return true;
 }
 
 function getDefaultThreshold(unitType) {

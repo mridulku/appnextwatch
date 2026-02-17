@@ -3,9 +3,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
+  FlatList,
   Modal,
   Pressable,
   SafeAreaView,
+  ScrollView,
   SectionList,
   StyleSheet,
   Text,
@@ -24,8 +26,10 @@ import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import {
   fetchCatalogIngredients,
-  fetchUserInventoryRows,
+  deleteUserIngredient,
   getOrCreateAppUser,
+  listCatalogIngredients,
+  listUserIngredients,
   updateUserIngredientQuantity,
   upsertUserIngredient,
 } from '../../../core/api/foodInventoryDb';
@@ -67,11 +71,16 @@ function normalizeCategory(rawCategory) {
   return 'Snacks';
 }
 
-const ADD_ITEM_UNITS = ['pcs', 'g', 'kg', 'ml', 'litre', 'bottle'];
+const CATALOG_FILTER_ORDER = ['All', ...CATEGORY_ORDER];
 
 function getQuantityStep(unitType) {
   if (unitType === 'kg' || unitType === 'litre') return 0.25;
   if (unitType === 'g' || unitType === 'ml') return 50;
+  return 1;
+}
+
+function getAddDefaultQuantity(unitType) {
+  if (unitType === 'g' || unitType === 'ml') return 100;
   return 1;
 }
 
@@ -146,12 +155,14 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
   const [isListening, setIsListening] = useState(false);
   const [recognizedText, setRecognizedText] = useState('');
   const [interpretation, setInterpretation] = useState({ actions: [], warnings: [] });
+  const [pendingRemoveItemId, setPendingRemoveItemId] = useState(null);
 
   const [addItemVisible, setAddItemVisible] = useState(false);
-  const [catalogSearch, setCatalogSearch] = useState('');
+  const [catalogSearchInput, setCatalogSearchInput] = useState('');
+  const [debouncedCatalogSearch, setDebouncedCatalogSearch] = useState('');
+  const [selectedCatalogCategory, setSelectedCatalogCategory] = useState('All');
   const [selectedCatalogItem, setSelectedCatalogItem] = useState(null);
-  const [manualUnit, setManualUnit] = useState('');
-  const [manualQuantity, setManualQuantity] = useState('1');
+  const [pickerQuantity, setPickerQuantity] = useState(1);
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -160,28 +171,30 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
   const autoInterpretTimeoutRef = useRef(null);
   const snackbarTimeoutRef = useRef(null);
 
-  const refreshInventory = async (resolvedAppUserId) => {
-    const rows = await fetchUserInventoryRows(resolvedAppUserId);
-    const mapped = rows
+  const mapInventoryRows = (rows) =>
+    rows
       .map((row) => {
         const catalog = row.catalog_ingredient;
         const itemName = catalog?.name || row.custom_name;
         if (!itemName) return null;
 
+        const normalizedCategory = normalizeCategory(catalog?.category);
         return {
           id: row.id,
           name: itemName,
-          category: normalizeCategory(catalog?.category),
-          unitType: row.unit_type || catalog?.unit_type || 'pcs',
+          category: normalizedCategory,
+          unitType: catalog?.unit_type || row.unit_type || 'pcs',
           quantity: Number(row.quantity) || 0,
           lowStockThreshold: Number(row.low_stock_threshold) || 1,
-          icon: CATEGORY_META[normalizeCategory(catalog?.category)]?.emoji || '🧺',
+          icon: CATEGORY_META[normalizedCategory]?.emoji || '🧺',
           ingredientId: row.ingredient_id,
         };
       })
       .filter(Boolean);
 
-    setInventory(mapped);
+  const refreshInventory = async (resolvedAppUserId) => {
+    const rows = await listUserIngredients(resolvedAppUserId);
+    setInventory(mapInventoryRows(rows));
   };
 
   useEffect(() => {
@@ -200,29 +213,12 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
         setAppUserId(appUser.id);
         const [catalog, rows] = await Promise.all([
           fetchCatalogIngredients(),
-          fetchUserInventoryRows(appUser.id),
+          listUserIngredients(appUser.id),
         ]);
         if (cancelled) return;
 
         setCatalogItems(catalog);
-        const mappedRows = rows
-          .map((row) => {
-            const catalogItem = row.catalog_ingredient;
-            const itemName = catalogItem?.name || row.custom_name;
-            if (!itemName) return null;
-            return {
-              id: row.id,
-              name: itemName,
-              category: normalizeCategory(catalogItem?.category),
-              unitType: row.unit_type || catalogItem?.unit_type || 'pcs',
-              quantity: Number(row.quantity) || 0,
-              lowStockThreshold: Number(row.low_stock_threshold) || 1,
-              icon: CATEGORY_META[normalizeCategory(catalogItem?.category)]?.emoji || '🧺',
-              ingredientId: row.ingredient_id,
-            };
-          })
-          .filter(Boolean);
-        setInventory(mappedRows);
+        setInventory(mapInventoryRows(rows));
       } catch (error) {
         if (!cancelled) {
           setInlineError(error?.message || 'Could not load inventory right now.');
@@ -281,6 +277,13 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     () => inventory.filter((item) => item.quantity <= item.lowStockThreshold).length,
     [inventory],
   );
+  const selectedExistingInventoryItem = useMemo(
+    () =>
+      selectedCatalogItem
+        ? inventory.find((entry) => entry.ingredientId === selectedCatalogItem.id)
+        : null,
+    [inventory, selectedCatalogItem],
+  );
 
   const sections = useMemo(() => {
     const grouped = inventory.reduce((acc, item) => {
@@ -313,15 +316,49 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     [expandedCategories, sections],
   );
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedCatalogSearch(catalogSearchInput.trim());
+    }, 280);
+    return () => clearTimeout(timeout);
+  }, [catalogSearchInput]);
+
+  useEffect(() => {
+    if (!selectedCatalogItem) return;
+    if (selectedExistingInventoryItem) {
+      setPickerQuantity(Number(selectedExistingInventoryItem.quantity) || 1);
+      return;
+    }
+    setPickerQuantity(getAddDefaultQuantity(selectedCatalogItem.unit_type || 'pcs'));
+  }, [selectedCatalogItem, selectedExistingInventoryItem]);
+
+  useEffect(() => {
+    let canceled = false;
+    if (!addItemVisible) return undefined;
+
+    const hydrateCatalog = async () => {
+      try {
+        const rows = await listCatalogIngredients({
+          search: debouncedCatalogSearch,
+        });
+        if (!canceled) setCatalogItems(rows);
+      } catch (error) {
+        if (!canceled) setInlineError(error?.message || 'Could not load catalog.');
+      }
+    };
+
+    hydrateCatalog();
+    return () => {
+      canceled = true;
+    };
+  }, [addItemVisible, debouncedCatalogSearch]);
+
   const filteredCatalogItems = useMemo(() => {
-    const query = catalogSearch.trim().toLowerCase();
-    if (!query) return catalogItems;
-    return catalogItems.filter((item) => {
-      const name = String(item.name || '').toLowerCase();
-      const category = String(item.category || '').toLowerCase();
-      return name.includes(query) || category.includes(query);
-    });
-  }, [catalogItems, catalogSearch]);
+    if (selectedCatalogCategory === 'All') return catalogItems;
+    return catalogItems.filter(
+      (item) => normalizeCategory(item.category) === selectedCatalogCategory,
+    );
+  }, [catalogItems, selectedCatalogCategory]);
 
   const showSnackbar = (message) => {
     setSnackbarMessage(message);
@@ -421,14 +458,19 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     if (!item) return;
 
     const step = getQuantityStep(item.unitType);
-    const nextValue = Number(Math.max(0, item.quantity + step * direction).toFixed(3));
+    const nextValue = Number((item.quantity + step * direction).toFixed(3));
+
+    if (direction < 0 && nextValue <= 0) {
+      setPendingRemoveItemId(itemId);
+      return;
+    }
 
     setInventory((prev) =>
-      prev.map((entry) => (entry.id === itemId ? { ...entry, quantity: nextValue } : entry)),
+      prev.map((entry) => (entry.id === itemId ? { ...entry, quantity: Math.max(0, nextValue) } : entry)),
     );
 
     try {
-      await updateUserIngredientQuantity({ rowId: itemId, quantity: nextValue });
+      await updateUserIngredientQuantity({ rowId: itemId, quantity: Math.max(0, nextValue) });
     } catch (error) {
       setInventory((prev) =>
         prev.map((entry) => (entry.id === itemId ? { ...entry, quantity: item.quantity } : entry)),
@@ -437,11 +479,28 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     }
   };
 
+  const confirmRemoveItem = async (item) => {
+    if (!appUserId || !item?.ingredientId) return;
+    try {
+      await deleteUserIngredient({ userId: appUserId, ingredientId: item.ingredientId });
+      setInventory((prev) => prev.filter((entry) => entry.id !== item.id));
+      setPendingRemoveItemId(null);
+      showSnackbar('Item removed');
+    } catch (error) {
+      showSnackbar(error?.message || 'Could not remove item');
+    }
+  };
+
+  const cancelRemoveItem = () => {
+    setPendingRemoveItemId(null);
+  };
+
   const openAddItemModal = () => {
-    setCatalogSearch('');
+    setCatalogSearchInput('');
+    setDebouncedCatalogSearch('');
+    setSelectedCatalogCategory('All');
     setSelectedCatalogItem(null);
-    setManualUnit('');
-    setManualQuantity('1');
+    setPickerQuantity(1);
     setAddItemVisible(true);
   };
 
@@ -455,8 +514,7 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
       return;
     }
 
-    const unit = manualUnit || selectedCatalogItem.unit_type || 'pcs';
-    const quantity = Math.max(0, Number(manualQuantity) || 0);
+    const quantity = Math.max(0, Number(pickerQuantity) || 0);
 
     if (quantity <= 0) {
       showSnackbar('Quantity should be greater than 0');
@@ -466,14 +524,13 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     try {
       setAddPending(true);
       const result = await upsertUserIngredient({
-        appUserId,
-        ingredient: selectedCatalogItem,
-        amount: quantity,
-        unitType: unit,
+        userId: appUserId,
+        ingredientId: selectedCatalogItem.id,
+        quantity,
       });
       await refreshInventory(appUserId);
       closeAddItemModal();
-      showSnackbar(result.mode === 'increment' ? 'Quantity updated' : 'Item added');
+      showSnackbar(result.mode === 'update' ? 'Item updated' : 'Item added');
     } catch (error) {
       showSnackbar(error?.message || 'Could not add item');
     } finally {
@@ -503,6 +560,7 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
 
   const renderItem = ({ item }) => {
     const low = item.quantity <= item.lowStockThreshold;
+    const pendingRemove = pendingRemoveItemId === item.id;
 
     return (
       <View style={styles.itemCard}>
@@ -520,22 +578,45 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
           </View>
         </View>
 
-        <View style={styles.stepper}>
-          <TouchableOpacity
-            style={styles.stepperButton}
-            activeOpacity={0.85}
-            onPress={() => adjustQuantity(item.id, -1)}
-          >
-            <Ionicons name="remove" size={16} color={COLORS.text} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.stepperButton, styles.stepperButtonAccent]}
-            activeOpacity={0.85}
-            onPress={() => adjustQuantity(item.id, 1)}
-          >
-            <Ionicons name="add" size={16} color={COLORS.bg} />
-          </TouchableOpacity>
-        </View>
+        {pendingRemove ? (
+          <View style={styles.removePromptWrap}>
+            <Text style={styles.removePromptText}>Remove?</Text>
+            <View style={styles.removePromptActions}>
+              <TouchableOpacity style={styles.removeCancelChip} activeOpacity={0.9} onPress={cancelRemoveItem}>
+                <Text style={styles.removeCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.removeConfirmChip} activeOpacity={0.9} onPress={() => confirmRemoveItem(item)}>
+                <Text style={styles.removeConfirmText}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.stepperWrap}>
+            <TouchableOpacity
+              style={styles.removeIconButton}
+              activeOpacity={0.85}
+              onPress={() => setPendingRemoveItemId(item.id)}
+            >
+              <Ionicons name="trash-outline" size={14} color="#FFA674" />
+            </TouchableOpacity>
+            <View style={styles.stepper}>
+              <TouchableOpacity
+                style={styles.stepperButton}
+                activeOpacity={0.85}
+                onPress={() => adjustQuantity(item.id, -1)}
+              >
+                <Ionicons name="remove" size={16} color={COLORS.text} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.stepperButton, styles.stepperButtonAccent]}
+                activeOpacity={0.85}
+                onPress={() => adjustQuantity(item.id, 1)}
+              >
+                <Ionicons name="add" size={16} color={COLORS.bg} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </View>
     );
   };
@@ -751,20 +832,42 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
             <Text style={styles.fieldLabel}>Search ingredient</Text>
             <TextInput
               style={styles.singleInput}
-              value={catalogSearch}
-              onChangeText={setCatalogSearch}
+              value={catalogSearchInput}
+              onChangeText={setCatalogSearchInput}
               placeholder="Type ingredient name"
               placeholderTextColor={COLORS.muted}
             />
 
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.categoryChipsRow}
+            >
+              {CATALOG_FILTER_ORDER.map((category) => {
+                const active = category === selectedCatalogCategory;
+                return (
+                  <TouchableOpacity
+                    key={category}
+                    style={[styles.categoryFilterChip, active && styles.categoryFilterChipActive]}
+                    activeOpacity={0.9}
+                    onPress={() => setSelectedCatalogCategory(category)}
+                  >
+                    <Text
+                      style={[
+                        styles.categoryFilterText,
+                        active && styles.categoryFilterTextActive,
+                      ]}
+                    >
+                      {category}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
             <View style={styles.catalogPickerWrap}>
-              <SectionList
-                sections={[
-                  {
-                    title: 'Catalog',
-                    data: filteredCatalogItems.slice(0, 40),
-                  },
-                ]}
+              <FlatList
+                data={filteredCatalogItems}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => {
                   const selected = selectedCatalogItem?.id === item.id;
@@ -774,9 +877,13 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
                       activeOpacity={0.9}
                       onPress={() => {
                         setSelectedCatalogItem(item);
-                        setManualUnit(item.unit_type || 'pcs');
                       }}
                     >
+                      <View style={styles.itemIconWrap}>
+                        <Text style={styles.itemIcon}>
+                          {CATEGORY_META[normalizeCategory(item.category)]?.emoji || '🧺'}
+                        </Text>
+                      </View>
                       <View style={styles.catalogRowText}>
                         <Text style={styles.catalogName}>{item.name}</Text>
                         <Text style={styles.catalogMeta}>
@@ -787,42 +894,56 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
                     </TouchableOpacity>
                   );
                 }}
-                renderSectionHeader={() => null}
-                stickySectionHeadersEnabled={false}
                 showsVerticalScrollIndicator={false}
+                initialNumToRender={16}
+                keyboardShouldPersistTaps="handled"
                 ListEmptyComponent={
                   <Text style={styles.catalogEmpty}>No catalog items match your search.</Text>
                 }
               />
             </View>
 
-            <Text style={styles.fieldLabel}>Quantity</Text>
-            <TextInput
-              style={styles.singleInput}
-              value={manualQuantity}
-              onChangeText={setManualQuantity}
-              keyboardType="numeric"
-              placeholder="1"
-              placeholderTextColor={COLORS.muted}
-            />
-
-            <Text style={styles.fieldLabel}>Unit</Text>
-            <View style={styles.choiceWrap}>
-              {ADD_ITEM_UNITS.map((unit) => (
-                <TouchableOpacity
-                  key={unit}
-                  style={[styles.choiceChip, manualUnit === unit && styles.choiceChipActive]}
-                  activeOpacity={0.9}
-                  onPress={() => setManualUnit(unit)}
-                >
-                  <Text
-                    style={[styles.choiceChipText, manualUnit === unit && styles.choiceChipTextActive]}
+            {selectedCatalogItem ? (
+              <View style={styles.quantityCard}>
+                <Text style={styles.fieldLabel}>Quantity</Text>
+                <View style={styles.quantityRow}>
+                  <TouchableOpacity
+                    style={styles.stepperButton}
+                    activeOpacity={0.9}
+                    onPress={() =>
+                      setPickerQuantity((prev) => {
+                        const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
+                        return Math.max(0, Number((prev - step).toFixed(3)));
+                      })
+                    }
                   >
-                    {unit}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                    <Ionicons name="remove" size={16} color={COLORS.text} />
+                  </TouchableOpacity>
+                  <View style={styles.quantityValueWrap}>
+                    <Text style={styles.quantityValueText}>
+                      {formatQuantity(pickerQuantity, selectedCatalogItem.unit_type || 'pcs')}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.stepperButton, styles.stepperButtonAccent]}
+                    activeOpacity={0.9}
+                    onPress={() =>
+                      setPickerQuantity((prev) => {
+                        const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
+                        return Number((prev + step).toFixed(3));
+                      })
+                    }
+                  >
+                    <Ionicons name="add" size={16} color={COLORS.bg} />
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.quantityHint}>
+                  Unit: {selectedCatalogItem.unit_type || 'pcs'} (from catalog)
+                </Text>
+              </View>
+            ) : (
+              <Text style={styles.catalogEmpty}>Select an ingredient to set quantity.</Text>
+            )}
 
             <View style={styles.sheetActions}>
               <TouchableOpacity
@@ -836,9 +957,15 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
                 style={[styles.confirmButton, addPending && styles.confirmButtonDisabled]}
                 activeOpacity={0.9}
                 onPress={submitAddItem}
-                disabled={addPending}
+                disabled={addPending || !selectedCatalogItem}
               >
-                <Text style={styles.confirmButtonText}>Add</Text>
+                {addPending ? (
+                  <ActivityIndicator color={COLORS.bg} size="small" />
+                ) : (
+                  <Text style={styles.confirmButtonText}>
+                    {selectedExistingInventoryItem ? 'Update' : 'Add'}
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -1041,6 +1168,59 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  stepperWrap: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  removeIconButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: 'rgba(255,145,107,0.4)',
+    backgroundColor: 'rgba(255,145,107,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  removePromptWrap: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  removePromptText: {
+    color: '#FFA674',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  removePromptActions: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  removeCancelChip: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.34)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: COLORS.cardSoft,
+  },
+  removeCancelText: {
+    color: COLORS.text,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  removeConfirmChip: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(255,145,107,0.5)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: 'rgba(255,145,107,0.16)',
+  },
+  removeConfirmText: {
+    color: '#FFA674',
+    fontSize: 11,
+    fontWeight: '700',
   },
   stepperButton: {
     width: 30,
@@ -1270,6 +1450,30 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 14,
   },
+  categoryChipsRow: {
+    gap: 8,
+    paddingBottom: 10,
+  },
+  categoryFilterChip: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.32)',
+    backgroundColor: COLORS.card,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  categoryFilterChipActive: {
+    borderColor: 'rgba(245,201,106,0.56)',
+    backgroundColor: 'rgba(245,201,106,0.17)',
+  },
+  categoryFilterText: {
+    color: COLORS.muted,
+    fontSize: 12,
+  },
+  categoryFilterTextActive: {
+    color: COLORS.accent,
+    fontWeight: '700',
+  },
   interpretButton: {
     backgroundColor: COLORS.cardSoft,
     borderWidth: 1,
@@ -1328,32 +1532,6 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     marginBottom: 3,
   },
-  choiceWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 12,
-  },
-  choiceChip: {
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.32)',
-    backgroundColor: COLORS.card,
-  },
-  choiceChipActive: {
-    borderColor: 'rgba(245,201,106,0.54)',
-    backgroundColor: 'rgba(245,201,106,0.15)',
-  },
-  choiceChipText: {
-    color: COLORS.muted,
-    fontSize: 12,
-  },
-  choiceChipTextActive: {
-    color: COLORS.accent,
-    fontWeight: '700',
-  },
   catalogPickerWrap: {
     maxHeight: 220,
     borderRadius: 12,
@@ -1371,6 +1549,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 8,
   },
   catalogRowActive: {
     backgroundColor: 'rgba(245,201,106,0.13)',
@@ -1394,6 +1573,41 @@ const styles = StyleSheet.create({
     fontSize: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
+  },
+  quantityCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.25)',
+    backgroundColor: COLORS.card,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+  },
+  quantityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  quantityValueWrap: {
+    flex: 1,
+    minHeight: 38,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.cardSoft,
+  },
+  quantityValueText: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  quantityHint: {
+    color: COLORS.muted,
+    fontSize: 11,
+    marginTop: 8,
   },
   sheetActions: {
     flexDirection: 'row',

@@ -2,6 +2,7 @@
 
 | Date | Time | Tag | Commit | Title (1 line) | Notes link |
 |---|---|---|---|---|---|
+| 2026-02-17 | 20:13 | nw-20260217-2013-inventory-additem-polish | TBD | inventory remove flow + add sheet polish | [2013_inventory-add-sheet-polish.md](2026-02-17/2013_inventory-add-sheet-polish.md) |
 | 2026-02-17 | 19:47 | nw-2026-02-17-1947-ui-food-inventory-db | TBD | food inventory supabase integration | [1947_food-inventory-db.md](2026-02-17/1947_food-inventory-db.md) |
 | 2026-02-17 | 16:39 | nw-20260217-1639-db-seed-verified | TBD | db seed verification + sop closeout | [1639_db-seed-verified.md](2026-02-17/1639_db-seed-verified.md) |
 | 2026-02-17 | 16:29 | nw-20260217-1629-db-seed-applied | TBD | remote seed verification via session pooler | [1629_db-seed-applied.md](2026-02-17/1629_db-seed-applied.md) |

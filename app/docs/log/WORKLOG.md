@@ -112,3 +112,13 @@
 - Follow-ups / risks: Current policy for `user_ingredients` is permissive to support local app auth model; should be tightened after Supabase auth integration.
 - Tag: nw-2026-02-17-1947-ui-food-inventory-db
 - Notes: app/docs/sessions/2026-02-17/1947_food-inventory-db.md
+
+## 2026-02-17 - Session inventory-add-sheet-polish
+- Summary: Upgraded Food Inventory remove behavior and Add Item sheet to a cleaner catalog-driven stepper UX.
+- Changes: Added row delete micro-confirm + explicit trash affordance, replaced Add sheet freeform inputs with category chips, searchable virtualized picker, read-only catalog unit, and quantity stepper; enforced user ingredient uniqueness with migration.
+- Files: app/features/wellness/food/FoodInventoryScreen.js, app/core/api/foodInventoryDb.js, supabase/migrations/20260217195500_user_ingredients_user_ingredient_unique.sql, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*, app/docs/log/WORKLOG.md.
+- Behavior impact: Food Inventory now supports clean delete semantics and product-grade add/update interactions while remaining Supabase-backed.
+- Validation performed: `npx expo export --platform ios` compile success; live DB checks covered empty state, Atta add(unit kg), Black Pepper add(step 50), quantity update, and delete path.
+- Follow-ups / risks: Voice-command create flow can be aligned to catalog-only add/update for full consistency.
+- Tag: nw-20260217-2013-inventory-additem-polish
+- Notes: app/docs/sessions/2026-02-17/2013_inventory-add-sheet-polish.md
