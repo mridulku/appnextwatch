@@ -56,6 +56,11 @@ export async function listCatalogIngredients({ search = '', category = 'All' } =
   return response.data ?? [];
 }
 
+// Backward-compatible alias for existing callsites.
+export async function fetchCatalogIngredients() {
+  return listCatalogIngredients({ search: '', category: 'All' });
+}
+
 export async function listUserIngredients(userId) {
   const client = getClientOrThrow();
   const response = await client

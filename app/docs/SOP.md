@@ -168,6 +168,7 @@ Codex must always output a final structured block containing:
 - Push status for `main` and tag: `success/failed/not-attempted` (truthful).
 - If `YES`: include `triggering T# reason(s) + exact copy-paste commands`.
 - If `NO`: include one-line rationale.
+- If `.gitignore` changed: include one sentence in the session note explaining why, and list what was excluded.
 
 ## Failure Handling
 If any mandatory step cannot be completed:
