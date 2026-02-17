@@ -72,3 +72,13 @@
 - Follow-ups / risks: Full runtime smoke test on simulator/device still recommended.
 - Tag: nw-2026-02-16-1619-test-tab-supabase-openai
 - Notes: app/docs/sessions/2026-02-16/1619_test-tab-supabase-openai.md
+
+## 2026-02-17 - Session db-schema-seed-workflow
+- Summary: Added one-command Supabase schema + seed workflow scaffolding with safety checks.
+- Changes: Added DB wrapper script, migration SQL, seed SQL, and docs workflow link.
+- Files: scripts/db/setup_and_apply_supabase.sh, scripts/db/README.md, supabase/migrations/20260217154400_init_wellness_food_gym.sql, supabase/seed/seed_catalog.sql, app/docs/README.md, app/docs/sessions/*, app/docs/log/WORKLOG.md.
+- Behavior impact: No user-visible app behavior change; repository DB operations workflow added.
+- Validation performed: `.env` ignore/tracking check passed; wrapper script syntax check passed; wrapper execution failed safely due missing Supabase CLI.
+- Follow-ups / risks: Pending install/login/link + `supabase db push` and seed apply before production usage.
+- Tag: NO (blocked: db push did not run)
+- Notes: app/docs/sessions/2026-02-17/1547_db-schema-seed-workflow.md

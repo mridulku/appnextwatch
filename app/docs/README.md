@@ -44,3 +44,6 @@
 - `npm install`
 - `npm run ios`
 - `npm run android`
+
+## 6) DB Workflow
+- [`scripts/db/README.md`](../../scripts/db/README.md) - Supabase CLI install/login/link plus one-command schema + seed apply flow.
