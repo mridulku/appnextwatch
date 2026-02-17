@@ -102,3 +102,13 @@
 - Follow-ups / risks: Optional helper script `scripts/db/apply_seed_via_psql.sh` can reduce manual repetition.
 - Tag: nw-20260217-1639-db-seed-verified
 - Notes: app/docs/sessions/2026-02-17/1639_db-seed-verified.md
+
+## 2026-02-17 - Session food-inventory-db
+- Summary: Converted Wellness Food Inventory to Supabase-backed fetch/add/update flow.
+- Changes: Added inventory DB module, refactored FoodInventory screen to query `user_ingredients` joined with `catalog_ingredients`, replaced free-text add with searchable catalog picker, and added quantity upsert/increment behavior.
+- Files: app/core/api/foodInventoryDb.js, app/features/wellness/food/FoodInventoryScreen.js, supabase/migrations/20260217164500_inventory_user_ingredients_public_policies.sql, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*, app/docs/log/WORKLOG.md.
+- Behavior impact: Food > Inventory now uses remote DB state for list and add flow; empty state appears for users without rows.
+- Validation performed: Applied migration via psql; DB script check verified empty -> add -> increment path; `npx expo export --platform ios` passed.
+- Follow-ups / risks: Current policy for `user_ingredients` is permissive to support local app auth model; should be tightened after Supabase auth integration.
+- Tag: nw-2026-02-17-1947-ui-food-inventory-db
+- Notes: app/docs/sessions/2026-02-17/1947_food-inventory-db.md

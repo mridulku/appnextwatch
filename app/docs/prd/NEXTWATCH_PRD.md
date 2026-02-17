@@ -6,6 +6,7 @@
 | 0.1 | 2026-02-16 | Codex (code-grounded draft) | Initial PRD derived from current `appnextwatch` implementation |
 | 0.2 | 2026-02-16 | Codex | Repository folderization by navigation/domain (`app/features`, `app/core/*`, `app/data/*`); no intended user-visible behavior change |
 | 0.3 | 2026-02-16 | Codex | Added Wellness `Test` tab (Tables + Chat) for Supabase/OpenAI connectivity validation; existing product flows unchanged |
+| 0.4 | 2026-02-17 | Codex | Food Inventory now reads/writes Supabase (`user_ingredients` + `catalog_ingredients`) with empty state + catalog picker add/upsert flow |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -20,6 +21,11 @@
 - Security handling kept explicit:
   - `.env` remains gitignored and not tracked.
   - UI/logs surface key state only as `configured: yes/no` and never print secret values.
+- 2026-02-17: Food Inventory behavior changed from local seed persistence to Supabase-backed user inventory:
+  - Inventory list fetch: `user_ingredients` joined with `catalog_ingredients`, scoped to mapped `app_users` identity.
+  - Empty state is shown when the user has no rows; no placeholder/demo inventory is injected.
+  - Add flow is now a searchable catalog picker and upsert-style write (`insert` new, `increment` existing quantity).
+  - Quantity steppers update `user_ingredients` rows directly.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.
@@ -203,7 +209,7 @@ Code references:
 ### 5.2 Key User Actions Mapped to Routes
 - Start workout session: `Home -> Sessions/WorkoutSessionSetup -> WorkoutSessionRun -> SessionSummary`
 - Start cooking session: `Sessions/CookingSessionSetup -> CookingSessionRun -> SessionSummary`
-- Manage food inventory: `FoodHub (Inventory) -> voice modal/manual add/stepper updates`
+- Manage food inventory: `FoodHub (Inventory) -> DB-backed grouped list -> catalog picker add/upsert -> stepper quantity updates`
 - Browse gym assets: `GymHub (Machines|Exercises) -> detail screens`
 
 Code references:
@@ -232,7 +238,7 @@ Code references:
 | US-10 | Session user | workout progress logging with timer and set tracking | I can complete and review a session | P0 | Runner supports start/pause/log set/next/finish and writes session history record | `screens/ExerciseSessionScreen.js`, `core/sessionHistoryStorage.js` |
 | US-11 | Session user | cooking step guidance with timer/chat/voice simulation | I can complete recipes in session mode | P0 | Cooking runner tracks steps/timer and logs completed/abandoned sessions to history | `screens/CookRecipeScreen.js`, `core/sessionHistoryStorage.js` |
 | US-12 | Wellness user | session history grouped by date | I can review completed and abandoned sessions | P0 | Sessions home loads AsyncStorage records, groups by date labels, links to session summary | `screens/SessionsHomeScreen.js`, `screens/SessionSummaryScreen.js`, `core/sessionHistoryStorage.js` |
-| US-13 | Food user | pantry management with quick adjust + voice parsing | I can keep inventory updated efficiently | P0 | Inventory supports steppers, add item, voice command parse/interpret/confirm, low-stock hints | `screens/FoodInventoryScreen.js`, `core/foodVoiceParser.js`, `core/foodInventoryStorage.js` |
+| US-13 | Food user | pantry management with quick adjust and DB-backed catalog add flow | I can keep inventory updated efficiently with real persisted data | P0 | Inventory loads user rows from Supabase, shows empty state when no rows, supports searchable catalog add with upsert, and steppers persist quantity updates | `app/features/wellness/food/FoodInventoryScreen.js`, `app/core/api/foodInventoryDb.js`, `app/core/integrations/supabase.js`, `supabase/migrations/20260217164500_inventory_user_ingredients_public_policies.sql` |
 | US-14 | Food user | utensil inventory management | I can track kitchen equipment counts and notes | P1 | Utensils supports category sections, add/edit modal, count steppers, persistence | `screens/FoodUtensilsScreen.js`, `core/foodUtensilsStorage.js` |
 | US-15 | Gym user | browsable machine and exercise libraries with details | I can plan and execute workouts with context | P1 | Gym hub switches segments, supports collapsible grouped lists, and navigates to detail screens | `screens/GymHubScreen.js`, `screens/GymHomeScreen.js`, `screens/ExercisesHomeScreen.js`, `screens/GymMachineDetailScreen.js`, `screens/ExerciseDetailScreen.js` |
 | US-16 | User/admin | settings and profile stats persistence | I can retain personal targets and preferences in wellness mode | P1 | Home settings loads/saves profile settings and can reset to defaults | `screens/HomeSettingsScreen.js`, `core/wellnessProfileStorage.js`, `screens/SettingsProfileScreen.js` |

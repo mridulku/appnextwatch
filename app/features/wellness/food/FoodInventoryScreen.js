@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Animated,
   Modal,
-  Platform,
   Pressable,
   SafeAreaView,
   SectionList,
@@ -20,10 +19,16 @@ import {
   applyVoiceActions,
   getRandomSampleVoicePhrase,
   parseVoiceCommand,
-  toCanonicalUnit,
 } from '../../../core/foodVoiceParser';
 import CollapsibleSection from '../../../components/CollapsibleSection';
-import { loadFoodInventory, saveFoodInventory } from '../../../core/storage/foodInventoryStorage';
+import { useAuth } from '../../../context/AuthContext';
+import {
+  fetchCatalogIngredients,
+  fetchUserInventoryRows,
+  getOrCreateAppUser,
+  updateUserIngredientQuantity,
+  upsertUserIngredient,
+} from '../../../core/api/foodInventoryDb';
 import COLORS from '../../../theme/colors';
 
 const CATEGORY_META = {
@@ -44,11 +49,25 @@ const CATEGORY_ORDER = [
   'Snacks',
 ];
 
-const ADD_ITEM_UNITS = ['pcs', 'g', 'kg', 'ml', 'litre', 'bottle'];
-
-function createFoodId(prefix = 'food_item') {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+function normalizeCategory(rawCategory) {
+  const source = String(rawCategory || '').trim().toLowerCase();
+  if (!source) return 'Snacks';
+  if (source.includes('vegetable') || source.includes('veggie')) return 'Vegetables';
+  if (source.includes('spice') || source.includes('masala')) return 'Spices & Masalas';
+  if (source.includes('staple') || source.includes('grain') || source.includes('dal')) return 'Staples';
+  if (source.includes('oil') || source.includes('sauce')) return 'Oils & Sauces';
+  if (
+    source.includes('dairy') ||
+    source.includes('egg') ||
+    source.includes('protein')
+  ) {
+    return 'Dairy & Eggs';
+  }
+  if (source.includes('snack')) return 'Snacks';
+  return 'Snacks';
 }
+
+const ADD_ITEM_UNITS = ['pcs', 'g', 'kg', 'ml', 'litre', 'bottle'];
 
 function getQuantityStep(unitType) {
   if (unitType === 'kg' || unitType === 'litre') return 0.25;
@@ -112,16 +131,16 @@ function getPreviewWarnings(actions, inventoryItems) {
   return warnings;
 }
 
-function getDefaultThreshold(unitType) {
-  if (unitType === 'kg' || unitType === 'litre') return 0.25;
-  if (unitType === 'g' || unitType === 'ml') return 100;
-  return 1;
-}
-
 function FoodInventoryScreen({ embedded = false, showHero = true }) {
+  const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [inventory, setInventory] = useState([]);
+  const [catalogItems, setCatalogItems] = useState([]);
+  const [appUserId, setAppUserId] = useState(null);
   const [hydrated, setHydrated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [inlineError, setInlineError] = useState('');
+  const [addPending, setAddPending] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState({});
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -129,9 +148,9 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
   const [interpretation, setInterpretation] = useState({ actions: [], warnings: [] });
 
   const [addItemVisible, setAddItemVisible] = useState(false);
-  const [manualName, setManualName] = useState('');
-  const [manualCategory, setManualCategory] = useState('Snacks');
-  const [manualUnit, setManualUnit] = useState('pcs');
+  const [catalogSearch, setCatalogSearch] = useState('');
+  const [selectedCatalogItem, setSelectedCatalogItem] = useState(null);
+  const [manualUnit, setManualUnit] = useState('');
   const [manualQuantity, setManualQuantity] = useState('1');
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -141,23 +160,86 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
   const autoInterpretTimeoutRef = useRef(null);
   const snackbarTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    loadFoodInventory().then((items) => {
-      if (!isMounted) return;
-      setInventory(items);
-      setHydrated(true);
-    });
+  const refreshInventory = async (resolvedAppUserId) => {
+    const rows = await fetchUserInventoryRows(resolvedAppUserId);
+    const mapped = rows
+      .map((row) => {
+        const catalog = row.catalog_ingredient;
+        const itemName = catalog?.name || row.custom_name;
+        if (!itemName) return null;
 
-    return () => {
-      isMounted = false;
+        return {
+          id: row.id,
+          name: itemName,
+          category: normalizeCategory(catalog?.category),
+          unitType: row.unit_type || catalog?.unit_type || 'pcs',
+          quantity: Number(row.quantity) || 0,
+          lowStockThreshold: Number(row.low_stock_threshold) || 1,
+          icon: CATEGORY_META[normalizeCategory(catalog?.category)]?.emoji || '🧺',
+          ingredientId: row.ingredient_id,
+        };
+      })
+      .filter(Boolean);
+
+    setInventory(mapped);
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const hydrate = async () => {
+      try {
+        setLoading(true);
+        setInlineError('');
+        const appUser = await getOrCreateAppUser({
+          username: user?.username || 'demo user',
+          name: user?.name || 'Demo User',
+        });
+        if (cancelled) return;
+
+        setAppUserId(appUser.id);
+        const [catalog, rows] = await Promise.all([
+          fetchCatalogIngredients(),
+          fetchUserInventoryRows(appUser.id),
+        ]);
+        if (cancelled) return;
+
+        setCatalogItems(catalog);
+        const mappedRows = rows
+          .map((row) => {
+            const catalogItem = row.catalog_ingredient;
+            const itemName = catalogItem?.name || row.custom_name;
+            if (!itemName) return null;
+            return {
+              id: row.id,
+              name: itemName,
+              category: normalizeCategory(catalogItem?.category),
+              unitType: row.unit_type || catalogItem?.unit_type || 'pcs',
+              quantity: Number(row.quantity) || 0,
+              lowStockThreshold: Number(row.low_stock_threshold) || 1,
+              icon: CATEGORY_META[normalizeCategory(catalogItem?.category)]?.emoji || '🧺',
+              ingredientId: row.ingredient_id,
+            };
+          })
+          .filter(Boolean);
+        setInventory(mappedRows);
+      } catch (error) {
+        if (!cancelled) {
+          setInlineError(error?.message || 'Could not load inventory right now.');
+        }
+      } finally {
+        if (!cancelled) {
+          setHydrated(true);
+          setLoading(false);
+        }
+      }
     };
-  }, []);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    saveFoodInventory(inventory);
-  }, [hydrated, inventory]);
+    hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.name, user?.username]);
 
   useEffect(
     () => () => {
@@ -231,6 +313,16 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     [expandedCategories, sections],
   );
 
+  const filteredCatalogItems = useMemo(() => {
+    const query = catalogSearch.trim().toLowerCase();
+    if (!query) return catalogItems;
+    return catalogItems.filter((item) => {
+      const name = String(item.name || '').toLowerCase();
+      const category = String(item.category || '').toLowerCase();
+      return name.includes(query) || category.includes(query);
+    });
+  }, [catalogItems, catalogSearch]);
+
   const showSnackbar = (message) => {
     setSnackbarMessage(message);
     Animated.timing(snackbarAnim, {
@@ -296,39 +388,59 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     setIsListening(false);
   };
 
-  const confirmVoiceActions = () => {
+  const confirmVoiceActions = async () => {
     if (interpretation.actions.length === 0) return;
 
     const { nextInventory, warnings } = applyVoiceActions(inventory, interpretation.actions);
     setInventory(nextInventory);
     closeVoiceModal();
 
-    if (warnings.length > 0) {
-      showSnackbar(`Inventory updated. ${warnings[0]}`);
-      return;
-    }
+    const existingRowsById = new Map(inventory.map((item) => [item.id, item]));
+    const updates = nextInventory
+      .filter((item) => existingRowsById.has(item.id))
+      .map(async (item) => {
+        const previous = existingRowsById.get(item.id);
+        if (Number(previous.quantity) === Number(item.quantity)) return null;
+        return updateUserIngredientQuantity({ rowId: item.id, quantity: item.quantity });
+      });
 
-    showSnackbar('Inventory updated');
+    try {
+      await Promise.all(updates);
+      if (warnings.length > 0) {
+        showSnackbar(`Inventory updated. ${warnings[0]}`);
+      } else {
+        showSnackbar('Inventory updated');
+      }
+    } catch (error) {
+      showSnackbar(error?.message || 'Inventory synced with partial errors');
+    }
   };
 
-  const adjustQuantity = (itemId, direction) => {
+  const adjustQuantity = async (itemId, direction) => {
+    const item = inventory.find((entry) => entry.id === itemId);
+    if (!item) return;
+
+    const step = getQuantityStep(item.unitType);
+    const nextValue = Number(Math.max(0, item.quantity + step * direction).toFixed(3));
+
     setInventory((prev) =>
-      prev.map((item) => {
-        if (item.id !== itemId) return item;
-        const step = getQuantityStep(item.unitType);
-        const nextValue = Math.max(0, item.quantity + step * direction);
-        return {
-          ...item,
-          quantity: Number(nextValue.toFixed(3)),
-        };
-      }),
+      prev.map((entry) => (entry.id === itemId ? { ...entry, quantity: nextValue } : entry)),
     );
+
+    try {
+      await updateUserIngredientQuantity({ rowId: itemId, quantity: nextValue });
+    } catch (error) {
+      setInventory((prev) =>
+        prev.map((entry) => (entry.id === itemId ? { ...entry, quantity: item.quantity } : entry)),
+      );
+      showSnackbar(error?.message || 'Could not update quantity');
+    }
   };
 
   const openAddItemModal = () => {
-    setManualName('');
-    setManualCategory('Snacks');
-    setManualUnit('pcs');
+    setCatalogSearch('');
+    setSelectedCatalogItem(null);
+    setManualUnit('');
     setManualQuantity('1');
     setAddItemVisible(true);
   };
@@ -337,36 +449,36 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     setAddItemVisible(false);
   };
 
-  const submitAddItem = () => {
-    const name = manualName.trim();
-    const unit = toCanonicalUnit(manualUnit) ?? 'pcs';
-    const quantity = Math.max(0, Number(manualQuantity) || 0);
-
-    if (!name) {
-      showSnackbar('Please enter an item name');
+  const submitAddItem = async () => {
+    if (!selectedCatalogItem || !appUserId) {
+      showSnackbar('Select an item first');
       return;
     }
+
+    const unit = manualUnit || selectedCatalogItem.unit_type || 'pcs';
+    const quantity = Math.max(0, Number(manualQuantity) || 0);
 
     if (quantity <= 0) {
       showSnackbar('Quantity should be greater than 0');
       return;
     }
 
-    setInventory((prev) => [
-      ...prev,
-      {
-        id: createFoodId(),
-        name,
-        category: manualCategory,
+    try {
+      setAddPending(true);
+      const result = await upsertUserIngredient({
+        appUserId,
+        ingredient: selectedCatalogItem,
+        amount: quantity,
         unitType: unit,
-        quantity,
-        lowStockThreshold: getDefaultThreshold(unit),
-        icon: '🧺',
-      },
-    ]);
-
-    closeAddItemModal();
-    showSnackbar('Item added');
+      });
+      await refreshInventory(appUserId);
+      closeAddItemModal();
+      showSnackbar(result.mode === 'increment' ? 'Quantity updated' : 'Item added');
+    } catch (error) {
+      showSnackbar(error?.message || 'Could not add item');
+    } finally {
+      setAddPending(false);
+    }
   };
 
   const toggleCategory = (title) => {
@@ -430,7 +542,7 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
 
   const RootContainer = embedded ? View : SafeAreaView;
 
-  if (!hydrated) {
+  if (!hydrated || loading) {
     return (
       <RootContainer style={styles.safeArea}>
         <View style={styles.loadingWrap}>
@@ -488,12 +600,22 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
             inventory.length === 0 ? (
               <View style={styles.emptyWrap}>
                 <Text style={styles.emptyTitle}>No pantry items yet</Text>
-                <Text style={styles.emptySubtle}>Tap Add Item to create your first inventory entry.</Text>
+                <Text style={styles.emptySubtle}>Add items from the catalog to start tracking stock.</Text>
+                <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={openAddItemModal}>
+                  <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
+                  <Text style={styles.emptyCtaText}>Add items</Text>
+                </TouchableOpacity>
               </View>
             ) : null
           }
           showsVerticalScrollIndicator={false}
         />
+
+        {inlineError ? (
+          <View style={styles.inlineErrorWrap}>
+            <Text style={styles.inlineErrorText}>{inlineError}</Text>
+          </View>
+        ) : null}
       </View>
 
       <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
@@ -624,23 +746,62 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
           <View style={[styles.addSheet, { paddingBottom: Math.max(insets.bottom, 12) }]}>
             <View style={styles.sheetHandle} />
             <Text style={styles.sheetTitle}>Add Item</Text>
-            <Text style={styles.sheetSubtitle}>Quickly add an inventory item manually.</Text>
+            <Text style={styles.sheetSubtitle}>Pick from catalog and set quantity.</Text>
 
-            <Text style={styles.fieldLabel}>Item name</Text>
+            <Text style={styles.fieldLabel}>Search ingredient</Text>
             <TextInput
               style={styles.singleInput}
-              value={manualName}
-              onChangeText={setManualName}
-              placeholder="e.g. Coconut Milk"
+              value={catalogSearch}
+              onChangeText={setCatalogSearch}
+              placeholder="Type ingredient name"
               placeholderTextColor={COLORS.muted}
             />
+
+            <View style={styles.catalogPickerWrap}>
+              <SectionList
+                sections={[
+                  {
+                    title: 'Catalog',
+                    data: filteredCatalogItems.slice(0, 40),
+                  },
+                ]}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => {
+                  const selected = selectedCatalogItem?.id === item.id;
+                  return (
+                    <TouchableOpacity
+                      style={[styles.catalogRow, selected && styles.catalogRowActive]}
+                      activeOpacity={0.9}
+                      onPress={() => {
+                        setSelectedCatalogItem(item);
+                        setManualUnit(item.unit_type || 'pcs');
+                      }}
+                    >
+                      <View style={styles.catalogRowText}>
+                        <Text style={styles.catalogName}>{item.name}</Text>
+                        <Text style={styles.catalogMeta}>
+                          {normalizeCategory(item.category)} · {item.unit_type || 'pcs'}
+                        </Text>
+                      </View>
+                      {selected ? <Ionicons name="checkmark-circle" size={18} color={COLORS.accent} /> : null}
+                    </TouchableOpacity>
+                  );
+                }}
+                renderSectionHeader={() => null}
+                stickySectionHeadersEnabled={false}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                  <Text style={styles.catalogEmpty}>No catalog items match your search.</Text>
+                }
+              />
+            </View>
 
             <Text style={styles.fieldLabel}>Quantity</Text>
             <TextInput
               style={styles.singleInput}
               value={manualQuantity}
               onChangeText={setManualQuantity}
-              keyboardType={Platform.select({ ios: 'decimal-pad', android: 'numeric' })}
+              keyboardType="numeric"
               placeholder="1"
               placeholderTextColor={COLORS.muted}
             />
@@ -663,32 +824,6 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
               ))}
             </View>
 
-            <Text style={styles.fieldLabel}>Category</Text>
-            <View style={styles.choiceWrap}>
-              {CATEGORY_ORDER.map((category) => (
-                <TouchableOpacity
-                  key={category}
-                  style={[
-                    styles.choiceChip,
-                    manualCategory === category && styles.choiceChipActive,
-                    styles.categoryChip,
-                  ]}
-                  activeOpacity={0.9}
-                  onPress={() => setManualCategory(category)}
-                >
-                  <Text
-                    style={[
-                      styles.choiceChipText,
-                      manualCategory === category && styles.choiceChipTextActive,
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {category}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
             <View style={styles.sheetActions}>
               <TouchableOpacity
                 style={styles.cancelButton}
@@ -697,7 +832,12 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.confirmButton} activeOpacity={0.9} onPress={submitAddItem}>
+              <TouchableOpacity
+                style={[styles.confirmButton, addPending && styles.confirmButtonDisabled]}
+                activeOpacity={0.9}
+                onPress={submitAddItem}
+                disabled={addPending}
+              >
                 <Text style={styles.confirmButtonText}>Add</Text>
               </TouchableOpacity>
             </View>
@@ -929,6 +1069,36 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     marginTop: 4,
     fontSize: 13,
+  },
+  emptyCta: {
+    marginTop: 12,
+    borderRadius: 12,
+    backgroundColor: COLORS.accent,
+    minHeight: 40,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  emptyCtaText: {
+    color: COLORS.bg,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  inlineErrorWrap: {
+    marginTop: 6,
+    marginBottom: 4,
+    backgroundColor: 'rgba(255,145,107,0.12)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,145,107,0.35)',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  inlineErrorText: {
+    color: '#FFA674',
+    fontSize: 11,
   },
   bottomBar: {
     position: 'absolute',
@@ -1172,9 +1342,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(162,167,179,0.32)',
     backgroundColor: COLORS.card,
   },
-  categoryChip: {
-    maxWidth: '48%',
-  },
   choiceChipActive: {
     borderColor: 'rgba(245,201,106,0.54)',
     backgroundColor: 'rgba(245,201,106,0.15)',
@@ -1186,6 +1353,47 @@ const styles = StyleSheet.create({
   choiceChipTextActive: {
     color: COLORS.accent,
     fontWeight: '700',
+  },
+  catalogPickerWrap: {
+    maxHeight: 220,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.25)',
+    backgroundColor: COLORS.card,
+    marginBottom: 12,
+  },
+  catalogRow: {
+    minHeight: 44,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(162,167,179,0.12)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  catalogRowActive: {
+    backgroundColor: 'rgba(245,201,106,0.13)',
+  },
+  catalogRowText: {
+    flex: 1,
+    paddingRight: 8,
+  },
+  catalogName: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  catalogMeta: {
+    color: COLORS.muted,
+    fontSize: 11,
+    marginTop: 2,
+  },
+  catalogEmpty: {
+    color: COLORS.muted,
+    fontSize: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   sheetActions: {
     flexDirection: 'row',
