@@ -82,3 +82,11 @@
 - Follow-ups / risks: Pending install/login/link + `supabase db push` and seed apply before production usage.
 - Tag: NO (blocked: db push did not run)
 - Notes: app/docs/sessions/2026-02-17/1547_db-schema-seed-workflow.md
+
+## 2026-02-17 - Session db-seed-applied
+- Summary: Applied seed_catalog.sql to remote Supabase via session pooler.
+- Verification: Checked public table presence and seeded counts for `catalog_ingredients`, `catalog_utensils`, `catalog_recipes`, `catalog_recipe_ingredients`, `catalog_exercises`, `catalog_machines`, `metric_definitions`; sampled rows from ingredients/recipes/exercises.
+- Files touched: app/docs/log/WORKLOG.md, app/docs/sessions/2026-02-17/1629_db-seed-applied.md, app/docs/sessions/INDEX.md, app/docs/sessions/LATEST.md.
+- Follow-ups / risks: Optional helper can be added later (`scripts/db/apply_seed_via_psql.sh`) for direct session-pooler runs.
+- Tag: nw-20260217-1629-db-seed-applied
+- Notes: app/docs/sessions/2026-02-17/1629_db-seed-applied.md
