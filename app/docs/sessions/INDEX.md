@@ -2,6 +2,7 @@
 
 | Date | Time | Tag | Commit | Title (1 line) | Notes link |
 |---|---|---|---|---|---|
+| 2026-02-18 | 15:34 | nw-2026-02-18-1534-navigation-add-fix | TBD | fix Gym Add Machines navigation crash + push checkpoint | [1534_navigation-add-fix.md](2026-02-18/1534_navigation-add-fix.md) |
 | 2026-02-18 | 14:24 | TBD | TBD | fix add-modal layout gap (remove bottom-alignment) | [1424_fix-modal-gap-layout.md](2026-02-18/1424_fix-modal-gap-layout.md) |
 | 2026-02-18 | 14:15 | TBD | TBD | fix add-modal list gap via ScrollView renderer | [1415_fix-modal-gap-scrollview.md](2026-02-18/1415_fix-modal-gap-scrollview.md) |
 | 2026-02-18 | 13:51 | TBD | TBD | UI design SOP + unified add modals/cards | [1351_ui-design-sop-unify-modals-cards.md](2026-02-18/1351_ui-design-sop-unify-modals-cards.md) |

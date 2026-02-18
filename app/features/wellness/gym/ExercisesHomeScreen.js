@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
-import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
 import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
@@ -81,6 +81,12 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
     [selection.groupedUserSections, selection.expandedCategories],
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      selection.hydrate();
+    }, [selection.hydrate]),
+  );
+
   const RootContainer = embedded ? View : SafeAreaView;
 
   if (selection.loading) {
@@ -105,7 +111,7 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
             </>
           ) : null}
 
-          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={selection.openAddModal}>
+          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={() => navigation?.navigate('AddExercises')}>
             <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
             <Text style={styles.addButtonText}>Add exercises</Text>
           </TouchableOpacity>
@@ -124,7 +130,7 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
           <View style={styles.emptyWrap}>
             <Text style={styles.emptyTitle}>No exercises yet</Text>
             <Text style={styles.emptySubtitle}>Add exercises from the catalog to shape your workout library.</Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={selection.openAddModal}>
+            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={() => navigation?.navigate('AddExercises')}>
               <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
               <Text style={styles.emptyCtaText}>Add exercises</Text>
             </TouchableOpacity>
@@ -175,29 +181,6 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
           />
         )}
       </View>
-
-      <CatalogPickerModal
-        visible={selection.modalVisible}
-        title="Add exercises"
-        subtitle="Pick from catalog exercises to personalize your gym hub."
-        searchPlaceholder="Search exercises"
-        searchValue={selection.searchInput}
-        onSearchChange={selection.setSearchInput}
-        categories={selection.categoryFilters}
-        selectedCategory={selection.selectedCategory}
-        onSelectCategory={selection.setSelectedCategory}
-        items={selection.filteredCatalogRows}
-        selectedIdSet={selection.selectedCatalogIdSet}
-        pendingAddId={selection.pendingAddId}
-        pendingRemoveId={selection.pendingRemoveId}
-        getItemId={(item) => item.id}
-        getItemTitle={(item) => item.name}
-        getItemSubtitle={(item) => `${normalizeExerciseCategory(item)} • ${item.type || 'exercise'} • ${item.equipment || 'bodyweight'}`}
-        getItemBadges={() => [{ label: '🏋️', tone: 'default' }]}
-        onAdd={selection.addCatalogItem}
-        onClose={selection.closeAddModal}
-        emptyText="No exercises match this filter."
-      />
     </RootContainer>
   );
 }

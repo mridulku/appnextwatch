@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
-import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
 import CatalogItemCard from '../../../components/cards/CatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
@@ -72,6 +72,12 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
     [selection.groupedUserSections, selection.expandedCategories],
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      selection.hydrate();
+    }, [selection.hydrate]),
+  );
+
   const RootContainer = embedded ? View : SafeAreaView;
 
   if (selection.loading) {
@@ -96,7 +102,7 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
             </>
           ) : null}
 
-          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={selection.openAddModal}>
+          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={() => navigation?.navigate('AddRecipes')}>
             <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
             <Text style={styles.addButtonText}>Add recipes</Text>
           </TouchableOpacity>
@@ -115,7 +121,7 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
           <View style={styles.emptyWrap}>
             <Text style={styles.emptyTitle}>No saved recipes yet</Text>
             <Text style={styles.emptySubtitle}>Add recipes you actually cook to build your own short list.</Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={selection.openAddModal}>
+            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={() => navigation?.navigate('AddRecipes')}>
               <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
               <Text style={styles.emptyCtaText}>Add recipes</Text>
             </TouchableOpacity>
@@ -167,29 +173,6 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
           />
         )}
       </View>
-
-      <CatalogPickerModal
-        visible={selection.modalVisible}
-        title="Add recipes"
-        subtitle="Pick from catalog recipes to build your saved cooking list."
-        searchPlaceholder="Search recipes"
-        searchValue={selection.searchInput}
-        onSearchChange={selection.setSearchInput}
-        categories={selection.categoryFilters}
-        selectedCategory={selection.selectedCategory}
-        onSelectCategory={selection.setSelectedCategory}
-        items={selection.filteredCatalogRows}
-        selectedIdSet={selection.selectedCatalogIdSet}
-        pendingAddId={selection.pendingAddId}
-        pendingRemoveId={selection.pendingRemoveId}
-        getItemId={(item) => item.id}
-        getItemTitle={(item) => item.name}
-        getItemSubtitle={(item) => `${normalizeMealType(item)} • ${item.total_minutes || '--'} min • ${item.difficulty || 'Easy'}`}
-        getItemBadges={(item) => [{ label: CATEGORY_ICONS[normalizeMealType(item)] || '🍽️', tone: 'default' }]}
-        onAdd={selection.addCatalogItem}
-        onClose={selection.closeAddModal}
-        emptyText="No recipes match this filter."
-      />
     </RootContainer>
   );
 }

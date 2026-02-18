@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -24,20 +25,32 @@ function SelectFromCatalogModal({
   footerContent,
   emptyText = 'No items match this filter.',
 }) {
+  const scrollRef = useRef(null);
+  const dataLength = data?.length || 0;
+  const scrollKey = `${visible ? 'open' : 'closed'}:${selectedCategory ?? ''}:${searchValue ?? ''}:${dataLength}`;
+
+  useEffect(() => {
+    if (!visible) return undefined;
+    const raf = requestAnimationFrame(() => {
+      scrollRef.current?.scrollTo?.({ y: 0, animated: false });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [visible, selectedCategory, searchValue, dataLength]);
+
   return (
     <FullSheetModal
       visible={visible}
       title={title}
       subtitle={subtitle}
       onClose={onClose}
-      footer={(
+      footer={
         <View style={styles.footerWrap}>
-          {footerContent}
+          {footerContent ? <View style={styles.footerTop}>{footerContent}</View> : null}
           <TouchableOpacity style={styles.doneButton} activeOpacity={0.9} onPress={onClose}>
             <Text style={styles.doneButtonText}>{doneLabel}</Text>
           </TouchableOpacity>
         </View>
-      )}
+      }
     >
       <View style={styles.searchWrap}>
         <Ionicons name="search-outline" size={16} color={COLORS.muted} />
@@ -56,8 +69,11 @@ function SelectFromCatalogModal({
         onSelectCategory={onSelectCategory}
       />
 
+      {/* RESULTS AREA — MUST TAKE ALL REMAINING SPACE */}
       <View style={styles.resultsWrap}>
         <ScrollView
+          key={scrollKey}
+          ref={scrollRef}
           style={styles.resultsScroll}
           contentContainerStyle={styles.resultsContent}
           showsVerticalScrollIndicator={false}
@@ -65,7 +81,7 @@ function SelectFromCatalogModal({
           contentInsetAdjustmentBehavior="never"
           automaticallyAdjustContentInsets={false}
         >
-          {data?.length ? (
+          {data && data.length > 0 ? (
             data.map((item, index) => {
               const key = keyExtractor ? keyExtractor(item, index) : String(index);
               return (
@@ -101,27 +117,37 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: UI_TOKENS.typography.subtitle,
   },
+
+  // KEY: this makes results start right below chips and fill the body.
   resultsWrap: {
     flex: 1,
+    minHeight: 0,
+    // IMPORTANT: keep this simple; no justifyContent/flexGrow layout hacks
   },
   resultsScroll: {
     flex: 1,
   },
   resultsContent: {
-    paddingTop: UI_TOKENS.spacing.sm,
+    paddingTop: UI_TOKENS.spacing.xs, // keep this small
     paddingBottom: UI_TOKENS.modal.footerHeight + UI_TOKENS.spacing.lg,
   },
   resultRow: {
     marginBottom: UI_TOKENS.spacing.sm,
   },
+
   emptyText: {
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.subtitle,
     textAlign: 'center',
     marginTop: UI_TOKENS.spacing.md,
   },
+
+  // Footer rendering is controlled by FullSheetModal; keep this minimal.
   footerWrap: {
     gap: UI_TOKENS.spacing.sm,
+  },
+  footerTop: {
+    // optional slot for extra footer content
   },
   doneButton: {
     borderRadius: UI_TOKENS.radius.md,

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { getOrCreateAppUser } from '../core/api/foodInventoryDb';
 import {
@@ -60,7 +60,7 @@ export default function useCatalogSelection({
     return () => clearTimeout(timeout);
   }, [searchInput]);
 
-  const hydrate = async () => {
+  const hydrate = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -92,11 +92,20 @@ export default function useCatalogSelection({
     } finally {
       setLoading(false);
     }
-  };
+  }, [
+    catalogOrderBy,
+    catalogSelect,
+    catalogTable,
+    user?.name,
+    user?.username,
+    userOrderBy,
+    userSelect,
+    userTable,
+  ]);
 
   useEffect(() => {
     hydrate();
-  }, [user?.username, user?.name]);
+  }, [hydrate]);
 
   const selectedCatalogIdSet = useMemo(() => {
     return new Set(

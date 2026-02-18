@@ -27,8 +27,13 @@ import ListDetailScreen from './features/movies/lists/ListDetailScreen';
 import FilmsWatchedScreen from './features/movies/profile/FilmsWatchedScreen';
 import GymMachineDetailScreen from './features/wellness/gym/GymMachineDetailScreen';
 import ExerciseDetailScreen from './features/wellness/gym/ExerciseDetailScreen';
+import AddMachinesScreen from './features/wellness/gym/AddMachinesScreen';
+import AddExercisesScreen from './features/wellness/gym/AddExercisesScreen';
 import CookRecipeScreen from './features/wellness/shared/CookRecipeScreen';
 import FoodHubScreen from './features/wellness/food/FoodHubScreen';
+import AddFoodItemsScreen from './features/wellness/food/AddFoodItemsScreen';
+import AddUtensilsScreen from './features/wellness/food/AddUtensilsScreen';
+import AddRecipesScreen from './features/wellness/food/AddRecipesScreen';
 import SessionsHomeScreen from './features/wellness/sessions/SessionsHomeScreen';
 import WorkoutSessionSetupScreen from './features/wellness/sessions/WorkoutSessionSetupScreen';
 import CookingSessionSetupScreen from './features/wellness/sessions/CookingSessionSetupScreen';
@@ -315,6 +320,16 @@ function GymStackScreens() {
         component={ExerciseDetailScreen}
         options={({ route }) => ({ title: route.params?.exerciseName ?? 'Exercise Detail' })}
       />
+      <WellnessGymStack.Screen
+        name="AddMachines"
+        component={AddMachinesScreen}
+        options={{ title: 'Add Machines' }}
+      />
+      <WellnessGymStack.Screen
+        name="AddExercises"
+        component={AddExercisesScreen}
+        options={{ title: 'Add Exercises' }}
+      />
     </WellnessGymStack.Navigator>
   );
 }
@@ -331,6 +346,21 @@ function FoodStackScreens() {
         name="CookRecipe"
         component={CookRecipeScreen}
         options={({ route }) => ({ title: route?.params?.recipeName ?? 'Recipe' })}
+      />
+      <WellnessFoodStack.Screen
+        name="AddFoodItems"
+        component={AddFoodItemsScreen}
+        options={{ title: 'Add Items' }}
+      />
+      <WellnessFoodStack.Screen
+        name="AddUtensils"
+        component={AddUtensilsScreen}
+        options={{ title: 'Add Utensils' }}
+      />
+      <WellnessFoodStack.Screen
+        name="AddRecipes"
+        component={AddRecipesScreen}
+        options={{ title: 'Add Recipes' }}
       />
     </WellnessFoodStack.Navigator>
   );

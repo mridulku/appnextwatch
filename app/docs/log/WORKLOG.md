@@ -212,3 +212,13 @@
 - Follow-ups / risks: Manual simulator QA across Add Item/Add Machines/Add Exercises still required for final sign-off.
 - Tag: NO (gated until manual QA confirmation)
 - Notes: app/docs/sessions/2026-02-18/1424_fix-modal-gap-layout.md
+
+## 2026-02-18 - Session navigation-add-fix-checkpoint
+- Summary: Fixed Gym Machines Add-screen runtime crash and finalized checkpoint push for current Add-screen migration set.
+- Changes: Wired `navigation` prop in `GymHomeScreen` for `navigate('AddMachines')`; kept existing Add-screen architecture and shared catalog selection logic intact.
+- Files: app/features/wellness/gym/GymHomeScreen.js, app/App.js, app/features/wellness/{food,gym}/Add*Screen.js, app/hooks/useCatalogSelection.js, app/components/modals/SelectFromCatalogModal.js, app/ui/components/FullSheetModal.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: Machines tab no longer crashes on Add; add flows remain screen-based and functional.
+- Validation performed: `npx expo export --platform ios` passed after fix.
+- Follow-ups / risks: Manual iOS pass still recommended for spacing/interaction polish across all Add screens.
+- Tag: nw-2026-02-18-1534-navigation-add-fix (T1)
+- Notes: app/docs/sessions/2026-02-18/1534_navigation-add-fix.md

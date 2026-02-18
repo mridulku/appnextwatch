@@ -39,14 +39,14 @@ function FoodHubScreen({ navigation, route }) {
     }
 
     if (segment === 'Utensils') {
-      return <FoodUtensilsScreen embedded showHero={false} />;
+      return <FoodUtensilsScreen navigation={navigation} embedded showHero={false} />;
     }
 
     if (segment === 'My Stats') {
       return <FoodMyStatsScreen />;
     }
 
-    return <FoodInventoryScreen embedded showHero={false} />;
+    return <FoodInventoryScreen navigation={navigation} embedded showHero={false} />;
   };
 
   return (

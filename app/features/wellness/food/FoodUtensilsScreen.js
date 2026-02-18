@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
-import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
 import CatalogItemCard from '../../../components/cards/CatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
@@ -30,7 +30,7 @@ function normalizeCategory(row) {
   return String(row?.category || '').trim() || 'Tools';
 }
 
-function FoodUtensilsScreen({ embedded = false, showHero = true }) {
+function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
   const { user } = useAuth();
 
   const selection = useCatalogSelection({
@@ -59,6 +59,12 @@ function FoodUtensilsScreen({ embedded = false, showHero = true }) {
     [selection.groupedUserSections, selection.expandedCategories],
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      selection.hydrate();
+    }, [selection.hydrate]),
+  );
+
   const RootContainer = embedded ? View : SafeAreaView;
 
   if (selection.loading) {
@@ -83,7 +89,7 @@ function FoodUtensilsScreen({ embedded = false, showHero = true }) {
             </>
           ) : null}
 
-          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={selection.openAddModal}>
+          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={() => navigation?.navigate('AddUtensils')}>
             <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
             <Text style={styles.addButtonText}>Add utensils</Text>
           </TouchableOpacity>
@@ -102,7 +108,7 @@ function FoodUtensilsScreen({ embedded = false, showHero = true }) {
           <View style={styles.emptyWrap}>
             <Text style={styles.emptyTitle}>No utensils yet</Text>
             <Text style={styles.emptySubtitle}>Add utensils from catalog to set up your kitchen profile.</Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={selection.openAddModal}>
+            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={() => navigation?.navigate('AddUtensils')}>
               <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
               <Text style={styles.emptyCtaText}>Add utensils</Text>
             </TouchableOpacity>
@@ -143,29 +149,6 @@ function FoodUtensilsScreen({ embedded = false, showHero = true }) {
           />
         )}
       </View>
-
-      <CatalogPickerModal
-        visible={selection.modalVisible}
-        title="Add utensils"
-        subtitle="Pick from catalog utensils available in your kitchen."
-        searchPlaceholder="Search utensils"
-        searchValue={selection.searchInput}
-        onSearchChange={selection.setSearchInput}
-        categories={selection.categoryFilters}
-        selectedCategory={selection.selectedCategory}
-        onSelectCategory={selection.setSelectedCategory}
-        items={selection.filteredCatalogRows}
-        selectedIdSet={selection.selectedCatalogIdSet}
-        pendingAddId={selection.pendingAddId}
-        pendingRemoveId={selection.pendingRemoveId}
-        getItemId={(item) => item.id}
-        getItemTitle={(item) => item.name}
-        getItemSubtitle={(item) => `${normalizeCategory(item)}${item?.note ? ` • ${item.note}` : ''}`}
-        getItemBadges={(item) => [{ label: CATEGORY_ICONS[normalizeCategory(item)] || '🍽️', tone: 'default' }]}
-        onAdd={selection.addCatalogItem}
-        onClose={selection.closeAddModal}
-        emptyText="No utensils match this filter."
-      />
     </RootContainer>
   );
 }

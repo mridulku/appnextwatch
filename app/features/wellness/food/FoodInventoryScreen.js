@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
@@ -21,19 +22,14 @@ import {
   parseVoiceCommand,
 } from '../../../core/foodVoiceParser';
 import CollapsibleSection from '../../../components/CollapsibleSection';
-import CatalogCardRow from '../../../components/cards/CatalogCardRow';
 import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import QuantityStepper from '../../../components/controls/QuantityStepper';
-import SelectFromCatalogModal from '../../../components/modals/SelectFromCatalogModal';
 import { useAuth } from '../../../context/AuthContext';
 import {
-  fetchCatalogIngredients,
   deleteUserIngredient,
   getOrCreateAppUser,
-  listCatalogIngredients,
   listUserIngredients,
   updateUserIngredientQuantity,
-  upsertUserIngredient,
 } from '../../../core/api/foodInventoryDb';
 import COLORS from '../../../theme/colors';
 
@@ -73,16 +69,9 @@ function normalizeCategory(rawCategory) {
   return 'Snacks';
 }
 
-const CATALOG_FILTER_ORDER = ['All', ...CATEGORY_ORDER];
-
 function getQuantityStep(unitType) {
   if (unitType === 'kg' || unitType === 'litre') return 0.25;
   if (unitType === 'g' || unitType === 'ml') return 50;
-  return 1;
-}
-
-function getAddDefaultQuantity(unitType) {
-  if (unitType === 'g' || unitType === 'ml') return 100;
   return 1;
 }
 
@@ -142,29 +131,20 @@ function getPreviewWarnings(actions, inventoryItems) {
   return warnings;
 }
 
-function FoodInventoryScreen({ embedded = false, showHero = true }) {
+function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [inventory, setInventory] = useState([]);
-  const [catalogItems, setCatalogItems] = useState([]);
   const [appUserId, setAppUserId] = useState(null);
   const [hydrated, setHydrated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [inlineError, setInlineError] = useState('');
-  const [addPending, setAddPending] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState({});
   const [voiceVisible, setVoiceVisible] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [recognizedText, setRecognizedText] = useState('');
   const [interpretation, setInterpretation] = useState({ actions: [], warnings: [] });
   const [pendingRemoveItemId, setPendingRemoveItemId] = useState(null);
-
-  const [addItemVisible, setAddItemVisible] = useState(false);
-  const [catalogSearchInput, setCatalogSearchInput] = useState('');
-  const [debouncedCatalogSearch, setDebouncedCatalogSearch] = useState('');
-  const [selectedCatalogCategory, setSelectedCatalogCategory] = useState('All');
-  const [selectedCatalogItem, setSelectedCatalogItem] = useState(null);
-  const [pickerQuantity, setPickerQuantity] = useState(1);
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -199,6 +179,16 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     setInventory(mapInventoryRows(rows));
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      if (!appUserId) return undefined;
+      refreshInventory(appUserId).catch((error) => {
+        setInlineError(error?.message || 'Could not refresh inventory.');
+      });
+      return undefined;
+    }, [appUserId]),
+  );
+
   useEffect(() => {
     let cancelled = false;
 
@@ -213,13 +203,8 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
         if (cancelled) return;
 
         setAppUserId(appUser.id);
-        const [catalog, rows] = await Promise.all([
-          fetchCatalogIngredients(),
-          listUserIngredients(appUser.id),
-        ]);
+        const rows = await listUserIngredients(appUser.id);
         if (cancelled) return;
-
-        setCatalogItems(catalog);
         setInventory(mapInventoryRows(rows));
       } catch (error) {
         if (!cancelled) {
@@ -279,13 +264,6 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     () => inventory.filter((item) => item.quantity <= item.lowStockThreshold).length,
     [inventory],
   );
-  const selectedExistingInventoryItem = useMemo(
-    () =>
-      selectedCatalogItem
-        ? inventory.find((entry) => entry.ingredientId === selectedCatalogItem.id)
-        : null,
-    [inventory, selectedCatalogItem],
-  );
 
   const sections = useMemo(() => {
     const grouped = inventory.reduce((acc, item) => {
@@ -317,50 +295,6 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
       })),
     [expandedCategories, sections],
   );
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedCatalogSearch(catalogSearchInput.trim());
-    }, 280);
-    return () => clearTimeout(timeout);
-  }, [catalogSearchInput]);
-
-  useEffect(() => {
-    if (!selectedCatalogItem) return;
-    if (selectedExistingInventoryItem) {
-      setPickerQuantity(Number(selectedExistingInventoryItem.quantity) || 1);
-      return;
-    }
-    setPickerQuantity(getAddDefaultQuantity(selectedCatalogItem.unit_type || 'pcs'));
-  }, [selectedCatalogItem, selectedExistingInventoryItem]);
-
-  useEffect(() => {
-    let canceled = false;
-    if (!addItemVisible) return undefined;
-
-    const hydrateCatalog = async () => {
-      try {
-        const rows = await listCatalogIngredients({
-          search: debouncedCatalogSearch,
-        });
-        if (!canceled) setCatalogItems(rows);
-      } catch (error) {
-        if (!canceled) setInlineError(error?.message || 'Could not load catalog.');
-      }
-    };
-
-    hydrateCatalog();
-    return () => {
-      canceled = true;
-    };
-  }, [addItemVisible, debouncedCatalogSearch]);
-
-  const filteredCatalogItems = useMemo(() => {
-    if (selectedCatalogCategory === 'All') return catalogItems;
-    return catalogItems.filter(
-      (item) => normalizeCategory(item.category) === selectedCatalogCategory,
-    );
-  }, [catalogItems, selectedCatalogCategory]);
 
   const showSnackbar = (message) => {
     setSnackbarMessage(message);
@@ -498,46 +432,7 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
   };
 
   const openAddItemModal = () => {
-    setCatalogSearchInput('');
-    setDebouncedCatalogSearch('');
-    setSelectedCatalogCategory('All');
-    setSelectedCatalogItem(null);
-    setPickerQuantity(1);
-    setAddItemVisible(true);
-  };
-
-  const closeAddItemModal = () => {
-    setAddItemVisible(false);
-  };
-
-  const submitAddItem = async () => {
-    if (!selectedCatalogItem || !appUserId) {
-      showSnackbar('Select an item first');
-      return;
-    }
-
-    const quantity = Math.max(0, Number(pickerQuantity) || 0);
-
-    if (quantity <= 0) {
-      showSnackbar('Quantity should be greater than 0');
-      return;
-    }
-
-    try {
-      setAddPending(true);
-      const result = await upsertUserIngredient({
-        userId: appUserId,
-        ingredientId: selectedCatalogItem.id,
-        quantity,
-      });
-      await refreshInventory(appUserId);
-      closeAddItemModal();
-      showSnackbar(result.mode === 'update' ? 'Item updated' : 'Item added');
-    } catch (error) {
-      showSnackbar(error?.message || 'Could not add item');
-    } finally {
-      setAddPending(false);
-    }
+    navigation?.navigate('AddFoodItems');
   };
 
   const toggleCategory = (title) => {
@@ -794,77 +689,6 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
         </View>
       </Modal>
 
-      <SelectFromCatalogModal
-        visible={addItemVisible}
-        title="Add items"
-        subtitle="Pick from catalog and set quantity."
-        searchPlaceholder="Search ingredient"
-        searchValue={catalogSearchInput}
-        onSearchChange={setCatalogSearchInput}
-        categories={CATALOG_FILTER_ORDER}
-        selectedCategory={selectedCatalogCategory}
-        onSelectCategory={setSelectedCatalogCategory}
-        data={filteredCatalogItems}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          const selected = selectedCatalogItem?.id === item.id;
-          return (
-            <CatalogCardRow
-              title={item.name}
-              subtitle={`${normalizeCategory(item.category)} • ${item.unit_type || 'pcs'}`}
-              selected={selected}
-              actionLabel={selected ? 'ADDED' : 'ADD'}
-              actionVariant={selected ? 'success' : 'accent'}
-              actionDisabled={selected}
-              onAction={() => setSelectedCatalogItem(item)}
-              onPress={() => setSelectedCatalogItem(item)}
-            />
-          );
-        }}
-        onClose={closeAddItemModal}
-        emptyText="No catalog items match your search."
-        footerContent={
-          selectedCatalogItem ? (
-            <View style={styles.catalogFooterCard}>
-              <Text style={styles.catalogFooterTitle}>Quantity</Text>
-              <QuantityStepper
-                valueLabel={formatQuantity(pickerQuantity, selectedCatalogItem.unit_type || 'pcs')}
-                onDecrement={() =>
-                  setPickerQuantity((prev) => {
-                    const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
-                    return Math.max(0, Number((prev - step).toFixed(3)));
-                  })
-                }
-                onIncrement={() =>
-                  setPickerQuantity((prev) => {
-                    const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
-                    return Number((prev + step).toFixed(3));
-                  })
-                }
-              />
-              <Text style={styles.catalogFooterHint}>
-                Unit: {selectedCatalogItem.unit_type || 'pcs'} (from catalog)
-              </Text>
-              <TouchableOpacity
-                style={[styles.catalogFooterAction, addPending && styles.confirmButtonDisabled]}
-                activeOpacity={0.9}
-                onPress={submitAddItem}
-                disabled={addPending}
-              >
-                {addPending ? (
-                  <ActivityIndicator color={COLORS.bg} size="small" />
-                ) : (
-                  <Text style={styles.catalogFooterActionText}>
-                    {selectedExistingInventoryItem ? 'Update' : 'Add'}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <Text style={styles.catalogFooterEmpty}>Select an ingredient to set quantity.</Text>
-          )
-        }
-      />
     </RootContainer>
   );
 }

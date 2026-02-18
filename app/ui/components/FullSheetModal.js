@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+    minHeight: 0,
     marginTop: UI_TOKENS.spacing.sm,
   },
   footer: {

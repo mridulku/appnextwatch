@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -9,13 +9,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
-import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import { useAuth } from '../../../context/AuthContext';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
-import { addUserMachine, fetchCatalogMachines, fetchUserMachines, removeUserMachine } from '../../../core/api/gymMachinesDb';
+import { fetchUserMachines, removeUserMachine } from '../../../core/api/gymMachinesDb';
 import COLORS from '../../../theme/colors';
 
 const MACHINE_GROUP_ORDER = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio', 'Other'];
@@ -38,31 +38,17 @@ function normalizeMachineCategory(machine) {
   return 'Other';
 }
 
-function GymHomeScreen({ embedded = false, showHeader = true }) {
+function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [inlineError, setInlineError] = useState('');
 
   const [appUserId, setAppUserId] = useState(null);
-  const [catalogMachines, setCatalogMachines] = useState([]);
   const [userMachines, setUserMachines] = useState([]);
 
   const [expandedGroups, setExpandedGroups] = useState({});
 
-  const [addModalVisible, setAddModalVisible] = useState(false);
-  const [catalogSearchInput, setCatalogSearchInput] = useState('');
-  const [catalogSearchDebounced, setCatalogSearchDebounced] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [addPendingMachineId, setAddPendingMachineId] = useState(null);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setCatalogSearchDebounced(catalogSearchInput.trim().toLowerCase());
-    }, 280);
-    return () => clearTimeout(timeout);
-  }, [catalogSearchInput]);
-
-  const hydrate = async () => {
+  const hydrate = useCallback(async () => {
     try {
       setLoading(true);
       setInlineError('');
@@ -72,26 +58,23 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
       });
 
       setAppUserId(appUser.id);
-      const [catalog, rows] = await Promise.all([
-        fetchCatalogMachines(),
-        fetchUserMachines(appUser.id),
-      ]);
-      setCatalogMachines(catalog);
+      const rows = await fetchUserMachines(appUser.id);
       setUserMachines(rows);
     } catch (error) {
       setInlineError(error?.message || 'Could not load machines right now.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.name, user?.username]);
 
   useEffect(() => {
     hydrate();
-  }, [user?.username, user?.name]);
+  }, [hydrate]);
 
-  const userMachineIdSet = useMemo(
-    () => new Set(userMachines.map((row) => row.machine_id)),
-    [userMachines],
+  useFocusEffect(
+    useCallback(() => {
+      hydrate();
+    }, [hydrate]),
   );
 
   const groupedUserMachineSections = useMemo(() => {
@@ -111,27 +94,6 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
     }));
   }, [userMachines]);
 
-  const catalogCategoryFilters = useMemo(() => {
-    const categories = Array.from(
-      new Set(catalogMachines.map((machine) => normalizeMachineCategory(machine))),
-    );
-    return ['All', ...MACHINE_GROUP_ORDER.filter((cat) => categories.includes(cat))];
-  }, [catalogMachines]);
-
-  const filteredCatalogMachines = useMemo(() => {
-    const search = catalogSearchDebounced;
-    return catalogMachines.filter((machine) => {
-      const machineCategory = normalizeMachineCategory(machine);
-      const matchesCategory = selectedCategory === 'All' || selectedCategory === machineCategory;
-      const matchesSearch =
-        !search ||
-        String(machine.name || '').toLowerCase().includes(search) ||
-        machineCategory.toLowerCase().includes(search) ||
-        String(machine.zone || '').toLowerCase().includes(search);
-      return matchesCategory && matchesSearch;
-    });
-  }, [catalogMachines, catalogSearchDebounced, selectedCategory]);
-
   const toggleGroup = (title) => {
     setExpandedGroups((prev) => ({
       ...prev,
@@ -139,29 +101,8 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
     }));
   };
 
-  const openAddModal = () => {
-    setCatalogSearchInput('');
-    setCatalogSearchDebounced('');
-    setSelectedCategory('All');
-    setAddModalVisible(true);
-  };
-
-  const closeAddModal = () => {
-    setAddModalVisible(false);
-  };
-
-  const addMachine = async (machineId) => {
-    if (!appUserId) return;
-    try {
-      setAddPendingMachineId(machineId);
-      await addUserMachine(appUserId, machineId);
-      const rows = await fetchUserMachines(appUserId);
-      setUserMachines(rows);
-    } catch (error) {
-      setInlineError(error?.message || 'Could not add machine');
-    } finally {
-      setAddPendingMachineId(null);
-    }
+  const openAddScreen = () => {
+    navigation?.navigate('AddMachines');
   };
 
   const removeMachine = async (machineId) => {
@@ -202,7 +143,7 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
           ) : null}
 
           <View style={styles.topActionsRow}>
-            <TouchableOpacity style={styles.addMachinesButton} activeOpacity={0.9} onPress={openAddModal}>
+            <TouchableOpacity style={styles.addMachinesButton} activeOpacity={0.9} onPress={openAddScreen}>
               <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
               <Text style={styles.addMachinesButtonText}>Add machines</Text>
             </TouchableOpacity>
@@ -224,7 +165,7 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
             <Text style={styles.emptySubtle}>
               Add the machines available at your gym to personalize workouts.
             </Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={openAddModal}>
+            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={openAddScreen}>
               <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
               <Text style={styles.emptyCtaText}>Add machines</Text>
             </TouchableOpacity>
@@ -262,28 +203,6 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
           />
         )}
       </View>
-
-      <CatalogPickerModal
-        visible={addModalVisible}
-        title="Add machines"
-        subtitle="Choose from catalog machines available at your gym."
-        searchPlaceholder="Search machines"
-        searchValue={catalogSearchInput}
-        onSearchChange={setCatalogSearchInput}
-        categories={catalogCategoryFilters}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-        items={filteredCatalogMachines}
-        selectedIdSet={userMachineIdSet}
-        pendingAddId={addPendingMachineId}
-        pendingRemoveId={null}
-        getItemId={(item) => item.id}
-        getItemTitle={(item) => item.name}
-        getItemSubtitle={(item) => `${normalizeMachineCategory(item)} • ${item.zone || 'Gym Zone'}`}
-        onAdd={addMachine}
-        onClose={closeAddModal}
-        emptyText="No machines match this filter."
-      />
     </RootContainer>
   );
 }
