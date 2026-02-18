@@ -5,6 +5,7 @@
 - [`app/docs/prd/NEXTWATCH_PRD.md`](./prd/NEXTWATCH_PRD.md)
 - [`app/docs/AI_CONTEXT.md`](./AI_CONTEXT.md)
 - [`app/docs/SOP.md`](./SOP.md)
+- [`app/docs/design/DESIGN_SOP.md`](./design/DESIGN_SOP.md)
 - [`app/docs/log/WORKLOG.md`](./log/WORKLOG.md)
 - [`app/docs/sessions/INDEX.md`](./sessions/INDEX.md)
 - [`app/docs/sessions/LATEST.md`](./sessions/LATEST.md)

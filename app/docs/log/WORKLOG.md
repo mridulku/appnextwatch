@@ -182,3 +182,13 @@
 - Follow-ups / risks: Full in-flow visual QA (post-login into Inventory/Machines/Exercises) still requires manual simulator interaction.
 - Tag: nw-2026-02-18-1338-ui-card-restore (T1: user-facing UI flow/layout changes)
 - Notes: app/docs/sessions/2026-02-18/1332_restore-card-layout-ui-cleanup.md
+
+## 2026-02-18 - Session ui-design-sop-unify
+- Summary: Added a formal UI design SOP and unified image-card/list/modal primitives across Food Inventory + Gym Machines + Gym Exercises add flows.
+- Changes: Introduced `app/ui/tokens.js` and shared UI components (`CatalogItemCard`, `SelectedItemCard`, `CategoryChipsRow`, `FullSheetModal`, `QuantityStepper`); rewired legacy shared components under `app/components/*` to delegate to `app/ui`; updated modal structure to full-sheet with compact horizontal chips and larger list area.
+- Files: app/ui/tokens.js, app/ui/components/*, app/components/cards/CatalogCardRow.js, app/components/cards/SelectedCatalogItemCard.js, app/components/catalog/CategoryChipRow.js, app/components/controls/QuantityStepper.js, app/components/modals/SelectFromCatalogModal.js, app/docs/design/DESIGN_SOP.md, app/docs/README.md, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: UI-only consistency improvements; no schema/API/CRUD behavior change.
+- Validation performed: `npx expo export --platform ios --output-dir /tmp/appnextwatch-export-design-sop` passed; `npx expo run:ios --device "iPhone 17 Pro" --port 8083` build/install/open passed.
+- Follow-ups / risks: Full in-flow manual interaction QA for Food Inventory + Gym Machines + Gym Exercises still required to sign off final spacing/ergonomics.
+- Tag: NO (pending full manual interaction verification of all target flows)
+- Notes: app/docs/sessions/2026-02-18/1351_ui-design-sop-unify-modals-cards.md

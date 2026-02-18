@@ -12,6 +12,7 @@
 | 0.7 | 2026-02-18 | Codex | Reusable catalog-selection pattern extended to Gym Exercises, Food Utensils, and Food Recipes using `user_exercises` + `user_recipes` + shared picker/hook |
 | 0.8 | 2026-02-18 | Codex | Wellness catalog/user list rows refactored to reusable Swiggy-style card layout with shared placeholder imagery |
 | 0.9 | 2026-02-18 | Codex | Restored image-first selected-card layout and applied cleanup: non-overlapping remove control, compact shared stepper, full-height add modals with compact chips/results for Food Inventory + Gym Machines + Gym Exercises |
+| 1.0 | 2026-02-18 | Codex | Introduced `app/ui` design system tokens/components and standardized all catalog/add surfaces on shared full-sheet modal + card/chip primitives |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -54,6 +55,11 @@
   - Standardized remove affordance as a top-right icon control outside image tiles (no overlap).
   - Introduced shared compact `QuantityStepper` and applied it to Inventory card rows and Add Item quantity controls.
   - Upgraded add modals for Inventory/Machines/Exercises to full-height shared modal layout with compact horizontal category chips and larger scrollable results area.
+- 2026-02-18: Design SOP + guardrails established:
+  - Added `app/ui/tokens.js` as spacing/radius/control/modal single source of truth.
+  - Added reusable `app/ui/components/*` (`CatalogItemCard`, `SelectedItemCard`, `CategoryChipsRow`, `QuantityStepper`, `FullSheetModal`).
+  - Refactored existing shared component layer (`app/components/*`) to delegate to `app/ui` primitives so Food/Gym surfaces inherit consistent visuals by default.
+  - Added enforceable design process doc: `app/docs/design/DESIGN_SOP.md`.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

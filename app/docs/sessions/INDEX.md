@@ -2,6 +2,7 @@
 
 | Date | Time | Tag | Commit | Title (1 line) | Notes link |
 |---|---|---|---|---|---|
+| 2026-02-18 | 13:51 | TBD | TBD | UI design SOP + unified add modals/cards | [1351_ui-design-sop-unify-modals-cards.md](2026-02-18/1351_ui-design-sop-unify-modals-cards.md) |
 | 2026-02-18 | 13:32 | nw-2026-02-18-1338-ui-card-restore | d2ffa34 | restore selected-card image layout + modal cleanup | [1332_restore-card-layout-ui-cleanup.md](2026-02-18/1332_restore-card-layout-ui-cleanup.md) |
 | 2026-02-18 | 12:54 | TBD | TBD | swiggy-style card UI refactor for wellness lists | [1254_ui-swiggy-cards.md](2026-02-18/1254_ui-swiggy-cards.md) |
 | 2026-02-18 | 11:46 | nw-2026-02-18-1147-ui-catalog-selection | TBD | reusable catalog selection for exercises/utensils/recipes | [1146_catalog-selection-reuse.md](2026-02-18/1146_catalog-selection-reuse.md) |
