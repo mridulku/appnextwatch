@@ -15,15 +15,30 @@ function CatalogItemCard({
   actionDisabled = false,
   onAction,
   onPress,
+  rightAction,
+  badges = [],
 }) {
   const actionStyle =
-    actionVariant === 'success'
+    actionVariant === 'danger'
+      ? styles.actionDanger
+      : actionVariant === 'success'
       ? styles.actionSuccess
       : actionVariant === 'muted'
         ? styles.actionMuted
         : styles.actionAccent;
 
   const actionTextStyle = actionVariant === 'muted' ? styles.actionTextMuted : styles.actionText;
+
+  const resolvedRightAction = rightAction ?? (
+    <TouchableOpacity
+      style={[styles.action, actionStyle, actionDisabled && styles.actionDisabled]}
+      activeOpacity={0.9}
+      onPress={onAction}
+      disabled={actionDisabled || !onAction}
+    >
+      <Text style={[styles.actionText, actionTextStyle]}>{actionLabel}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <TouchableOpacity
@@ -33,25 +48,43 @@ function CatalogItemCard({
       disabled={!onPress}
     >
       <View style={styles.left}>
-        <Text style={styles.title} numberOfLines={2}>{title}</Text>
-        <Text style={styles.subtitle} numberOfLines={2}>{subtitle}</Text>
-      </View>
-
-      <View style={styles.right}>
         <Image
           source={imageUrl ? { uri: imageUrl } : ITEM_PLACEHOLDER_IMAGE}
           style={styles.image}
           resizeMode="cover"
         />
+      </View>
 
-        <TouchableOpacity
-          style={[styles.action, actionStyle, actionDisabled && styles.actionDisabled]}
-          activeOpacity={0.9}
-          onPress={onAction}
-          disabled={actionDisabled || !onAction}
-        >
-          <Text style={[styles.actionText, actionTextStyle]}>{actionLabel}</Text>
-        </TouchableOpacity>
+      <View style={styles.middle}>
+        <Text style={styles.title} numberOfLines={2}>{title}</Text>
+        <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>
+        {badges.length ? (
+          <View style={styles.badgesRow}>
+            {badges.slice(0, 2).map((badge) => (
+              <View
+                key={`${title}_${badge.label}`}
+                style={[
+                  styles.badge,
+                  badge.tone === 'warn' ? styles.badgeWarn : styles.badgeDefault,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.badgeText,
+                    badge.tone === 'warn' ? styles.badgeWarnText : styles.badgeDefaultText,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {badge.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+      </View>
+
+      <View style={styles.right}>
+        {resolvedRightAction}
       </View>
     </TouchableOpacity>
   );
@@ -73,9 +106,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(245,201,106,0.1)',
   },
   left: {
-    flex: 1,
+    width: UI_TOKENS.card.imageSize,
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingRight: UI_TOKENS.spacing.xs,
+    flexShrink: 0,
+  },
+  middle: {
+    flex: 1,
+    minWidth: 0,
+    justifyContent: 'center',
   },
   title: {
     color: COLORS.text,
@@ -89,10 +128,42 @@ const styles = StyleSheet.create({
     marginTop: UI_TOKENS.spacing.xs,
     lineHeight: 16,
   },
+  badgesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: UI_TOKENS.spacing.xs,
+    marginTop: UI_TOKENS.spacing.xs,
+  },
+  badge: {
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    paddingHorizontal: UI_TOKENS.spacing.xs,
+    paddingVertical: 2,
+    maxWidth: 120,
+  },
+  badgeDefault: {
+    borderColor: 'rgba(162,167,179,0.3)',
+    backgroundColor: 'rgba(162,167,179,0.12)',
+  },
+  badgeWarn: {
+    borderColor: 'rgba(255,164,116,0.45)',
+    backgroundColor: 'rgba(255,164,116,0.16)',
+  },
+  badgeText: {
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+  },
+  badgeDefaultText: {
+    color: COLORS.muted,
+  },
+  badgeWarnText: {
+    color: '#FFB98F',
+  },
   right: {
-    width: UI_TOKENS.card.imageSize + UI_TOKENS.spacing.lg,
+    width: 96,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
   image: {
     width: UI_TOKENS.card.imageSize,
@@ -103,11 +174,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(162,167,179,0.1)',
   },
   action: {
-    marginTop: UI_TOKENS.spacing.xs,
     minWidth: 84,
+    minHeight: 36,
     borderRadius: UI_TOKENS.radius.sm,
     borderWidth: UI_TOKENS.border.hairline,
     alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 7,
     paddingHorizontal: UI_TOKENS.spacing.sm,
   },
@@ -118,6 +190,10 @@ const styles = StyleSheet.create({
   actionSuccess: {
     backgroundColor: 'rgba(113,228,179,0.18)',
     borderColor: 'rgba(113,228,179,0.42)',
+  },
+  actionDanger: {
+    backgroundColor: 'rgba(255,124,123,0.16)',
+    borderColor: 'rgba(255,124,123,0.44)',
   },
   actionMuted: {
     backgroundColor: 'rgba(162,167,179,0.16)',

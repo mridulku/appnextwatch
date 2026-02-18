@@ -16,11 +16,9 @@ function SelectedItemCard({
   removeDisabled = false,
   rightControls,
   topAction,
+  rightAction,
+  layout = 'rightThumb',
 }) {
-  const leadingBadge = badges[0];
-  const leadingText = leadingBadge?.label || '•';
-  const warning = badges.some((badge) => badge.tone === 'warn');
-
   const resolvedTopAction = topAction?.onPress
     ? {
         iconName: topAction.iconName || 'create-outline',
@@ -37,49 +35,67 @@ function SelectedItemCard({
         }
       : null;
 
+  const hasLegacyLayout = layout === 'rightThumb';
+  const resolvedRightAction =
+    rightAction ||
+    rightControls ||
+    (resolvedTopAction ? (
+      <TouchableOpacity
+        style={[styles.actionButton, resolvedTopAction.disabled && styles.actionButtonDisabled]}
+        activeOpacity={0.85}
+        disabled={resolvedTopAction.disabled}
+        onPress={resolvedTopAction.onPress}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <Ionicons name={resolvedTopAction.iconName} size={15} color={resolvedTopAction.iconColor} />
+      </TouchableOpacity>
+    ) : null);
+
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, hasLegacyLayout && styles.cardLegacy]}
       activeOpacity={onPress ? 0.9 : 1}
       onPress={onPress}
       disabled={!onPress}
     >
       <View style={styles.leftColumn}>
-        <View style={styles.textRow}>
-          <View style={[styles.leadingIcon, warning && styles.leadingIconWarn]}>
-            <Text style={styles.leadingIconText}>{leadingText}</Text>
-          </View>
-          <View style={styles.textBlock}>
-            <Text style={styles.title} numberOfLines={2}>{title}</Text>
-            <Text style={styles.subtitle} numberOfLines={2}>{subtitle}</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.rightColumn}>
-        {resolvedTopAction ? (
-          <View style={styles.actionRow}>
-            <TouchableOpacity
-              style={[styles.removeButton, resolvedTopAction.disabled && styles.removeButtonDisabled]}
-              activeOpacity={0.85}
-              disabled={resolvedTopAction.disabled}
-              onPress={resolvedTopAction.onPress}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Ionicons name={resolvedTopAction.iconName} size={15} color={resolvedTopAction.iconColor} />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.actionRowSpacer} />
-        )}
-
         <Image
           source={imageUrl ? { uri: imageUrl } : ITEM_PLACEHOLDER_IMAGE}
           style={styles.image}
           resizeMode="cover"
         />
+      </View>
 
-        {rightControls ? <View style={styles.controlsWrap}>{rightControls}</View> : null}
+      <View style={styles.middleColumn}>
+        <Text style={styles.title} numberOfLines={2}>{title}</Text>
+        <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>
+        {badges.length ? (
+          <View style={styles.badgesRow}>
+            {badges.slice(0, 2).map((badge) => (
+              <View
+                key={`${title}_${badge.label}`}
+                style={[
+                  styles.badge,
+                  badge.tone === 'warn' ? styles.badgeWarn : styles.badgeDefault,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.badgeText,
+                    badge.tone === 'warn' ? styles.badgeWarnText : styles.badgeDefaultText,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {badge.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+      </View>
+
+      <View style={styles.rightColumn}>
+        {resolvedRightAction ? resolvedRightAction : <View style={styles.rightActionSpacer} />}
       </View>
     </TouchableOpacity>
   );
@@ -100,36 +116,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  cardLegacy: {
+    // Kept for backward compatibility of prop, but schema is unified.
+  },
   leftColumn: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  textRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: UI_TOKENS.spacing.sm,
-  },
-  leadingIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.28)',
-    backgroundColor: 'rgba(162,167,179,0.14)',
+    width: UI_TOKENS.card.imageSize,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  leadingIconWarn: {
-    borderColor: 'rgba(255,164,116,0.42)',
-    backgroundColor: 'rgba(255,164,116,0.14)',
-  },
-  leadingIconText: {
-    color: COLORS.text,
-    fontSize: UI_TOKENS.typography.meta,
-    fontWeight: '700',
-  },
-  textBlock: {
-    flex: 1,
+    flexShrink: 0,
   },
   title: {
     color: COLORS.text,
@@ -144,19 +138,17 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   rightColumn: {
-    width: UI_TOKENS.card.imageSize + UI_TOKENS.spacing.lg,
+    width: 96,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
-  actionRow: {
-    width: '100%',
-    alignItems: 'flex-end',
-    marginBottom: UI_TOKENS.spacing.xs,
+  middleColumn: {
+    flex: 1,
+    minWidth: 0,
+    justifyContent: 'center',
   },
-  actionRowSpacer: {
-    width: '100%',
-    height: UI_TOKENS.control.iconButton + UI_TOKENS.spacing.xs,
-  },
-  removeButton: {
+  actionButton: {
     width: UI_TOKENS.control.iconButton,
     height: UI_TOKENS.control.iconButton,
     borderRadius: UI_TOKENS.radius.sm,
@@ -166,8 +158,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  removeButtonDisabled: {
+  actionButtonDisabled: {
     opacity: 0.55,
+  },
+  rightActionSpacer: {
+    width: UI_TOKENS.control.iconButton,
+    height: UI_TOKENS.control.iconButton,
   },
   image: {
     width: UI_TOKENS.card.imageSize,
@@ -177,10 +173,37 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(162,167,179,0.24)',
     backgroundColor: 'rgba(162,167,179,0.1)',
   },
-  controlsWrap: {
-    marginTop: UI_TOKENS.spacing.sm,
-    width: '100%',
-    alignItems: 'center',
+  badgesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: UI_TOKENS.spacing.xs,
+    marginTop: UI_TOKENS.spacing.xs,
+  },
+  badge: {
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    paddingHorizontal: UI_TOKENS.spacing.xs,
+    paddingVertical: 2,
+    maxWidth: 120,
+  },
+  badgeDefault: {
+    borderColor: 'rgba(162,167,179,0.3)',
+    backgroundColor: 'rgba(162,167,179,0.12)',
+  },
+  badgeWarn: {
+    borderColor: 'rgba(255,164,116,0.42)',
+    backgroundColor: 'rgba(255,164,116,0.14)',
+  },
+  badgeText: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+  },
+  badgeDefaultText: {
+    color: COLORS.muted,
+  },
+  badgeWarnText: {
+    color: '#FFD8BD',
   },
 });
 

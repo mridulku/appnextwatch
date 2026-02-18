@@ -2,6 +2,7 @@
 
 | Date | Time | Tag | Commit | Title (1 line) | Notes link |
 |---|---|---|---|---|---|
+| 2026-02-18 | 16:16 | nw-2026-02-18-1616-ui-card-schema | TBD | unify wellness cards to 3-column schema | [1616_ui-card-3col-schema.md](2026-02-18/1616_ui-card-3col-schema.md) |
 | 2026-02-18 | 15:48 | TBD | TBD | food inventory browse-only list + detail editor | [1548_food-inventory-browse-detail.md](2026-02-18/1548_food-inventory-browse-detail.md) |
 | 2026-02-18 | 15:34 | nw-2026-02-18-1534-navigation-add-fix | TBD | fix Gym Add Machines navigation crash + push checkpoint | [1534_navigation-add-fix.md](2026-02-18/1534_navigation-add-fix.md) |
 | 2026-02-18 | 14:24 | TBD | TBD | fix add-modal layout gap (remove bottom-alignment) | [1424_fix-modal-gap-layout.md](2026-02-18/1424_fix-modal-gap-layout.md) |

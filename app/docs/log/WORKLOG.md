@@ -232,3 +232,13 @@
 - Follow-ups / risks: Manual simulator interaction pass still needed to confirm ideal ergonomics for detail screen save/remove flow.
 - Tag: TBD
 - Notes: app/docs/sessions/2026-02-18/1548_food-inventory-browse-detail.md
+
+## 2026-02-18 - Session ui-card-schema
+- Summary: Unified Wellness card layout schema to one consistent 3-column row structure.
+- Changes: Standardized shared catalog and selected card components to `LEFT thumbnail | MIDDLE text | RIGHT action`; migrated legacy catalog card wrapper to shared UI implementation while preserving per-screen action behavior.
+- Files: app/ui/components/CatalogItemCard.js, app/ui/components/SelectedItemCard.js, app/components/cards/CatalogItemCard.js, app/features/wellness/food/FoodInventoryScreen.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: User-visible UI consistency update across Gym + Food card rows; no data-flow/business-logic changes.
+- Validation performed: `npx expo export --platform ios` passed; `npx expo run:ios --device "iPhone 17 Pro" --port 8083` build/install/open passed.
+- Follow-ups / risks: Manual in-app visual pass still recommended to confirm ideal text truncation and spacing on all tab surfaces.
+- Tag: nw-2026-02-18-1616-ui-card-schema (T1)
+- Notes: app/docs/sessions/2026-02-18/1616_ui-card-3col-schema.md

@@ -423,8 +423,9 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
       <SelectedCatalogItemCard
         title={item.name}
         subtitle={`${item.category} • ${formatQuantity(item.quantity, item.unitType)}`}
-        badges={low ? [{ label: 'Low stock', tone: 'warn' }] : [{ label: item.icon || '🧺', tone: 'default' }]}
+        badges={low ? [{ label: 'Low stock', tone: 'warn' }] : []}
         onPress={() => openItemDetail(item)}
+        layout="leftThumb"
         topAction={{
           iconName: 'create-outline',
           iconColor: COLORS.text,
