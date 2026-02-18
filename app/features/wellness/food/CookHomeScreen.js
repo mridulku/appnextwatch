@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
+import CatalogItemCard from '../../../components/cards/CatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
@@ -143,45 +144,24 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
               const localRecipeId = findLocalRecipeIdByName(recipe?.name);
 
               return (
-                <TouchableOpacity
-                  style={styles.itemRow}
-                  activeOpacity={0.9}
-                  onPress={() => {
-                    if (localRecipeId) {
-                      navigation.navigate('CookRecipe', {
-                        recipeId: localRecipeId,
-                        recipeName: recipe?.name,
-                      });
-                    }
-                  }}
-                  disabled={!localRecipeId}
-                >
-                  <View style={styles.itemLeft}>
-                    <View style={styles.itemIconWrap}>
-                      <Text style={styles.itemEmoji}>{CATEGORY_ICONS[normalizeMealType(recipe)] || '🍽️'}</Text>
-                    </View>
-                    <View style={styles.itemTextWrap}>
-                      <Text style={styles.itemTitle}>{recipe?.name || 'Recipe'}</Text>
-                      <Text style={styles.itemMeta}>
-                        {normalizeMealType(recipe)} • {recipe?.total_minutes || '--'} min • {recipe?.difficulty || 'Easy'}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.rowActions}>
-                    {localRecipeId ? <Ionicons name="chevron-forward" size={14} color={COLORS.muted} /> : null}
-                    <TouchableOpacity
-                      style={styles.removeButton}
-                      activeOpacity={0.9}
-                      disabled={selection.pendingRemoveId === item.recipe_id}
-                      onPress={() => selection.removeCatalogItem(item.recipe_id)}
-                    >
-                      <Text style={styles.removeButtonText}>
-                        {selection.pendingRemoveId === item.recipe_id ? '...' : 'Remove'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
+                <CatalogItemCard
+                  title={recipe?.name || 'Recipe'}
+                  subtitle={`${normalizeMealType(recipe)} • ${recipe?.total_minutes || '--'} min • ${recipe?.difficulty || 'Easy'}`}
+                  badges={[{ label: CATEGORY_ICONS[normalizeMealType(recipe)] || '🍽️', tone: 'default' }]}
+                  onPress={
+                    localRecipeId
+                      ? () =>
+                          navigation.navigate('CookRecipe', {
+                            recipeId: localRecipeId,
+                            recipeName: recipe?.name,
+                          })
+                      : undefined
+                  }
+                  primaryActionLabel={selection.pendingRemoveId === item.recipe_id ? '...' : 'REMOVE'}
+                  primaryActionVariant="danger"
+                  primaryActionDisabled={selection.pendingRemoveId === item.recipe_id}
+                  onPrimaryAction={() => selection.removeCatalogItem(item.recipe_id)}
+                />
               );
             }}
           />
@@ -205,9 +185,8 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
         getItemId={(item) => item.id}
         getItemTitle={(item) => item.name}
         getItemSubtitle={(item) => `${normalizeMealType(item)} • ${item.total_minutes || '--'} min • ${item.difficulty || 'Easy'}`}
-        getItemIcon={(item) => CATEGORY_ICONS[normalizeMealType(item)] || '🍽️'}
+        getItemBadges={(item) => [{ label: CATEGORY_ICONS[normalizeMealType(item)] || '🍽️', tone: 'default' }]}
         onAdd={selection.addCatalogItem}
-        onRemove={selection.removeCatalogItem}
         onClose={selection.closeAddModal}
         emptyText="No recipes match this filter."
       />

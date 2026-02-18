@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useCallback } from 'react';
 import {
   FlatList,
   Modal,
@@ -10,6 +11,7 @@ import {
   View,
 } from 'react-native';
 
+import CatalogItemCard from '../cards/CatalogItemCard';
 import COLORS from '../../theme/colors';
 
 function CatalogPickerModal({
@@ -30,60 +32,77 @@ function CatalogPickerModal({
   getItemTitle,
   getItemSubtitle,
   getItemIcon,
+  getItemImageUrl,
+  getItemBadges,
   onAdd,
   onRemove,
   onClose,
   emptyText = 'No items match this filter.',
+  selectedActionMode = 'added',
 }) {
-  const renderRow = ({ item }) => {
-    const id = getItemId(item);
-    const isAdded = selectedIdSet.has(id);
-    const isBusy = pendingAddId === id || pendingRemoveId === id;
+  const renderRow = useCallback(
+    ({ item }) => {
+      const id = getItemId(item);
+      const isAdded = selectedIdSet.has(id);
+      const isBusy = pendingAddId === id || pendingRemoveId === id;
 
-    return (
-      <View style={styles.itemRow}>
-        <View style={styles.itemLeft}>
-          <View style={styles.itemIconWrap}>
-            {getItemIcon ? (
-              typeof getItemIcon(item) === 'string' && getItemIcon(item).startsWith('ios-') ? (
-                <Ionicons name={getItemIcon(item)} size={14} color={COLORS.accent2} />
-              ) : (
-                <Text style={styles.emojiText}>{getItemIcon(item)}</Text>
-              )
-            ) : (
-              <Ionicons name="cube-outline" size={14} color={COLORS.accent2} />
-            )}
-          </View>
+      let primaryActionLabel = 'ADD';
+      let primaryActionVariant = 'accent';
+      let primaryActionDisabled = false;
+      let onPrimaryAction = () => onAdd(id);
 
-          <View style={styles.itemTextWrap}>
-            <Text style={styles.itemTitle}>{getItemTitle(item)}</Text>
-            <Text style={styles.itemMeta}>{getItemSubtitle(item)}</Text>
-          </View>
-        </View>
+      if (isAdded) {
+        if (selectedActionMode === 'remove' && onRemove) {
+          primaryActionLabel = isBusy ? '...' : 'REMOVE';
+          primaryActionVariant = 'danger';
+          primaryActionDisabled = isBusy;
+          onPrimaryAction = () => onRemove(id);
+        } else {
+          primaryActionLabel = 'ADDED';
+          primaryActionVariant = 'success';
+          primaryActionDisabled = true;
+          onPrimaryAction = undefined;
+        }
+      } else if (isBusy) {
+        primaryActionLabel = '...';
+        primaryActionDisabled = true;
+      }
 
-        {isAdded ? (
-          <TouchableOpacity
-            style={[styles.rowButton, styles.removeButton, isBusy && styles.rowButtonDisabled]}
-            disabled={isBusy}
-            activeOpacity={0.9}
-            onPress={() => onRemove(id)}
-          >
-            <Text style={styles.removeButtonText}>{isBusy ? '...' : 'Remove'}</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[styles.rowButton, styles.addButton, isBusy && styles.rowButtonDisabled]}
-            disabled={isBusy}
-            activeOpacity={0.9}
-            onPress={() => onAdd(id)}
-          >
-            <Ionicons name="add" size={14} color={COLORS.bg} />
-            <Text style={styles.addButtonText}>{isBusy ? 'Adding' : 'Add'}</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    );
-  };
+      const icon = getItemIcon ? getItemIcon(item) : null;
+      const badgeFromIcon = icon
+        ? [{ label: icon, tone: 'default' }]
+        : [];
+      const badges = getItemBadges ? getItemBadges(item) : badgeFromIcon;
+
+      return (
+        <CatalogItemCard
+          title={getItemTitle(item)}
+          subtitle={getItemSubtitle(item)}
+          imageUrl={getItemImageUrl ? getItemImageUrl(item) : null}
+          badges={badges}
+          selected={isAdded}
+          primaryActionLabel={primaryActionLabel}
+          primaryActionVariant={primaryActionVariant}
+          primaryActionDisabled={primaryActionDisabled}
+          onPrimaryAction={onPrimaryAction}
+        />
+      );
+    },
+    [
+      getItemBadges,
+      getItemIcon,
+      getItemId,
+      getItemImageUrl,
+      getItemSubtitle,
+      getItemTitle,
+      onAdd,
+      onRemove,
+      pendingAddId,
+      pendingRemoveId,
+      selectedActionMode,
+      selectedIdSet,
+    ],
+  );
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -139,6 +158,8 @@ function CatalogPickerModal({
               style={styles.list}
               contentContainerStyle={styles.listContent}
               showsVerticalScrollIndicator={false}
+              initialNumToRender={8}
+              windowSize={6}
             />
           )}
 
@@ -183,9 +204,9 @@ const styles = StyleSheet.create({
   },
   sheetTitle: {
     color: COLORS.text,
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: '700',
-    lineHeight: 38,
+    lineHeight: 36,
   },
   sheetSubtitle: {
     color: COLORS.muted,
@@ -249,81 +270,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 12,
     gap: 8,
-  },
-  itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.18)',
-    backgroundColor: COLORS.card,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  itemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    flex: 1,
-  },
-  itemIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(90,209,232,0.13)',
-    borderWidth: 1,
-    borderColor: 'rgba(90,209,232,0.28)',
-  },
-  emojiText: {
-    fontSize: 15,
-  },
-  itemTextWrap: {
-    flex: 1,
-  },
-  itemTitle: {
-    color: COLORS.text,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  itemMeta: {
-    color: COLORS.muted,
-    fontSize: 11,
-    marginTop: 2,
-  },
-  rowButton: {
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minWidth: 76,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 4,
-  },
-  addButton: {
-    backgroundColor: COLORS.accent,
-  },
-  removeButton: {
-    borderWidth: 1,
-    borderColor: 'rgba(255,124,123,0.45)',
-    backgroundColor: 'rgba(255,124,123,0.16)',
-  },
-  rowButtonDisabled: {
-    opacity: 0.6,
-  },
-  addButtonText: {
-    color: COLORS.bg,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  removeButtonText: {
-    color: '#FF9C92',
-    fontSize: 12,
-    fontWeight: '700',
   },
   emptyWrap: {
     marginTop: 10,

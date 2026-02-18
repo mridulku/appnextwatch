@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
+import CatalogItemCard from '../../../components/cards/CatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
@@ -151,47 +152,26 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
               const localExerciseId = findLocalExerciseIdByName(catalog?.name);
 
               return (
-                <TouchableOpacity
-                  style={styles.itemRow}
-                  activeOpacity={0.9}
-                  onPress={() => {
-                    if (localExerciseId) {
-                      navigation.navigate('ExerciseDetail', {
-                        exerciseId: localExerciseId,
-                        exerciseName: catalog?.name,
-                      });
-                    }
-                  }}
-                  disabled={!localExerciseId}
-                >
-                  <View style={styles.itemLeft}>
-                    <View style={styles.itemIconWrap}>
-                      <Ionicons name="barbell-outline" size={14} color={COLORS.accent2} />
-                    </View>
-                    <View style={styles.itemTextWrap}>
-                      <Text style={styles.itemTitle}>{catalog?.name || 'Exercise'}</Text>
-                      <Text style={styles.itemMeta}>
-                        {catalog?.type || 'exercise'} • {catalog?.equipment || 'bodyweight'}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.rowActions}>
-                    {localExerciseId ? (
-                      <Ionicons name="chevron-forward" size={14} color={COLORS.muted} style={styles.chevron} />
-                    ) : null}
-                    <TouchableOpacity
-                      style={styles.removeButton}
-                      activeOpacity={0.9}
-                      disabled={selection.pendingRemoveId === item.exercise_id}
-                      onPress={() => selection.removeCatalogItem(item.exercise_id)}
-                    >
-                      <Text style={styles.removeButtonText}>
-                        {selection.pendingRemoveId === item.exercise_id ? '...' : 'Remove'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
+                <CatalogItemCard
+                  title={catalog?.name || 'Exercise'}
+                  subtitle={`${normalizeExerciseCategory(catalog)} • ${catalog?.type || 'exercise'} • ${catalog?.equipment || 'bodyweight'}`}
+                  badges={[
+                    { label: GROUP_ICONS[normalizeExerciseCategory(catalog)] ? '🏋️' : '•', tone: 'default' },
+                  ]}
+                  onPress={
+                    localExerciseId
+                      ? () =>
+                          navigation.navigate('ExerciseDetail', {
+                            exerciseId: localExerciseId,
+                            exerciseName: catalog?.name,
+                          })
+                      : undefined
+                  }
+                  primaryActionLabel={selection.pendingRemoveId === item.exercise_id ? '...' : 'REMOVE'}
+                  primaryActionVariant="danger"
+                  primaryActionDisabled={selection.pendingRemoveId === item.exercise_id}
+                  onPrimaryAction={() => selection.removeCatalogItem(item.exercise_id)}
+                />
               );
             }}
           />
@@ -215,9 +195,8 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
         getItemId={(item) => item.id}
         getItemTitle={(item) => item.name}
         getItemSubtitle={(item) => `${normalizeExerciseCategory(item)} • ${item.type || 'exercise'} • ${item.equipment || 'bodyweight'}`}
-        getItemIcon={(item) => GROUP_ICONS[normalizeExerciseCategory(item)] || 'barbell-outline'}
+        getItemBadges={() => [{ label: '🏋️', tone: 'default' }]}
         onAdd={selection.addCatalogItem}
-        onRemove={selection.removeCatalogItem}
         onClose={selection.closeAddModal}
         emptyText="No exercises match this filter."
       />

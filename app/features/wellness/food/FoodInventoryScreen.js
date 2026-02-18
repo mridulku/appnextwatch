@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -23,6 +23,7 @@ import {
   parseVoiceCommand,
 } from '../../../core/foodVoiceParser';
 import CollapsibleSection from '../../../components/CollapsibleSection';
+import CatalogItemCard from '../../../components/cards/CatalogItemCard';
 import { useAuth } from '../../../context/AuthContext';
 import {
   fetchCatalogIngredients,
@@ -558,68 +559,58 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
     />
   );
 
-  const renderItem = ({ item }) => {
+  const renderItem = useCallback(({ item }) => {
     const low = item.quantity <= item.lowStockThreshold;
     const pendingRemove = pendingRemoveItemId === item.id;
-
-    return (
-      <View style={styles.itemCard}>
-        <View style={styles.itemLeft}>
-          <View style={styles.itemIconWrap}>
-            <Text style={styles.itemIcon}>{item.icon || '🧺'}</Text>
-          </View>
-          <View style={styles.itemTextWrap}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <View style={styles.itemMetaRow}>
-              <Text style={styles.itemQty}>{formatQuantity(item.quantity, item.unitType)}</Text>
-              {low ? <View style={styles.lowDot} /> : null}
-              {low ? <Text style={styles.lowText}>Low stock</Text> : null}
-            </View>
-          </View>
+    const rightControls = pendingRemove ? (
+      <View style={styles.removePromptWrap}>
+        <Text style={styles.removePromptText}>Remove?</Text>
+        <View style={styles.removePromptActions}>
+          <TouchableOpacity style={styles.removeCancelChip} activeOpacity={0.9} onPress={cancelRemoveItem}>
+            <Text style={styles.removeCancelText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.removeConfirmChip} activeOpacity={0.9} onPress={() => confirmRemoveItem(item)}>
+            <Text style={styles.removeConfirmText}>Remove</Text>
+          </TouchableOpacity>
         </View>
-
-        {pendingRemove ? (
-          <View style={styles.removePromptWrap}>
-            <Text style={styles.removePromptText}>Remove?</Text>
-            <View style={styles.removePromptActions}>
-              <TouchableOpacity style={styles.removeCancelChip} activeOpacity={0.9} onPress={cancelRemoveItem}>
-                <Text style={styles.removeCancelText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.removeConfirmChip} activeOpacity={0.9} onPress={() => confirmRemoveItem(item)}>
-                <Text style={styles.removeConfirmText}>Remove</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.stepperWrap}>
-            <TouchableOpacity
-              style={styles.removeIconButton}
-              activeOpacity={0.85}
-              onPress={() => setPendingRemoveItemId(item.id)}
-            >
-              <Ionicons name="trash-outline" size={14} color="#FFA674" />
-            </TouchableOpacity>
-            <View style={styles.stepper}>
-              <TouchableOpacity
-                style={styles.stepperButton}
-                activeOpacity={0.85}
-                onPress={() => adjustQuantity(item.id, -1)}
-              >
-                <Ionicons name="remove" size={16} color={COLORS.text} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.stepperButton, styles.stepperButtonAccent]}
-                activeOpacity={0.85}
-                onPress={() => adjustQuantity(item.id, 1)}
-              >
-                <Ionicons name="add" size={16} color={COLORS.bg} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+      </View>
+    ) : (
+      <View style={styles.stepperWrap}>
+        <TouchableOpacity
+          style={styles.removeIconButton}
+          activeOpacity={0.85}
+          onPress={() => setPendingRemoveItemId(item.id)}
+        >
+          <Ionicons name="trash-outline" size={14} color="#FFA674" />
+        </TouchableOpacity>
+        <View style={styles.stepper}>
+          <TouchableOpacity
+            style={styles.stepperButton}
+            activeOpacity={0.85}
+            onPress={() => adjustQuantity(item.id, -1)}
+          >
+            <Ionicons name="remove" size={16} color={COLORS.text} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.stepperButton, styles.stepperButtonAccent]}
+            activeOpacity={0.85}
+            onPress={() => adjustQuantity(item.id, 1)}
+          >
+            <Ionicons name="add" size={16} color={COLORS.bg} />
+          </TouchableOpacity>
+        </View>
       </View>
     );
-  };
+
+    return (
+      <CatalogItemCard
+        title={item.name}
+        subtitle={`${item.category} • ${formatQuantity(item.quantity, item.unitType)}`}
+        badges={low ? [{ label: 'Low stock', tone: 'warn' }] : [{ label: item.icon || '🧺', tone: 'default' }]}
+        rightControls={rightControls}
+      />
+    );
+  }, [adjustQuantity, cancelRemoveItem, confirmRemoveItem, pendingRemoveItemId]);
 
   const RootContainer = embedded ? View : SafeAreaView;
 
@@ -872,30 +863,22 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
                 renderItem={({ item }) => {
                   const selected = selectedCatalogItem?.id === item.id;
                   return (
-                    <TouchableOpacity
-                      style={[styles.catalogRow, selected && styles.catalogRowActive]}
-                      activeOpacity={0.9}
-                      onPress={() => {
-                        setSelectedCatalogItem(item);
-                      }}
-                    >
-                      <View style={styles.itemIconWrap}>
-                        <Text style={styles.itemIcon}>
-                          {CATEGORY_META[normalizeCategory(item.category)]?.emoji || '🧺'}
-                        </Text>
-                      </View>
-                      <View style={styles.catalogRowText}>
-                        <Text style={styles.catalogName}>{item.name}</Text>
-                        <Text style={styles.catalogMeta}>
-                          {normalizeCategory(item.category)} · {item.unit_type || 'pcs'}
-                        </Text>
-                      </View>
-                      {selected ? <Ionicons name="checkmark-circle" size={18} color={COLORS.accent} /> : null}
-                    </TouchableOpacity>
+                    <CatalogItemCard
+                      title={item.name}
+                      subtitle={`${normalizeCategory(item.category)} • ${item.unit_type || 'pcs'}`}
+                      badges={[{ label: CATEGORY_META[normalizeCategory(item.category)]?.emoji || '🧺', tone: 'default' }]}
+                      selected={selected}
+                      primaryActionLabel={selected ? 'ADDED' : 'ADD'}
+                      primaryActionVariant={selected ? 'success' : 'accent'}
+                      primaryActionDisabled={selected}
+                      onPrimaryAction={() => setSelectedCatalogItem(item)}
+                      onPress={() => setSelectedCatalogItem(item)}
+                    />
                   );
                 }}
                 showsVerticalScrollIndicator={false}
-                initialNumToRender={16}
+                initialNumToRender={8}
+                windowSize={6}
                 keyboardShouldPersistTaps="handled"
                 ListEmptyComponent={
                   <Text style={styles.catalogEmpty}>No catalog items match your search.</Text>

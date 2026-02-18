@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
+import CatalogItemCard from '../../../components/cards/CatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
@@ -128,28 +129,15 @@ function FoodUtensilsScreen({ embedded = false, showHero = true }) {
             renderItem={({ item }) => {
               const utensil = item.catalog_utensil;
               return (
-                <View style={styles.itemRow}>
-                  <View style={styles.itemLeft}>
-                    <View style={styles.itemIconWrap}>
-                      <Text style={styles.itemEmoji}>{CATEGORY_ICONS[normalizeCategory(utensil)] || '🍽️'}</Text>
-                    </View>
-                    <View style={styles.itemTextWrap}>
-                      <Text style={styles.itemTitle}>{utensil?.name || 'Utensil'}</Text>
-                      <Text style={styles.itemMeta}>{normalizeCategory(utensil)}</Text>
-                    </View>
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.removeButton}
-                    activeOpacity={0.9}
-                    disabled={selection.pendingRemoveId === item.utensil_id}
-                    onPress={() => selection.removeCatalogItem(item.utensil_id)}
-                  >
-                    <Text style={styles.removeButtonText}>
-                      {selection.pendingRemoveId === item.utensil_id ? '...' : 'Remove'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                <CatalogItemCard
+                  title={utensil?.name || 'Utensil'}
+                  subtitle={`${normalizeCategory(utensil)}${utensil?.note ? ` • ${utensil.note}` : ''}`}
+                  badges={[{ label: CATEGORY_ICONS[normalizeCategory(utensil)] || '🍽️', tone: 'default' }]}
+                  primaryActionLabel={selection.pendingRemoveId === item.utensil_id ? '...' : 'REMOVE'}
+                  primaryActionVariant="danger"
+                  primaryActionDisabled={selection.pendingRemoveId === item.utensil_id}
+                  onPrimaryAction={() => selection.removeCatalogItem(item.utensil_id)}
+                />
               );
             }}
           />
@@ -173,9 +161,8 @@ function FoodUtensilsScreen({ embedded = false, showHero = true }) {
         getItemId={(item) => item.id}
         getItemTitle={(item) => item.name}
         getItemSubtitle={(item) => `${normalizeCategory(item)}${item?.note ? ` • ${item.note}` : ''}`}
-        getItemIcon={(item) => CATEGORY_ICONS[normalizeCategory(item)] || '🍽️'}
+        getItemBadges={(item) => [{ label: CATEGORY_ICONS[normalizeCategory(item)] || '🍽️', tone: 'default' }]}
         onAdd={selection.addCatalogItem}
-        onRemove={selection.removeCatalogItem}
         onClose={selection.closeAddModal}
         emptyText="No utensils match this filter."
       />

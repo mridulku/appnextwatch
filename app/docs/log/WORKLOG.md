@@ -162,3 +162,13 @@
 - Follow-ups / risks: Recipe detail route currently opens only when saved recipe name matches a local seeded recipe ID; consider full DB-native recipe detail to remove this dependency.
 - Tag: nw-2026-02-18-1147-ui-catalog-selection
 - Notes: app/docs/sessions/2026-02-18/1146_catalog-selection-reuse.md
+
+## 2026-02-18 - Session ui-swiggy-cards
+- Summary: Refactored wellness catalog and user-selected rows to a reusable Swiggy-style card UI (image + text + CTA).
+- Changes: Added reusable `CatalogItemCard`, centralized placeholder image usage, updated `CatalogPickerModal` rendering, and swapped row renderers in Food Inventory, Food Utensils, Food Recipes, Gym Machines, and Gym Exercises.
+- Files: app/components/cards/CatalogItemCard.js, app/core/placeholders.js, assets/placeholders/item.png, app/components/catalog/CatalogPickerModal.js, app/features/wellness/food/FoodInventoryScreen.js, app/features/wellness/food/FoodUtensilsScreen.js, app/features/wellness/food/CookHomeScreen.js, app/features/wellness/gym/GymHomeScreen.js, app/features/wellness/gym/ExercisesHomeScreen.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: User-visible UI refresh only; data fetching, grouping, add/remove, and persistence logic remain unchanged.
+- Validation performed: `npx expo export --platform ios --output-dir /tmp/appnextwatch-export-sw-card` succeeded.
+- Follow-ups / risks: Visual tuning may still be needed after manual simulator pass (spacing/CTA overlap edge cases on smaller devices).
+- Tag: TBD (pending manual visual verification on iOS simulator/device)
+- Notes: app/docs/sessions/2026-02-18/1254_ui-swiggy-cards.md

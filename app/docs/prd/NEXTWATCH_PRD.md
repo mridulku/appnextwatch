@@ -10,6 +10,7 @@
 | 0.5 | 2026-02-17 | Codex | Food Inventory UX polish: remove flow (micro-confirm + delete), Add Item sheet category chips + stepper quantity + catalog-unit lock |
 | 0.6 | 2026-02-18 | Codex | Gym Machines now supports Supabase-backed user selection flow (`user_machines`) with empty state, add modal, categorized list, and remove |
 | 0.7 | 2026-02-18 | Codex | Reusable catalog-selection pattern extended to Gym Exercises, Food Utensils, and Food Recipes using `user_exercises` + `user_recipes` + shared picker/hook |
+| 0.8 | 2026-02-18 | Codex | Wellness catalog/user list rows refactored to reusable Swiggy-style card layout with shared placeholder imagery |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -43,6 +44,10 @@
   - Food → Utensils now uses `catalog_utensils` + `user_utensils` with the same user-selection UX model.
   - Food → Recipes is now a saved-list flow backed by `catalog_recipes` + `user_recipes`.
   - Shared modules introduced: `app/hooks/useCatalogSelection.js`, `app/components/catalog/CatalogPickerModal.js`, `app/core/api/catalogSelectionDb.js`.
+- 2026-02-18: UI-only card refactor for selection surfaces:
+  - Added reusable `CatalogItemCard` with image thumbnail + CTA action pattern.
+  - Updated catalog add pickers and user-selected grouped rows for Inventory, Machines, Exercises, Utensils, and Recipes.
+  - Introduced shared placeholder asset fallback for item thumbnails (`assets/placeholders/item.png`).
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

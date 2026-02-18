@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  FlatList,
   Modal,
   Pressable,
   SafeAreaView,
@@ -15,6 +16,7 @@ import {
 } from 'react-native';
 
 import CollapsibleSection from '../../../components/CollapsibleSection';
+import CatalogItemCard from '../../../components/cards/CatalogItemCard';
 import { useAuth } from '../../../context/AuthContext';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
 import { addUserMachine, fetchCatalogMachines, fetchUserMachines, removeUserMachine } from '../../../core/api/gymMachinesDb';
@@ -252,22 +254,14 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
               />
             )}
             renderItem={({ item }) => (
-              <View style={styles.machineRow}>
-                <View style={styles.machineIconWrap}>
-                  <Ionicons name="barbell-outline" size={14} color={COLORS.accent2} />
-                </View>
-                <View style={styles.machineTextWrap}>
-                  <Text style={styles.machineName}>{item.catalog_machine?.name || 'Machine'}</Text>
-                  <Text style={styles.machineMeta}>{item.catalog_machine?.zone || 'Gym Zone'}</Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  activeOpacity={0.9}
-                  onPress={() => removeMachine(item.machine_id)}
-                >
-                  <Ionicons name="trash-outline" size={14} color="#FFA674" />
-                </TouchableOpacity>
-              </View>
+              <CatalogItemCard
+                title={item.catalog_machine?.name || 'Machine'}
+                subtitle={`${normalizeMachineCategory(item.catalog_machine)} • ${item.catalog_machine?.zone || 'Gym Zone'}`}
+                badges={[{ label: '🏋️', tone: 'default' }]}
+                primaryActionLabel="REMOVE"
+                primaryActionVariant="danger"
+                onPrimaryAction={() => removeMachine(item.machine_id)}
+              />
             )}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
@@ -307,48 +301,37 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
               })}
             </ScrollView>
 
-            <ScrollView style={styles.catalogList} contentContainerStyle={styles.catalogListContent}>
-              {filteredCatalogMachines.length === 0 ? (
+            {filteredCatalogMachines.length === 0 ? (
+              <View style={styles.catalogListEmptyWrap}>
                 <Text style={styles.catalogEmpty}>No machines match this filter.</Text>
-              ) : (
-                filteredCatalogMachines.map((machine) => {
+              </View>
+            ) : (
+              <FlatList
+                data={filteredCatalogMachines}
+                keyExtractor={(machine) => machine.id}
+                style={styles.catalogList}
+                contentContainerStyle={styles.catalogListContent}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item: machine }) => {
                   const added = userMachineIdSet.has(machine.id);
                   const pending = addPendingMachineId === machine.id;
                   return (
-                    <View key={machine.id} style={styles.catalogRow}>
-                      <View style={styles.machineIconWrap}>
-                        <Ionicons name="barbell-outline" size={14} color={COLORS.accent2} />
-                      </View>
-                      <View style={styles.catalogTextWrap}>
-                        <Text style={styles.catalogName}>{machine.name}</Text>
-                        <Text style={styles.catalogMeta}>
-                          {normalizeMachineCategory(machine)} · {machine.zone || 'Gym Zone'}
-                        </Text>
-                      </View>
-
-                      {added ? (
-                        <View style={styles.addedChip}>
-                          <Text style={styles.addedChipText}>Added</Text>
-                        </View>
-                      ) : (
-                        <TouchableOpacity
-                          style={styles.addOneButton}
-                          activeOpacity={0.9}
-                          onPress={() => addMachine(machine.id)}
-                          disabled={pending}
-                        >
-                          {pending ? (
-                            <ActivityIndicator color={COLORS.bg} size="small" />
-                          ) : (
-                            <Text style={styles.addOneButtonText}>Add</Text>
-                          )}
-                        </TouchableOpacity>
-                      )}
-                    </View>
+                    <CatalogItemCard
+                      title={machine.name}
+                      subtitle={`${normalizeMachineCategory(machine)} • ${machine.zone || 'Gym Zone'}`}
+                      badges={[{ label: '🏋️', tone: 'default' }]}
+                      selected={added}
+                      primaryActionLabel={added ? 'ADDED' : pending ? '...' : 'ADD'}
+                      primaryActionVariant={added ? 'success' : 'accent'}
+                      primaryActionDisabled={added || pending}
+                      onPrimaryAction={() => addMachine(machine.id)}
+                    />
                   );
-                })
-              )}
-            </ScrollView>
+                }}
+                initialNumToRender={8}
+                windowSize={6}
+              />
+            )}
 
             <TouchableOpacity style={styles.closeSheetButton} activeOpacity={0.9} onPress={closeAddModal}>
               <Text style={styles.closeSheetButtonText}>Done</Text>
@@ -607,6 +590,15 @@ const styles = StyleSheet.create({
   },
   catalogListContent: {
     padding: 8,
+    gap: 8,
+  },
+  catalogListEmptyWrap: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.24)',
+    backgroundColor: COLORS.card,
+    minHeight: 88,
+    justifyContent: 'center',
   },
   catalogEmpty: {
     color: COLORS.muted,
