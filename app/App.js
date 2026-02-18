@@ -25,7 +25,7 @@ import DirectoryScreen from './features/movies/directory/DirectoryScreen';
 import ListsHomeScreen from './features/movies/lists/ListsHomeScreen';
 import ListDetailScreen from './features/movies/lists/ListDetailScreen';
 import FilmsWatchedScreen from './features/movies/profile/FilmsWatchedScreen';
-import GymMachineDetailScreen from './features/wellness/gym/GymMachineDetailScreen';
+import MachineDetailScreen from './features/wellness/gym/MachineDetailScreen';
 import ExerciseDetailScreen from './features/wellness/gym/ExerciseDetailScreen';
 import AddMachinesScreen from './features/wellness/gym/AddMachinesScreen';
 import AddExercisesScreen from './features/wellness/gym/AddExercisesScreen';
@@ -33,6 +33,7 @@ import CookRecipeScreen from './features/wellness/shared/CookRecipeScreen';
 import FoodHubScreen from './features/wellness/food/FoodHubScreen';
 import AddFoodItemsScreen from './features/wellness/food/AddFoodItemsScreen';
 import FoodInventoryItemDetailScreen from './features/wellness/food/FoodInventoryItemDetailScreen';
+import UtensilDetailScreen from './features/wellness/food/UtensilDetailScreen';
 import AddUtensilsScreen from './features/wellness/food/AddUtensilsScreen';
 import AddRecipesScreen from './features/wellness/food/AddRecipesScreen';
 import SessionsHomeScreen from './features/wellness/sessions/SessionsHomeScreen';
@@ -312,8 +313,13 @@ function GymStackScreens() {
         options={{ title: 'Gym', headerShown: false }}
       />
       <WellnessGymStack.Screen
+        name="MachineDetail"
+        component={MachineDetailScreen}
+        options={({ route }) => ({ title: route.params?.machineName ?? 'Machine Details' })}
+      />
+      <WellnessGymStack.Screen
         name="GymMachineDetail"
-        component={GymMachineDetailScreen}
+        component={MachineDetailScreen}
         options={({ route }) => ({ title: route.params?.machineName ?? 'Machine Details' })}
       />
       <WellnessGymStack.Screen
@@ -362,6 +368,11 @@ function FoodStackScreens() {
         name="AddUtensils"
         component={AddUtensilsScreen}
         options={{ title: 'Add Utensils' }}
+      />
+      <WellnessFoodStack.Screen
+        name="UtensilDetail"
+        component={UtensilDetailScreen}
+        options={({ route }) => ({ title: route?.params?.item?.name ?? 'Utensil Detail' })}
       />
       <WellnessFoodStack.Screen
         name="AddRecipes"

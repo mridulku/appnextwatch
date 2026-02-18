@@ -242,3 +242,13 @@
 - Follow-ups / risks: Manual in-app visual pass still recommended to confirm ideal text truncation and spacing on all tab surfaces.
 - Tag: nw-2026-02-18-1616-ui-card-schema (T1)
 - Notes: app/docs/sessions/2026-02-18/1616_ui-card-3col-schema.md
+
+## 2026-02-18 - Session navigation-detail-screens
+- Summary: Added dedicated selected-item detail screens for Wellness Utensils, Machines, and Exercises, and wired list row taps into those routes.
+- Changes: Added `UtensilDetailScreen` and `MachineDetailScreen`, refreshed `ExerciseDetailScreen` to selected-item detail surface, registered new stack routes, and connected selected list card `onPress` navigation in Gym/Food list screens.
+- Files: app/App.js, app/features/wellness/gym/{GymHomeScreen.js,ExercisesHomeScreen.js,ExerciseDetailScreen.js,MachineDetailScreen.js}, app/features/wellness/food/{FoodUtensilsScreen.js,UtensilDetailScreen.js,CookHomeScreen.js}, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: User-facing navigation improvement; selected list items in Utensils/Machines/Exercises now open detail pages with hero/details UI and back navigation.
+- Validation performed: `npx expo export --platform ios` passed; `npx expo run:ios --no-build-cache` build/install/open succeeded.
+- Follow-ups / risks: Full manual tap-through verification of all three detail routes is still required to confirm end-to-end interaction paths on simulator/device.
+- Tag: nw-2026-02-18-1725-navigation-detail-screens
+- Notes: app/docs/sessions/2026-02-18/1725_navigation-detail-screens.md

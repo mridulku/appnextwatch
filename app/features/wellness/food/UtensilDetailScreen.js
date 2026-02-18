@@ -9,19 +9,19 @@ import { ITEM_PLACEHOLDER_IMAGE } from '../../../core/placeholders';
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
 
-function ExerciseDetailScreen({ route, navigation }) {
+function UtensilDetailScreen({ route, navigation }) {
   const { user } = useAuth();
   const { itemId, item } = route.params || {};
   const [removing, setRemoving] = useState(false);
   const [inlineError, setInlineError] = useState('');
 
-  const name = item?.name || route.params?.exerciseName || 'Exercise';
-  const subtitle = `${item?.primary_muscle_group || 'Workout'} • ${item?.type || 'exercise'} • ${item?.equipment || 'bodyweight'}`;
+  const name = item?.name || 'Utensil';
+  const subtitle = `${item?.category || 'Kitchen tool'}${item?.note ? ` • ${item.note}` : ''}`;
 
   const onRemove = () => {
     if (!itemId || removing) return;
 
-    Alert.alert('Remove exercise?', 'This exercise will be removed from your selected list.', [
+    Alert.alert('Remove utensil?', 'This utensil will be removed from your list.', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Remove',
@@ -35,14 +35,14 @@ function ExerciseDetailScreen({ route, navigation }) {
               name: user?.name || 'Demo User',
             });
             await removeUserSelection({
-              table: 'user_exercises',
+              table: 'user_utensils',
               userId: appUser.id,
-              fkColumn: 'exercise_id',
+              fkColumn: 'utensil_id',
               fkValue: itemId,
             });
             navigation.goBack();
           } catch (error) {
-            setInlineError(error?.message || 'Could not remove exercise');
+            setInlineError(error?.message || 'Could not remove utensil');
           } finally {
             setRemoving(false);
           }
@@ -87,7 +87,7 @@ function ExerciseDetailScreen({ route, navigation }) {
           ) : (
             <>
               <Ionicons name="trash-outline" size={16} color="#FFB4A8" />
-              <Text style={styles.removeText}>Remove from Exercises</Text>
+              <Text style={styles.removeText}>Remove from Utensils</Text>
             </>
           )}
         </TouchableOpacity>
@@ -166,4 +166,4 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.6 },
 });
 
-export default ExerciseDetailScreen;
+export default UtensilDetailScreen;

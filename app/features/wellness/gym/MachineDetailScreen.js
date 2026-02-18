@@ -4,24 +4,24 @@ import { useState } from 'react';
 
 import { useAuth } from '../../../context/AuthContext';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
-import { removeUserSelection } from '../../../core/api/catalogSelectionDb';
+import { removeUserMachine } from '../../../core/api/gymMachinesDb';
 import { ITEM_PLACEHOLDER_IMAGE } from '../../../core/placeholders';
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
 
-function ExerciseDetailScreen({ route, navigation }) {
+function MachineDetailScreen({ route, navigation }) {
   const { user } = useAuth();
   const { itemId, item } = route.params || {};
   const [removing, setRemoving] = useState(false);
   const [inlineError, setInlineError] = useState('');
 
-  const name = item?.name || route.params?.exerciseName || 'Exercise';
-  const subtitle = `${item?.primary_muscle_group || 'Workout'} • ${item?.type || 'exercise'} • ${item?.equipment || 'bodyweight'}`;
+  const machineName = item?.name || route.params?.machineName || 'Machine';
+  const subtitle = `${item?.zone || 'Gym Zone'} • ${Array.isArray(item?.primary_muscles) && item.primary_muscles.length ? item.primary_muscles.join(', ') : 'Strength'}`;
 
   const onRemove = () => {
     if (!itemId || removing) return;
 
-    Alert.alert('Remove exercise?', 'This exercise will be removed from your selected list.', [
+    Alert.alert('Remove machine?', 'This machine will be removed from your selected list.', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Remove',
@@ -34,15 +34,10 @@ function ExerciseDetailScreen({ route, navigation }) {
               username: user?.username || 'demo user',
               name: user?.name || 'Demo User',
             });
-            await removeUserSelection({
-              table: 'user_exercises',
-              userId: appUser.id,
-              fkColumn: 'exercise_id',
-              fkValue: itemId,
-            });
+            await removeUserMachine(appUser.id, itemId);
             navigation.goBack();
           } catch (error) {
-            setInlineError(error?.message || 'Could not remove exercise');
+            setInlineError(error?.message || 'Could not remove machine');
           } finally {
             setRemoving(false);
           }
@@ -57,7 +52,7 @@ function ExerciseDetailScreen({ route, navigation }) {
         <View style={styles.heroCard}>
           <Image source={ITEM_PLACEHOLDER_IMAGE} style={styles.heroImage} resizeMode="cover" />
           <View style={styles.heroTextWrap}>
-            <Text style={styles.heroTitle}>{name}</Text>
+            <Text style={styles.heroTitle}>{machineName}</Text>
             <Text style={styles.heroSubtitle}>{subtitle}</Text>
           </View>
         </View>
@@ -87,7 +82,7 @@ function ExerciseDetailScreen({ route, navigation }) {
           ) : (
             <>
               <Ionicons name="trash-outline" size={16} color="#FFB4A8" />
-              <Text style={styles.removeText}>Remove from Exercises</Text>
+              <Text style={styles.removeText}>Remove from Machines</Text>
             </>
           )}
         </TouchableOpacity>
@@ -166,4 +161,4 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.6 },
 });
 
-export default ExerciseDetailScreen;
+export default MachineDetailScreen;

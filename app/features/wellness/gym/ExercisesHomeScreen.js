@@ -15,7 +15,6 @@ import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogIt
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
-import { FITNESS_EXERCISES } from '../../../data/wellness/fitnessExercises';
 import COLORS from '../../../theme/colors';
 
 const GROUP_ORDER = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio', 'Mobility', 'Other'];
@@ -41,13 +40,6 @@ function normalizeExerciseCategory(row) {
   if (type.includes('mobility')) return 'Mobility';
 
   return 'Other';
-}
-
-function findLocalExerciseIdByName(name) {
-  const normalized = String(name || '').trim().toLowerCase();
-  if (!normalized) return null;
-  const matched = FITNESS_EXERCISES.find((entry) => entry.name.trim().toLowerCase() === normalized);
-  return matched?.id ?? null;
 }
 
 function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }) {
@@ -155,23 +147,17 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
             )}
             renderItem={({ item }) => {
               const catalog = item.catalog_exercise;
-              const localExerciseId = findLocalExerciseIdByName(catalog?.name);
 
               return (
                 <SelectedCatalogItemCard
                   title={catalog?.name || 'Exercise'}
                   subtitle={`${normalizeExerciseCategory(catalog)} • ${catalog?.type || 'exercise'} • ${catalog?.equipment || 'bodyweight'}`}
-                  badges={[
-                    { label: GROUP_ICONS[normalizeExerciseCategory(catalog)] ? '🏋️' : '•', tone: 'default' },
-                  ]}
-                  onPress={
-                    localExerciseId
-                      ? () =>
-                          navigation.navigate('ExerciseDetail', {
-                            exerciseId: localExerciseId,
-                            exerciseName: catalog?.name,
-                          })
-                      : undefined
+                  onPress={() =>
+                    navigation.navigate('ExerciseDetail', {
+                      itemId: item.exercise_id,
+                      exerciseName: catalog?.name,
+                      item: catalog,
+                    })
                   }
                   removeDisabled={selection.pendingRemoveId === item.exercise_id}
                   onRemove={() => selection.removeCatalogItem(item.exercise_id)}

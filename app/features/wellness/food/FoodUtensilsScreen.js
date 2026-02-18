@@ -138,7 +138,12 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
                 <CatalogItemCard
                   title={utensil?.name || 'Utensil'}
                   subtitle={`${normalizeCategory(utensil)}${utensil?.note ? ` • ${utensil.note}` : ''}`}
-                  badges={[{ label: CATEGORY_ICONS[normalizeCategory(utensil)] || '🍽️', tone: 'default' }]}
+                  onPress={() =>
+                    navigation?.navigate('UtensilDetail', {
+                      itemId: item.utensil_id,
+                      item: utensil,
+                    })
+                  }
                   primaryActionLabel={selection.pendingRemoveId === item.utensil_id ? '...' : 'REMOVE'}
                   primaryActionVariant="danger"
                   primaryActionDisabled={selection.pendingRemoveId === item.utensil_id}

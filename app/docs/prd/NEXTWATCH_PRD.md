@@ -18,6 +18,7 @@
 | 1.3 | 2026-02-18 | Codex | Replaced add-sheet flows with dedicated Add screens (Machines/Exercises/Food Items/Recipes/Utensils) and fixed Gym Add Machines navigation crash (`navigation` prop wiring) |
 | 1.4 | 2026-02-18 | Codex | Food Inventory now separates browse vs edit: list rows are read-only with edit affordance; quantity/remove moved to dedicated item detail screen; Add Items now adds directly with default quantity |
 | 1.5 | 2026-02-18 | Codex | Unified Wellness card row schema to consistent 3-column layout (left thumbnail, middle text, right action) across catalog and selected surfaces |
+| 1.6 | 2026-02-18 | Codex | Added tappable detail surfaces for selected Wellness items: Utensils, Machines, and Exercises now navigate to dedicated detail screens with hero/details sections and back navigation |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -86,6 +87,10 @@
   - Standardized both reusable card families on one physical schema: `LEFT thumbnail | MIDDLE title+meta | RIGHT action`.
   - Applied through shared UI components (`app/ui/components/CatalogItemCard.js`, `app/ui/components/SelectedItemCard.js`) and the legacy wrapper path (`app/components/cards/CatalogItemCard.js`).
   - Actions remain per-feature (ADD/ADDED, pencil edit, remove), while layout now stays consistent across Gym + Food surfaces.
+- 2026-02-18: Wellness selected-item detail navigation:
+  - Added `UtensilDetail`, `MachineDetail`, and refreshed `ExerciseDetail` screens as dedicated surfaces with hero + placeholder details + back navigation.
+  - Wired taps from selected lists to these screens without changing add/remove persistence semantics.
+  - Kept inline remove actions on list cards intact; detail screens add an additional remove action path.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

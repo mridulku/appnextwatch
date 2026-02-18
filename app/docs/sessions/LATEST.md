@@ -1,1 +1,1 @@
-[Latest session notes](2026-02-18/1616_ui-card-3col-schema.md)
+[Latest session notes](2026-02-18/1725_navigation-detail-screens.md)

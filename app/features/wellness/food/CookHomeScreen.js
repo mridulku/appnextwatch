@@ -153,7 +153,6 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
                 <CatalogItemCard
                   title={recipe?.name || 'Recipe'}
                   subtitle={`${normalizeMealType(recipe)} • ${recipe?.total_minutes || '--'} min • ${recipe?.difficulty || 'Easy'}`}
-                  badges={[{ label: CATEGORY_ICONS[normalizeMealType(recipe)] || '🍽️', tone: 'default' }]}
                   onPress={
                     localRecipeId
                       ? () =>

@@ -194,7 +194,13 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
               <SelectedCatalogItemCard
                 title={item.catalog_machine?.name || 'Machine'}
                 subtitle={`${normalizeMachineCategory(item.catalog_machine)} • ${item.catalog_machine?.zone || 'Gym Zone'}`}
-                badges={[{ label: '🏋️', tone: 'default' }]}
+                onPress={() =>
+                  navigation?.navigate('MachineDetail', {
+                    itemId: item.machine_id,
+                    machineName: item.catalog_machine?.name,
+                    item: item.catalog_machine,
+                  })
+                }
                 onRemove={() => removeMachine(item.machine_id)}
               />
             )}
