@@ -122,3 +122,13 @@
 - Follow-ups / risks: Voice-command create flow can be aligned to catalog-only add/update for full consistency.
 - Tag: nw-20260217-2013-inventory-additem-polish
 - Notes: app/docs/sessions/2026-02-17/2013_inventory-add-sheet-polish.md
+
+## 2026-02-18 - Session test-tables-schema-map
+- Summary: Upgraded Test → Tables with grouped domains, readable data preview, and docs-driven schema metadata.
+- Changes: Added DB table catalog metadata module, rewrote TestTables screen UI (collapsible groups, details modal, manual quick-pick, table preview), added SCHEMA_MAP doc, and updated SOP DB schema checklist.
+- Files: app/features/wellness/test/TestTablesScreen.js, app/core/api/dbTableCatalog.js, app/core/api/supabaseTables.js, app/docs/db/SCHEMA_MAP.md, app/docs/SOP.md, app/docs/README.md, app/docs/sessions/*, app/docs/log/WORKLOG.md.
+- Behavior impact: Test tab now presents Movies/Wellness/Core table probes with maintainable metadata and readable sample rows.
+- Validation performed: `npx expo export --platform ios` compile check passed.
+- Follow-ups / risks: Keep `dbTableCatalog.js` and `SCHEMA_MAP.md` synchronized when migrations add/rename tables.
+- Tag: nw-20260218-0839-test-tables-schema-map
+- Notes: app/docs/sessions/2026-02-18/0839_test-tables-schema-map.md

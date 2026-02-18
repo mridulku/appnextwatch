@@ -47,3 +47,4 @@
 
 ## 6) DB Workflow
 - [`scripts/db/README.md`](../../scripts/db/README.md) - Supabase CLI install/login/link plus one-command schema + seed apply flow.
+- [`app/docs/db/SCHEMA_MAP.md`](./db/SCHEMA_MAP.md) - source-of-truth table grouping, purposes, and app-surface mappings.

@@ -45,6 +45,15 @@ PRD update checklist:
 - [ ] State/storage behavior is accurate.
 - [ ] New/changed acceptance criteria reflected.
 
+## DB Schema Change Checklist
+When adding or modifying database tables/columns:
+- [ ] Add/update migration under `supabase/migrations/`.
+- [ ] Update seed files if baseline data changed.
+- [ ] Update `app/docs/db/SCHEMA_MAP.md` (purpose, key columns, surfaces).
+- [ ] Update `app/core/api/dbTableCatalog.js` group metadata.
+- [ ] Verify in Test → Tables UI (`Probe` + sample preview).
+- [ ] Record changes in `app/docs/log/WORKLOG.md` and session notes.
+
 ## Worklog Policy
 Always append one new entry to:
 - `app/docs/log/WORKLOG.md`

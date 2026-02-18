@@ -1,1 +1,1 @@
-[Latest session notes](2026-02-17/2013_inventory-add-sheet-polish.md)
+[Latest session notes](2026-02-18/0839_test-tables-schema-map.md)
