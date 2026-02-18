@@ -222,3 +222,13 @@
 - Follow-ups / risks: Manual iOS pass still recommended for spacing/interaction polish across all Add screens.
 - Tag: nw-2026-02-18-1534-navigation-add-fix (T1)
 - Notes: app/docs/sessions/2026-02-18/1534_navigation-add-fix.md
+
+## 2026-02-18 - Session food-inventory-browse-detail
+- Summary: Refactored Food Inventory to browse-only list + dedicated item detail editor, and simplified Add Items to direct-add behavior.
+- Changes: Removed inline row trash/stepper from inventory list; added pencil/row-tap navigation to new detail screen; moved quantity update/remove controls to item detail; removed quantity prompt from Add Items and now add uses unit-based defaults.
+- Files: app/features/wellness/food/FoodInventoryScreen.js, app/features/wellness/food/AddFoodItemsScreen.js, app/features/wellness/food/FoodInventoryItemDetailScreen.js, app/ui/components/SelectedItemCard.js, app/App.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: Food Inventory list is read-only and cleaner; edit/remove happens only inside item detail screen; Add Items no longer blocks on quantity input.
+- Validation performed: `npx expo export --platform ios` passed.
+- Follow-ups / risks: Manual simulator interaction pass still needed to confirm ideal ergonomics for detail screen save/remove flow.
+- Tag: TBD
+- Notes: app/docs/sessions/2026-02-18/1548_food-inventory-browse-detail.md

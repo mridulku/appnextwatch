@@ -16,6 +16,7 @@
 | 1.1 | 2026-02-18 | Codex | Fixed persistent Add-modal list top-gap by using deterministic ScrollView renderer reset in shared modal layer (`SelectFromCatalogModal`) |
 | 1.2 | 2026-02-18 | Codex | Fixed add-modal blank-gap layout by removing bottom-alignment-prone list container rules and using explicit `resultsWrap/resultsScroll/resultsContent` layout contract |
 | 1.3 | 2026-02-18 | Codex | Replaced add-sheet flows with dedicated Add screens (Machines/Exercises/Food Items/Recipes/Utensils) and fixed Gym Add Machines navigation crash (`navigation` prop wiring) |
+| 1.4 | 2026-02-18 | Codex | Food Inventory now separates browse vs edit: list rows are read-only with edit affordance; quantity/remove moved to dedicated item detail screen; Add Items now adds directly with default quantity |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -75,6 +76,11 @@
   - Replaced sheet-based Add flows with dedicated push screens: `AddMachines`, `AddExercises`, `AddFoodItems`, `AddRecipes`, `AddUtensils`.
   - Preserved existing selection/business logic while removing reliance on sheet layout behavior.
   - Fixed Gym Machines runtime crash by wiring `navigation` prop in `GymHomeScreen` before `navigate('AddMachines')`.
+- 2026-02-18: Food Inventory browse/edit separation:
+  - Inventory list is now lightweight browse UI only (no inline +/- or trash actions).
+  - Each row opens `FoodInventoryItemDetail` via row tap or pencil action.
+  - Item detail screen now owns quantity editing and remove-from-inventory actions.
+  - `AddFoodItems` flow now adds selected catalog items directly (no add-time quantity prompt); default quantity derives from unit type (`g/ml=100`, others=`1`).
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

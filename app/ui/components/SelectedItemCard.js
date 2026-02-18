@@ -15,10 +15,27 @@ function SelectedItemCard({
   onRemove,
   removeDisabled = false,
   rightControls,
+  topAction,
 }) {
   const leadingBadge = badges[0];
   const leadingText = leadingBadge?.label || '•';
   const warning = badges.some((badge) => badge.tone === 'warn');
+
+  const resolvedTopAction = topAction?.onPress
+    ? {
+        iconName: topAction.iconName || 'create-outline',
+        iconColor: topAction.iconColor || COLORS.text,
+        onPress: topAction.onPress,
+        disabled: Boolean(topAction.disabled),
+      }
+    : onRemove
+      ? {
+          iconName: 'trash-outline',
+          iconColor: '#FFC19A',
+          onPress: onRemove,
+          disabled: removeDisabled,
+        }
+      : null;
 
   return (
     <TouchableOpacity
@@ -40,17 +57,21 @@ function SelectedItemCard({
       </View>
 
       <View style={styles.rightColumn}>
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={[styles.removeButton, removeDisabled && styles.removeButtonDisabled]}
-            activeOpacity={0.85}
-            disabled={removeDisabled || !onRemove}
-            onPress={onRemove}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Ionicons name="trash-outline" size={15} color="#FFC19A" />
-          </TouchableOpacity>
-        </View>
+        {resolvedTopAction ? (
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={[styles.removeButton, resolvedTopAction.disabled && styles.removeButtonDisabled]}
+              activeOpacity={0.85}
+              disabled={resolvedTopAction.disabled}
+              onPress={resolvedTopAction.onPress}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name={resolvedTopAction.iconName} size={15} color={resolvedTopAction.iconColor} />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.actionRowSpacer} />
+        )}
 
         <Image
           source={imageUrl ? { uri: imageUrl } : ITEM_PLACEHOLDER_IMAGE}
@@ -130,6 +151,10 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'flex-end',
     marginBottom: UI_TOKENS.spacing.xs,
+  },
+  actionRowSpacer: {
+    width: '100%',
+    height: UI_TOKENS.control.iconButton + UI_TOKENS.spacing.xs,
   },
   removeButton: {
     width: UI_TOKENS.control.iconButton,

@@ -23,10 +23,8 @@ import {
 } from '../../../core/foodVoiceParser';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
-import QuantityStepper from '../../../components/controls/QuantityStepper';
 import { useAuth } from '../../../context/AuthContext';
 import {
-  deleteUserIngredient,
   getOrCreateAppUser,
   listUserIngredients,
   updateUserIngredientQuantity,
@@ -67,12 +65,6 @@ function normalizeCategory(rawCategory) {
   }
   if (source.includes('snack')) return 'Snacks';
   return 'Snacks';
-}
-
-function getQuantityStep(unitType) {
-  if (unitType === 'kg' || unitType === 'litre') return 0.25;
-  if (unitType === 'g' || unitType === 'ml') return 50;
-  return 1;
 }
 
 function formatUnit(unit, quantity) {
@@ -144,7 +136,6 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
   const [isListening, setIsListening] = useState(false);
   const [recognizedText, setRecognizedText] = useState('');
   const [interpretation, setInterpretation] = useState({ actions: [], warnings: [] });
-  const [pendingRemoveItemId, setPendingRemoveItemId] = useState(null);
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -389,51 +380,21 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
     }
   };
 
-  const adjustQuantity = async (itemId, direction) => {
-    const item = inventory.find((entry) => entry.id === itemId);
-    if (!item) return;
-
-    const step = getQuantityStep(item.unitType);
-    const nextValue = Number((item.quantity + step * direction).toFixed(3));
-
-    if (direction < 0 && nextValue <= 0) {
-      setPendingRemoveItemId(itemId);
-      return;
-    }
-
-    setInventory((prev) =>
-      prev.map((entry) => (entry.id === itemId ? { ...entry, quantity: Math.max(0, nextValue) } : entry)),
-    );
-
-    try {
-      await updateUserIngredientQuantity({ rowId: itemId, quantity: Math.max(0, nextValue) });
-    } catch (error) {
-      setInventory((prev) =>
-        prev.map((entry) => (entry.id === itemId ? { ...entry, quantity: item.quantity } : entry)),
-      );
-      showSnackbar(error?.message || 'Could not update quantity');
-    }
-  };
-
-  const confirmRemoveItem = async (item) => {
-    if (!appUserId || !item?.ingredientId) return;
-    try {
-      await deleteUserIngredient({ userId: appUserId, ingredientId: item.ingredientId });
-      setInventory((prev) => prev.filter((entry) => entry.id !== item.id));
-      setPendingRemoveItemId(null);
-      showSnackbar('Item removed');
-    } catch (error) {
-      showSnackbar(error?.message || 'Could not remove item');
-    }
-  };
-
-  const cancelRemoveItem = () => {
-    setPendingRemoveItemId(null);
-  };
-
   const openAddItemModal = () => {
     navigation?.navigate('AddFoodItems');
   };
+
+  const openItemDetail = useCallback((item) => {
+    navigation?.navigate('FoodInventoryItemDetail', {
+      itemId: item.id,
+      ingredientId: item.ingredientId,
+      name: item.name,
+      category: item.category,
+      unitType: item.unitType,
+      quantity: item.quantity,
+      icon: item.icon,
+    });
+  }, [navigation]);
 
   const toggleCategory = (title) => {
     setExpandedCategories((prev) => ({
@@ -457,37 +418,21 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
 
   const renderItem = useCallback(({ item }) => {
     const low = item.quantity <= item.lowStockThreshold;
-    const pendingRemove = pendingRemoveItemId === item.id;
-    const rightControls = pendingRemove ? (
-      <View style={styles.removePromptWrap}>
-        <Text style={styles.removePromptText}>Remove?</Text>
-        <View style={styles.removePromptActions}>
-          <TouchableOpacity style={styles.removeCancelChip} activeOpacity={0.9} onPress={cancelRemoveItem}>
-            <Text style={styles.removeCancelText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.removeConfirmChip} activeOpacity={0.9} onPress={() => confirmRemoveItem(item)}>
-            <Text style={styles.removeConfirmText}>Remove</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    ) : (
-      <QuantityStepper
-        compact
-        onDecrement={() => adjustQuantity(item.id, -1)}
-        onIncrement={() => adjustQuantity(item.id, 1)}
-      />
-    );
 
     return (
       <SelectedCatalogItemCard
         title={item.name}
         subtitle={`${item.category} • ${formatQuantity(item.quantity, item.unitType)}`}
         badges={low ? [{ label: 'Low stock', tone: 'warn' }] : [{ label: item.icon || '🧺', tone: 'default' }]}
-        onRemove={() => setPendingRemoveItemId(item.id)}
-        rightControls={rightControls}
+        onPress={() => openItemDetail(item)}
+        topAction={{
+          iconName: 'create-outline',
+          iconColor: COLORS.text,
+          onPress: () => openItemDetail(item),
+        }}
       />
     );
-  }, [adjustQuantity, cancelRemoveItem, confirmRemoveItem, pendingRemoveItemId]);
+  }, [openItemDetail]);
 
   const RootContainer = embedded ? View : SafeAreaView;
 

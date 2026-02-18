@@ -13,7 +13,6 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import CatalogCardRow from '../../../components/cards/CatalogCardRow';
-import QuantityStepper from '../../../components/controls/QuantityStepper';
 import CategoryChipsRow from '../../../ui/components/CategoryChipsRow';
 import { useAuth } from '../../../context/AuthContext';
 import {
@@ -34,7 +33,7 @@ const CATEGORY_ORDER = [
   'Dairy & Eggs',
   'Snacks',
 ];
-const FOOTER_BASE_HEIGHT = 84;
+const FOOTER_BASE_HEIGHT = 88;
 
 function normalizeCategory(rawCategory) {
   const source = String(rawCategory || '').trim().toLowerCase();
@@ -48,38 +47,9 @@ function normalizeCategory(rawCategory) {
   return 'Snacks';
 }
 
-function getQuantityStep(unitType) {
-  if (unitType === 'kg' || unitType === 'litre') return 0.25;
-  if (unitType === 'g' || unitType === 'ml') return 50;
-  return 1;
-}
-
 function getAddDefaultQuantity(unitType) {
   if (unitType === 'g' || unitType === 'ml') return 100;
   return 1;
-}
-
-function formatUnit(unit, quantity) {
-  const absolute = Math.abs(Number(quantity));
-  if (unit === 'bottle') return absolute === 1 ? 'bottle' : 'bottles';
-  if (unit === 'litre') return absolute === 1 ? 'litre' : 'litres';
-  if (unit === 'pcs') return 'pcs';
-  return unit;
-}
-
-function formatQuantity(quantity, unitType) {
-  const value = Number(quantity) || 0;
-
-  if (unitType === 'pcs' || unitType === 'bottle') {
-    const rounded = Math.round(value);
-    return `${rounded} ${formatUnit(unitType, rounded)}`;
-  }
-
-  const needsPrecision = unitType === 'kg' || unitType === 'litre';
-  const normalized = needsPrecision
-    ? Number(value.toFixed(2)).toString()
-    : Number(value.toFixed(0)).toString();
-  return `${normalized} ${formatUnit(unitType, value)}`;
 }
 
 function AddFoodItemsScreen({ navigation }) {
@@ -96,9 +66,7 @@ function AddFoodItemsScreen({ navigation }) {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedCatalogItem, setSelectedCatalogItem] = useState(null);
-  const [pickerQuantity, setPickerQuantity] = useState(1);
-  const [addPending, setAddPending] = useState(false);
+  const [addingId, setAddingId] = useState(null);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -163,14 +131,6 @@ function AddFoodItemsScreen({ navigation }) {
     });
   }, [selectedCategory, searchInput]);
 
-  const userRowsByIngredientId = useMemo(() => {
-    const next = new Map();
-    userRows.forEach((row) => {
-      next.set(row.ingredient_id, row);
-    });
-    return next;
-  }, [userRows]);
-
   const selectedIds = useMemo(
     () => new Set(userRows.map((row) => row.ingredient_id).filter(Boolean)),
     [userRows],
@@ -186,60 +146,35 @@ function AddFoodItemsScreen({ navigation }) {
   const filteredCatalogItems = useMemo(() => {
     return catalogItems.filter((item) => {
       const category = normalizeCategory(item.category);
-      const matchesCategory = selectedCategory === 'All' || category === selectedCategory;
-      return matchesCategory;
+      return selectedCategory === 'All' || category === selectedCategory;
     });
   }, [catalogItems, selectedCategory]);
 
-  const selectedExistingInventoryItem = useMemo(
-    () => (selectedCatalogItem ? userRowsByIngredientId.get(selectedCatalogItem.id) : null),
-    [selectedCatalogItem, userRowsByIngredientId],
-  );
-
-  useEffect(() => {
-    if (!selectedCatalogItem) return;
-    if (selectedExistingInventoryItem) {
-      setPickerQuantity(Number(selectedExistingInventoryItem.quantity) || 1);
-      return;
-    }
-    setPickerQuantity(getAddDefaultQuantity(selectedCatalogItem.unit_type || 'pcs'));
-  }, [selectedCatalogItem, selectedExistingInventoryItem]);
-
-  const selectItem = (item) => {
-    setSelectedCatalogItem(item);
-  };
-
-  const submitAddItem = async () => {
-    if (!selectedCatalogItem || !appUserId || addPending) return;
-
-    const quantity = Math.max(0, Number(pickerQuantity) || 0);
-    if (quantity <= 0) {
-      setInlineError('Quantity should be greater than 0');
-      return;
-    }
+  const addItemDirectly = async (catalogItem) => {
+    if (!catalogItem?.id || !appUserId || addingId || selectedIds.has(catalogItem.id)) return;
 
     try {
-      setAddPending(true);
+      setAddingId(catalogItem.id);
       setInlineError('');
       await upsertUserIngredient({
         userId: appUserId,
-        ingredientId: selectedCatalogItem.id,
-        quantity,
+        ingredientId: catalogItem.id,
+        quantity: getAddDefaultQuantity(catalogItem.unit_type || 'pcs'),
       });
 
       const rows = await listUserIngredients(appUserId);
       setUserRows(rows);
     } catch (error) {
-      setInlineError(error?.message || 'Could not save ingredient');
+      setInlineError(error?.message || 'Could not add ingredient');
     } finally {
-      setAddPending(false);
+      setAddingId(null);
     }
   };
 
   const renderHeader = () => (
     <View style={styles.headerContent}>
       <Text style={styles.title}>Add items</Text>
-      <Text style={styles.subtitle}>Pick from catalog and set quantity.</Text>
+      <Text style={styles.subtitle}>Pick from catalog. Items are added directly to inventory.</Text>
 
       <View style={styles.searchWrap}>
         <Ionicons name="search-outline" size={16} color={COLORS.muted} />
@@ -273,19 +208,19 @@ function AddFoodItemsScreen({ navigation }) {
 
   const renderRow = ({ item }) => {
     const id = item.id;
-    const selected = selectedCatalogItem?.id === id;
     const alreadyAdded = selectedIds.has(id);
+    const isAdding = addingId === id;
 
     return (
       <CatalogCardRow
         title={item.name}
         subtitle={`${normalizeCategory(item.category)} • ${item.unit_type || 'pcs'}`}
-        selected={selected || alreadyAdded}
-        actionLabel={selected ? 'SELECTED' : alreadyAdded ? 'ADDED' : 'ADD'}
-        actionVariant={selected || alreadyAdded ? 'success' : 'accent'}
-        actionDisabled={selected}
-        onAction={() => selectItem(item)}
-        onPress={() => selectItem(item)}
+        selected={alreadyAdded}
+        actionLabel={isAdding ? 'ADDING' : alreadyAdded ? 'ADDED' : 'ADD'}
+        actionVariant={alreadyAdded ? 'success' : 'accent'}
+        actionDisabled={alreadyAdded || isAdding}
+        onAction={() => addItemDirectly(item)}
+        onPress={() => addItemDirectly(item)}
       />
     );
   };
@@ -303,8 +238,6 @@ function AddFoodItemsScreen({ navigation }) {
     return <Text style={styles.emptyText}>No catalog items match your search.</Text>;
   };
 
-  const dynamicFooterHeight = selectedCatalogItem ? 220 : FOOTER_BASE_HEIGHT;
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -320,7 +253,7 @@ function AddFoodItemsScreen({ navigation }) {
             styles.listContent,
             {
               paddingBottom:
-                dynamicFooterHeight + Math.max(insets.bottom, UI_TOKENS.spacing.sm) + UI_TOKENS.spacing.sm,
+                FOOTER_BASE_HEIGHT + Math.max(insets.bottom, UI_TOKENS.spacing.sm) + UI_TOKENS.spacing.sm,
             },
           ]}
           showsVerticalScrollIndicator={false}
@@ -328,38 +261,7 @@ function AddFoodItemsScreen({ navigation }) {
         />
 
         <View style={[styles.footerBar, { paddingBottom: Math.max(insets.bottom, UI_TOKENS.spacing.xs) }]}>
-          {selectedCatalogItem ? (
-            <View style={styles.footerCard}>
-              <Text style={styles.footerTitle}>Quantity</Text>
-              <QuantityStepper
-                valueLabel={formatQuantity(pickerQuantity, selectedCatalogItem.unit_type || 'pcs')}
-                onDecrement={() => {
-                  const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
-                  setPickerQuantity((prev) => Math.max(0, Number((prev - step).toFixed(3))));
-                }}
-                onIncrement={() => {
-                  const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
-                  setPickerQuantity((prev) => Number((prev + step).toFixed(3)));
-                }}
-              />
-              <Text style={styles.footerHint}>Unit: {selectedCatalogItem.unit_type || 'pcs'} (from catalog)</Text>
-              <TouchableOpacity
-                style={[styles.footerAction, addPending && styles.footerActionDisabled]}
-                activeOpacity={0.9}
-                onPress={submitAddItem}
-                disabled={addPending}
-              >
-                {addPending ? (
-                  <ActivityIndicator color={COLORS.bg} size="small" />
-                ) : (
-                  <Text style={styles.footerActionText}>{selectedExistingInventoryItem ? 'Update' : 'Add'}</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <Text style={styles.footerEmpty}>Select an ingredient to set quantity.</Text>
-          )}
-
+          <Text style={styles.footerMeta}>{selectedIds.size} added</Text>
           <TouchableOpacity style={styles.doneButton} activeOpacity={0.9} onPress={() => navigation.goBack()}>
             <Text style={styles.doneButtonText}>Done</Text>
           </TouchableOpacity>
@@ -470,39 +372,7 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(162,167,179,0.2)',
     backgroundColor: COLORS.bg,
   },
-  footerCard: {
-    borderRadius: UI_TOKENS.radius.md,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.24)',
-    backgroundColor: COLORS.card,
-    padding: UI_TOKENS.spacing.sm,
-    gap: UI_TOKENS.spacing.xs,
-  },
-  footerTitle: {
-    color: COLORS.text,
-    fontSize: UI_TOKENS.typography.subtitle,
-    fontWeight: '700',
-  },
-  footerHint: {
-    color: COLORS.muted,
-    fontSize: UI_TOKENS.typography.meta,
-  },
-  footerAction: {
-    marginTop: UI_TOKENS.spacing.xs,
-    borderRadius: UI_TOKENS.radius.md,
-    backgroundColor: COLORS.accent,
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  footerActionDisabled: {
-    opacity: 0.7,
-  },
-  footerActionText: {
-    color: COLORS.bg,
-    fontSize: UI_TOKENS.typography.subtitle,
-    fontWeight: '700',
-  },
-  footerEmpty: {
+  footerMeta: {
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.meta,
   },

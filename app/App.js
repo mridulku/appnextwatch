@@ -32,6 +32,7 @@ import AddExercisesScreen from './features/wellness/gym/AddExercisesScreen';
 import CookRecipeScreen from './features/wellness/shared/CookRecipeScreen';
 import FoodHubScreen from './features/wellness/food/FoodHubScreen';
 import AddFoodItemsScreen from './features/wellness/food/AddFoodItemsScreen';
+import FoodInventoryItemDetailScreen from './features/wellness/food/FoodInventoryItemDetailScreen';
 import AddUtensilsScreen from './features/wellness/food/AddUtensilsScreen';
 import AddRecipesScreen from './features/wellness/food/AddRecipesScreen';
 import SessionsHomeScreen from './features/wellness/sessions/SessionsHomeScreen';
@@ -351,6 +352,11 @@ function FoodStackScreens() {
         name="AddFoodItems"
         component={AddFoodItemsScreen}
         options={{ title: 'Add Items' }}
+      />
+      <WellnessFoodStack.Screen
+        name="FoodInventoryItemDetail"
+        component={FoodInventoryItemDetailScreen}
+        options={{ title: 'Item Details' }}
       />
       <WellnessFoodStack.Screen
         name="AddUtensils"
