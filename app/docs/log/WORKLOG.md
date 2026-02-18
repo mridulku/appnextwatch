@@ -192,3 +192,13 @@
 - Follow-ups / risks: Full in-flow manual interaction QA for Food Inventory + Gym Machines + Gym Exercises still required to sign off final spacing/ergonomics.
 - Tag: NO (pending full manual interaction verification of all target flows)
 - Notes: app/docs/sessions/2026-02-18/1351_ui-design-sop-unify-modals-cards.md
+
+## 2026-02-18 - Session fix-modal-gap-scrollview
+- Summary: Fixed persistent blank top gap in Add-from-catalog modal results by switching to deterministic ScrollView rendering.
+- Changes: Replaced internal modal list virtualized behavior with `ScrollView + map` while preserving shared modal API (`data`, `keyExtractor`, `renderItem`); added explicit top reset on open/filter/search/data changes; retained full-height sheet, compact chips, and image-card rows.
+- Files: app/components/modals/SelectFromCatalogModal.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: UI layout fix only; no business-logic/CRUD/schema changes.
+- Validation performed: `npx expo export --platform ios --output-dir /tmp/appnextwatch-export-modal-gap-scrollview-final` passed; `npx expo run:ios --device "iPhone 17 Pro" --port 8083` build/install/open passed.
+- Follow-ups / risks: Manual interaction QA still required to confirm zero-gap behavior across repeated open/close + chip/search changes on all three target modals.
+- Tag: NO (gated until manual QA confirmation)
+- Notes: app/docs/sessions/2026-02-18/1415_fix-modal-gap-scrollview.md

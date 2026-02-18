@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import CategoryChipsRow from '../../ui/components/CategoryChipsRow';
 import FullSheetModal from '../../ui/components/FullSheetModal';
@@ -24,6 +25,16 @@ function SelectFromCatalogModal({
   footerContent,
   emptyText = 'No items match this filter.',
 }) {
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (!visible) return;
+    const timer = setTimeout(() => {
+      scrollRef.current?.scrollTo?.({ y: 0, animated: false });
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [visible, selectedCategory, searchValue, data?.length]);
+
   return (
     <FullSheetModal
       visible={visible}
@@ -56,18 +67,26 @@ function SelectFromCatalogModal({
         onSelectCategory={onSelectCategory}
       />
 
-      <FlatList
-        data={data}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        style={styles.list}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        initialNumToRender={8}
-        windowSize={8}
-        ListEmptyComponent={<Text style={styles.emptyText}>{emptyText}</Text>}
-      />
+      <View style={styles.list}>
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentInsetAdjustmentBehavior="never"
+          automaticallyAdjustContentInsets={false}
+        >
+          {data.length === 0 ? (
+            <Text style={styles.emptyText}>{emptyText}</Text>
+          ) : (
+            data.map((item, index) => (
+              <View key={keyExtractor(item, index)} style={styles.rowWrap}>
+                {renderItem({ item, index })}
+              </View>
+            ))
+          )}
+        </ScrollView>
+      </View>
     </FullSheetModal>
   );
 }
@@ -95,8 +114,10 @@ const styles = StyleSheet.create({
     marginTop: UI_TOKENS.spacing.xs,
   },
   listContent: {
-    paddingBottom: UI_TOKENS.modal.footerHeight,
-    gap: UI_TOKENS.spacing.sm,
+    paddingBottom: UI_TOKENS.modal.footerHeight + UI_TOKENS.spacing.md,
+  },
+  rowWrap: {
+    marginBottom: UI_TOKENS.spacing.sm,
   },
   emptyText: {
     color: COLORS.muted,

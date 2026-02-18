@@ -13,6 +13,7 @@
 | 0.8 | 2026-02-18 | Codex | Wellness catalog/user list rows refactored to reusable Swiggy-style card layout with shared placeholder imagery |
 | 0.9 | 2026-02-18 | Codex | Restored image-first selected-card layout and applied cleanup: non-overlapping remove control, compact shared stepper, full-height add modals with compact chips/results for Food Inventory + Gym Machines + Gym Exercises |
 | 1.0 | 2026-02-18 | Codex | Introduced `app/ui` design system tokens/components and standardized all catalog/add surfaces on shared full-sheet modal + card/chip primitives |
+| 1.1 | 2026-02-18 | Codex | Fixed persistent Add-modal list top-gap by using deterministic ScrollView renderer reset in shared modal layer (`SelectFromCatalogModal`) |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -60,6 +61,10 @@
   - Added reusable `app/ui/components/*` (`CatalogItemCard`, `SelectedItemCard`, `CategoryChipsRow`, `QuantityStepper`, `FullSheetModal`).
   - Refactored existing shared component layer (`app/components/*`) to delegate to `app/ui` primitives so Food/Gym surfaces inherit consistent visuals by default.
   - Added enforceable design process doc: `app/docs/design/DESIGN_SOP.md`.
+- 2026-02-18: Add-modal layout stability fix:
+  - Replaced virtualized in-modal list behavior with deterministic ScrollView mapping in `SelectFromCatalogModal`.
+  - Added explicit scroll-to-top reset on modal open/filter/search/data changes to prevent stale offset blank-gap artifacts.
+  - Kept image-card UI and near-full-height modal layout unchanged.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.
