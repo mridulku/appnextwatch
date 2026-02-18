@@ -18,6 +18,7 @@ import { ITEM_PLACEHOLDER_IMAGE } from '../../../core/placeholders';
 import {
   deleteUserIngredient,
   getOrCreateAppUser,
+  upsertUserIngredient,
   updateUserIngredientQuantity,
 } from '../../../core/api/foodInventoryDb';
 import COLORS from '../../../theme/colors';
@@ -60,10 +61,12 @@ function formatQuantity(quantity, unitType) {
 function FoodInventoryItemDetailScreen({ route, navigation }) {
   const { user } = useAuth();
   const params = route?.params || {};
+  const isCatalogMode = Boolean(params.fromCatalog);
 
-  const rowId = params.itemId;
-  const ingredientId = params.ingredientId;
+  const rowId = isCatalogMode ? null : params.itemId;
+  const ingredientId = params.ingredientId || (isCatalogMode ? params.itemId : null);
   const unitType = params.unitType || 'pcs';
+  const [isAdded, setIsAdded] = useState(params?.isAdded ?? !isCatalogMode);
 
   const [quantity, setQuantity] = useState(
     Number(params.quantity) > 0 ? Number(params.quantity) : getDefaultQuantity(unitType),
@@ -74,30 +77,47 @@ function FoodInventoryItemDetailScreen({ route, navigation }) {
 
   const originalQuantity = Number(params.quantity) || 0;
   const isDirty = useMemo(
-    () => Number(quantity.toFixed(3)) !== Number(originalQuantity.toFixed(3)),
-    [originalQuantity, quantity],
+    () => (isCatalogMode
+      ? true
+      : Number(quantity.toFixed(3)) !== Number(originalQuantity.toFixed(3))),
+    [isCatalogMode, originalQuantity, quantity],
   );
 
   const onSave = async () => {
-    if (!rowId || saving) return;
+    if (saving) return;
 
     try {
       setSaving(true);
       setInlineError('');
-      await updateUserIngredientQuantity({
-        rowId,
-        quantity: Math.max(0, Number(quantity) || 0),
-      });
-      navigation.goBack();
+      if (isCatalogMode) {
+        if (!ingredientId) return;
+        const appUser = await getOrCreateAppUser({
+          username: user?.username || 'demo user',
+          name: user?.name || 'Demo User',
+        });
+        await upsertUserIngredient({
+          userId: appUser.id,
+          ingredientId,
+          quantity: Math.max(0, Number(quantity) || 0),
+        });
+        setIsAdded(true);
+      } else {
+        if (!rowId) return;
+        await updateUserIngredientQuantity({
+          rowId,
+          quantity: Math.max(0, Number(quantity) || 0),
+        });
+        navigation.goBack();
+      }
     } catch (error) {
-      setInlineError(error?.message || 'Could not update quantity');
+      setInlineError(error?.message || (isCatalogMode ? 'Could not add item' : 'Could not update quantity'));
     } finally {
       setSaving(false);
     }
   };
 
   const onRemove = async () => {
-    if (!ingredientId || removing) return;
+    if (!ingredientId || removing || (!isCatalogMode && !isAdded)) return;
 
     Alert.alert('Remove from inventory?', 'This item will be removed from your pantry.', [
       { text: 'Cancel', style: 'cancel' },
@@ -116,7 +136,11 @@ function FoodInventoryItemDetailScreen({ route, navigation }) {
               userId: appUser.id,
               ingredientId,
             });
-            navigation.goBack();
+            if (isCatalogMode) {
+              setIsAdded(false);
+            } else {
+              navigation.goBack();
+            }
           } catch (error) {
             setInlineError(error?.message || 'Could not remove item');
           } finally {
@@ -182,19 +206,33 @@ function FoodInventoryItemDetailScreen({ route, navigation }) {
 
         <View style={styles.actionRow}>
           <TouchableOpacity
-            style={[styles.saveButton, (!isDirty || saving) && styles.buttonDisabled]}
+            style={[
+              styles.saveButton,
+              isCatalogMode && isAdded && styles.buttonDisabledAlt,
+              (!isDirty || saving || (isCatalogMode && isAdded)) && styles.buttonDisabled,
+            ]}
             activeOpacity={0.9}
             onPress={onSave}
-            disabled={!isDirty || saving}
+            disabled={!isDirty || saving || (isCatalogMode && isAdded)}
           >
-            {saving ? <ActivityIndicator color={COLORS.bg} size="small" /> : <Text style={styles.saveText}>Update</Text>}
+            {saving ? (
+              <ActivityIndicator color={COLORS.bg} size="small" />
+            ) : (
+              <Text style={styles.saveText}>
+                {isCatalogMode ? (isAdded ? 'Added' : 'Add to inventory') : 'Update'}
+              </Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.removeButton, removing && styles.buttonDisabled]}
+            style={[
+              styles.removeButton,
+              (!isAdded && isCatalogMode) && styles.buttonDisabled,
+              removing && styles.buttonDisabled,
+            ]}
             activeOpacity={0.9}
             onPress={onRemove}
-            disabled={removing}
+            disabled={removing || (!isAdded && isCatalogMode)}
           >
             {removing ? (
               <ActivityIndicator color="#FFB4A8" size="small" />
@@ -205,6 +243,16 @@ function FoodInventoryItemDetailScreen({ route, navigation }) {
               </>
             )}
           </TouchableOpacity>
+
+          {isCatalogMode ? (
+            <TouchableOpacity
+              style={styles.backButton}
+              activeOpacity={0.9}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.backText}>Back to Catalog</Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -315,6 +363,9 @@ const styles = StyleSheet.create({
     fontSize: UI_TOKENS.typography.subtitle,
     fontWeight: '700',
   },
+  buttonDisabledAlt: {
+    backgroundColor: 'rgba(162,167,179,0.2)',
+  },
   removeButton: {
     borderRadius: UI_TOKENS.radius.md,
     borderWidth: UI_TOKENS.border.hairline,
@@ -329,6 +380,20 @@ const styles = StyleSheet.create({
   removeText: {
     color: '#FFB4A8',
     fontSize: UI_TOKENS.typography.subtitle,
+    fontWeight: '700',
+  },
+  backButton: {
+    borderRadius: UI_TOKENS.radius.md,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.35)',
+    backgroundColor: COLORS.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
+  },
+  backText: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta + 1,
     fontWeight: '700',
   },
   buttonDisabled: {

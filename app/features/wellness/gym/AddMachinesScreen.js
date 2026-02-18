@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 
 import CatalogCardRow from '../../../components/cards/CatalogCardRow';
 import CategoryChipsRow from '../../../ui/components/CategoryChipsRow';
@@ -70,6 +71,12 @@ function AddMachinesScreen({ navigation }) {
   const selectedIds = selection.selectedCatalogIdSet;
   const footerText = useMemo(() => `${selectedIds.size} selected`, [selectedIds]);
 
+  useFocusEffect(
+    useCallback(() => {
+      selection.hydrate();
+    }, [selection.hydrate]),
+  );
+
   const renderHeader = () => (
     <View style={styles.headerContent}>
       <Text style={styles.title}>Add machines</Text>
@@ -119,7 +126,15 @@ function AddMachinesScreen({ navigation }) {
         actionVariant={isAdded ? 'success' : 'accent'}
         actionDisabled={isAdded || isBusy}
         onAction={() => selection.addCatalogItem(id)}
-        onPress={isAdded ? undefined : () => selection.addCatalogItem(id)}
+        onPress={() =>
+          navigation.navigate('MachineDetail', {
+            itemId: id,
+            item,
+            machineName: item.name,
+            fromCatalog: true,
+            isAdded,
+          })
+        }
       />
     );
   };

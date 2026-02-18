@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,11 +11,13 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 
 import CatalogCardRow from '../../../components/cards/CatalogCardRow';
 import CategoryChipsRow from '../../../ui/components/CategoryChipsRow';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
+import { FOOD_RECIPES } from '../../../data/wellness/foodRecipes';
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
 
@@ -27,6 +29,13 @@ function normalizeMealType(row) {
   if (!value) return 'Other';
   if (CATEGORY_ORDER.includes(value)) return value;
   return 'Other';
+}
+
+function findLocalRecipeIdByName(name) {
+  const normalized = String(name || '').trim().toLowerCase();
+  if (!normalized) return null;
+  const matched = FOOD_RECIPES.find((entry) => entry.name.trim().toLowerCase() === normalized);
+  return matched?.id ?? null;
 }
 
 function AddRecipesScreen({ navigation }) {
@@ -62,6 +71,12 @@ function AddRecipesScreen({ navigation }) {
 
   const selectedIds = selection.selectedCatalogIdSet;
   const footerText = useMemo(() => `${selectedIds.size} selected`, [selectedIds]);
+
+  useFocusEffect(
+    useCallback(() => {
+      selection.hydrate();
+    }, [selection.hydrate]),
+  );
 
   const renderHeader = () => (
     <View style={styles.headerContent}>
@@ -102,6 +117,7 @@ function AddRecipesScreen({ navigation }) {
     const id = item.id;
     const isAdded = selectedIds.has(id);
     const isBusy = selection.pendingAddId === id;
+    const localRecipeId = findLocalRecipeIdByName(item.name);
 
     return (
       <CatalogCardRow
@@ -112,7 +128,18 @@ function AddRecipesScreen({ navigation }) {
         actionVariant={isAdded ? 'success' : 'accent'}
         actionDisabled={isAdded || isBusy}
         onAction={() => selection.addCatalogItem(id)}
-        onPress={isAdded ? undefined : () => selection.addCatalogItem(id)}
+        onPress={
+          localRecipeId
+            ? () =>
+                navigation.navigate('CookRecipe', {
+                  recipeId: localRecipeId,
+                  recipeName: item.name,
+                  savedRecipeId: id,
+                  fromCatalog: true,
+                  isAdded,
+                })
+            : undefined
+        }
       />
     );
   };

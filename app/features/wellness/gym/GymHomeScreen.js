@@ -17,7 +17,7 @@ import CollapsibleSection from '../../../components/CollapsibleSection';
 import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import { useAuth } from '../../../context/AuthContext';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
-import { fetchUserMachines, removeUserMachine } from '../../../core/api/gymMachinesDb';
+import { fetchUserMachines } from '../../../core/api/gymMachinesDb';
 import COLORS from '../../../theme/colors';
 
 const MACHINE_GROUP_ORDER = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio', 'Other'];
@@ -46,7 +46,6 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const [loading, setLoading] = useState(true);
   const [inlineError, setInlineError] = useState('');
 
-  const [appUserId, setAppUserId] = useState(null);
   const [userMachines, setUserMachines] = useState([]);
 
   const [expandedGroups, setExpandedGroups] = useState({});
@@ -60,7 +59,6 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
         name: user?.name || 'Demo User',
       });
 
-      setAppUserId(appUser.id);
       const rows = await fetchUserMachines(appUser.id);
       setUserMachines(rows);
     } catch (error) {
@@ -109,19 +107,6 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
   };
   const openVoiceCommand = () =>
     Alert.alert('Voice Command', 'Machine voice command is coming soon.');
-
-  const removeMachine = async (machineId) => {
-    if (!appUserId) return;
-    const previous = userMachines;
-    setUserMachines((prev) => prev.filter((row) => row.machine_id !== machineId));
-
-    try {
-      await removeUserMachine(appUserId, machineId);
-    } catch (error) {
-      setUserMachines(previous);
-      setInlineError(error?.message || 'Could not remove machine');
-    }
-  };
 
   const RootContainer = embedded ? View : SafeAreaView;
 
@@ -200,7 +185,15 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
                     item: item.catalog_machine,
                   })
                 }
-                onRemove={() => removeMachine(item.machine_id)}
+                topAction={{
+                  iconName: 'create-outline',
+                  onPress: () =>
+                    navigation?.navigate('MachineDetail', {
+                      itemId: item.machine_id,
+                      machineName: item.catalog_machine?.name,
+                      item: item.catalog_machine,
+                    }),
+                }}
               />
             )}
             contentContainerStyle={[styles.listContent, { paddingBottom: 130 + insets.bottom }]}

@@ -13,7 +13,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import CatalogItemCard from '../../../components/cards/CatalogItemCard';
+import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
@@ -137,7 +137,7 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
             renderItem={({ item }) => {
               const utensil = item.catalog_utensil;
               return (
-                <CatalogItemCard
+                <SelectedCatalogItemCard
                   title={utensil?.name || 'Utensil'}
                   subtitle={`${normalizeCategory(utensil)}${utensil?.note ? ` • ${utensil.note}` : ''}`}
                   onPress={() =>
@@ -146,10 +146,14 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
                       item: utensil,
                     })
                   }
-                  primaryActionLabel={selection.pendingRemoveId === item.utensil_id ? '...' : 'REMOVE'}
-                  primaryActionVariant="danger"
-                  primaryActionDisabled={selection.pendingRemoveId === item.utensil_id}
-                  onPrimaryAction={() => selection.removeCatalogItem(item.utensil_id)}
+                  topAction={{
+                    iconName: 'create-outline',
+                    onPress: () =>
+                      navigation?.navigate('UtensilDetail', {
+                        itemId: item.utensil_id,
+                        item: utensil,
+                      }),
+                  }}
                 />
               );
             }}

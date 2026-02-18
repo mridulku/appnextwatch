@@ -13,7 +13,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import CatalogItemCard from '../../../components/cards/CatalogItemCard';
+import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
@@ -152,7 +152,7 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
               const localRecipeId = findLocalRecipeIdByName(recipe?.name);
 
               return (
-                <CatalogItemCard
+                <SelectedCatalogItemCard
                   title={recipe?.name || 'Recipe'}
                   subtitle={`${normalizeMealType(recipe)} • ${recipe?.total_minutes || '--'} min • ${recipe?.difficulty || 'Easy'}`}
                   onPress={
@@ -161,13 +161,23 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
                           navigation.navigate('CookRecipe', {
                             recipeId: localRecipeId,
                             recipeName: recipe?.name,
+                            savedRecipeId: item.recipe_id,
                           })
                       : undefined
                   }
-                  primaryActionLabel={selection.pendingRemoveId === item.recipe_id ? '...' : 'REMOVE'}
-                  primaryActionVariant="danger"
-                  primaryActionDisabled={selection.pendingRemoveId === item.recipe_id}
-                  onPrimaryAction={() => selection.removeCatalogItem(item.recipe_id)}
+                  topAction={
+                    localRecipeId
+                      ? {
+                          iconName: 'create-outline',
+                          onPress: () =>
+                            navigation.navigate('CookRecipe', {
+                              recipeId: localRecipeId,
+                              recipeName: recipe?.name,
+                              savedRecipeId: item.recipe_id,
+                            }),
+                        }
+                      : undefined
+                  }
                 />
               );
             }}

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 
 import CatalogCardRow from '../../../components/cards/CatalogCardRow';
 import CategoryChipsRow from '../../../ui/components/CategoryChipsRow';
@@ -101,6 +102,12 @@ function AddFoodItemsScreen({ navigation }) {
   useEffect(() => {
     hydrate();
   }, [user?.username, user?.name]);
+
+  useFocusEffect(
+    useCallback(() => {
+      hydrate();
+    }, [user?.username, user?.name]),
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -220,7 +227,18 @@ function AddFoodItemsScreen({ navigation }) {
         actionVariant={alreadyAdded ? 'success' : 'accent'}
         actionDisabled={alreadyAdded || isAdding}
         onAction={() => addItemDirectly(item)}
-        onPress={() => addItemDirectly(item)}
+        onPress={() =>
+          navigation.navigate('FoodInventoryItemDetail', {
+            fromCatalog: true,
+            isAdded: alreadyAdded,
+            ingredientId: id,
+            itemId: id,
+            name: item.name,
+            category: normalizeCategory(item.category),
+            unitType: item.unit_type || 'pcs',
+            quantity: getAddDefaultQuantity(item.unit_type || 'pcs'),
+          })
+        }
       />
     );
   };

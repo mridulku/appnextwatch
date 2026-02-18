@@ -3,6 +3,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Animated,
   FlatList,
   LayoutAnimation,
@@ -18,6 +20,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useAuth } from '../../../context/AuthContext';
+import { addUserSelection, removeUserSelection } from '../../../core/api/catalogSelectionDb';
+import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
 import { addSessionToHistory, createSessionHistoryId } from '../../../core/storage/sessionHistoryStorage';
 import { getFoodRecipeById } from '../../../data/wellness/foodRecipes';
 import COLORS from '../../../theme/colors';
@@ -99,7 +104,10 @@ function normalizeSessionRecipe(rawRecipe) {
 
 function CookRecipeScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
   const isSessionMode = Boolean(route.params?.sessionMode);
+  const savedRecipeId = route.params?.savedRecipeId;
+  const canManageSaved = !isSessionMode && Boolean(savedRecipeId);
   const recipe = useMemo(() => {
     const sessionRecipe = normalizeSessionRecipe(route.params?.sessionRecipe);
     if (sessionRecipe) return sessionRecipe;
@@ -123,6 +131,8 @@ function CookRecipeScreen({ route, navigation }) {
     createChatMessage('chef', 'Chef assistant is ready. Ask anything or tap mic for quick commands.'),
   ]);
   const [isVoiceListening, setIsVoiceListening] = useState(false);
+  const [isMutatingSaved, setIsMutatingSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(route.params?.isAdded ?? true);
 
   const [toastMessage, setToastMessage] = useState('');
 
@@ -719,6 +729,48 @@ function CookRecipeScreen({ route, navigation }) {
 
   const controlsBottom = Math.max(insets.bottom, 10);
 
+  const toggleSavedRecipe = () => {
+    if (!canManageSaved || isMutatingSaved) return;
+
+    const actionLabel = isSaved ? 'Remove' : 'Add';
+    const actionMessage = isSaved
+      ? 'This recipe will be removed from your saved recipes.'
+      : 'This recipe will be added to your saved recipes.';
+
+    Alert.alert(`${actionLabel} recipe?`, actionMessage, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: actionLabel,
+        style: isSaved ? 'destructive' : 'default',
+        onPress: async () => {
+          try {
+            setIsMutatingSaved(true);
+            const appUser = await getOrCreateAppUser({
+              username: user?.username || 'demo user',
+              name: user?.name || 'Demo User',
+            });
+            await (isSaved ? removeUserSelection({
+              table: 'user_recipes',
+              userId: appUser.id,
+              fkColumn: 'recipe_id',
+              fkValue: savedRecipeId,
+            }) : addUserSelection({
+              table: 'user_recipes',
+              userId: appUser.id,
+              fkColumn: 'recipe_id',
+              fkValue: savedRecipeId,
+            }));
+            setIsSaved(!isSaved);
+          } catch (error) {
+            showToast(error?.message || `Could not ${isSaved ? 'remove' : 'add'} recipe`);
+          } finally {
+            setIsMutatingSaved(false);
+          }
+        },
+      },
+    ]);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -914,6 +966,30 @@ function CookRecipeScreen({ route, navigation }) {
                 <Text style={allStepsDone ? styles.controlPrimaryText : styles.controlText}>
                   Finish
                 </Text>
+              </TouchableOpacity>
+            ) : null}
+
+            {canManageSaved ? (
+              <TouchableOpacity
+                style={[styles.controlButton, isSaved ? styles.controlButtonDanger : styles.controlButtonPrimary]}
+                activeOpacity={0.9}
+                onPress={toggleSavedRecipe}
+                disabled={isMutatingSaved}
+              >
+                {isMutatingSaved ? (
+                  <ActivityIndicator size="small" color={isSaved ? '#FFB4A8' : COLORS.bg} />
+                ) : (
+                  <>
+                    <Ionicons
+                      name={isSaved ? 'trash-outline' : 'add-circle-outline'}
+                      size={14}
+                      color={isSaved ? '#FFB4A8' : COLORS.bg}
+                    />
+                    <Text style={isSaved ? styles.controlDangerText : styles.controlPrimaryText}>
+                      {isSaved ? 'Remove' : 'Add'}
+                    </Text>
+                  </>
+                )}
               </TouchableOpacity>
             ) : null}
           </View>
@@ -1405,8 +1481,17 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.accent,
     borderColor: 'rgba(245,201,106,0.58)',
   },
+  controlButtonDanger: {
+    borderColor: 'rgba(255,124,123,0.42)',
+    backgroundColor: 'rgba(255,124,123,0.12)',
+  },
   controlText: {
     color: COLORS.text,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  controlDangerText: {
+    color: '#FFB4A8',
     fontSize: 11,
     fontWeight: '700',
   },

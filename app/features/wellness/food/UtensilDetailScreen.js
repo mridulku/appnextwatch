@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { useAuth } from '../../../context/AuthContext';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
-import { removeUserSelection } from '../../../core/api/catalogSelectionDb';
+import { addUserSelection, removeUserSelection } from '../../../core/api/catalogSelectionDb';
 import { ITEM_PLACEHOLDER_IMAGE } from '../../../core/placeholders';
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
@@ -12,39 +12,52 @@ import UI_TOKENS from '../../../ui/tokens';
 function UtensilDetailScreen({ route, navigation }) {
   const { user } = useAuth();
   const { itemId, item } = route.params || {};
-  const [removing, setRemoving] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
+  const [isAdded, setIsAdded] = useState(route.params?.isAdded ?? true);
   const [inlineError, setInlineError] = useState('');
+  const fromCatalog = Boolean(route.params?.fromCatalog);
 
   const name = item?.name || 'Utensil';
   const subtitle = `${item?.category || 'Kitchen tool'}${item?.note ? ` • ${item.note}` : ''}`;
 
-  const onRemove = () => {
-    if (!itemId || removing) return;
+  const onToggleSaved = () => {
+    if (!itemId || isMutating) return;
 
-    Alert.alert('Remove utensil?', 'This utensil will be removed from your list.', [
+    const actionLabel = isAdded ? 'Remove' : 'Add';
+    const actionMessage = isAdded
+      ? 'This utensil will be removed from your list.'
+      : 'This utensil will be added to your list.';
+
+    Alert.alert(`${actionLabel} utensil?`, actionMessage, [
       { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Remove',
-        style: 'destructive',
+        text: actionLabel,
+        style: isAdded ? 'destructive' : 'default',
         onPress: async () => {
           try {
-            setRemoving(true);
+            setIsMutating(true);
             setInlineError('');
             const appUser = await getOrCreateAppUser({
               username: user?.username || 'demo user',
               name: user?.name || 'Demo User',
             });
-            await removeUserSelection({
+            await (isAdded ? removeUserSelection({
               table: 'user_utensils',
               userId: appUser.id,
               fkColumn: 'utensil_id',
               fkValue: itemId,
-            });
-            navigation.goBack();
+            }) : addUserSelection({
+              table: 'user_utensils',
+              userId: appUser.id,
+              fkColumn: 'utensil_id',
+              fkValue: itemId,
+              payload: { count: 1 },
+            }));
+            setIsAdded(!isAdded);
           } catch (error) {
-            setInlineError(error?.message || 'Could not remove utensil');
+            setInlineError(error?.message || `Could not ${isAdded ? 'remove' : 'add'} utensil`);
           } finally {
-            setRemoving(false);
+            setIsMutating(false);
           }
         },
       },
@@ -77,20 +90,31 @@ function UtensilDetailScreen({ route, navigation }) {
 
       <View style={styles.bottomActions}>
         <TouchableOpacity
-          style={[styles.removeButton, removing && styles.buttonDisabled]}
+          style={[styles.removeButton, !isAdded && styles.addButton, isMutating && styles.buttonDisabled]}
           activeOpacity={0.9}
-          onPress={onRemove}
-          disabled={removing}
+          onPress={onToggleSaved}
+          disabled={isMutating}
         >
-          {removing ? (
-            <ActivityIndicator size="small" color="#FFB4A8" />
+          {isMutating ? (
+            <ActivityIndicator size="small" color={isAdded ? '#FFB4A8' : COLORS.bg} />
           ) : (
             <>
-              <Ionicons name="trash-outline" size={16} color="#FFB4A8" />
-              <Text style={styles.removeText}>Remove from Utensils</Text>
+              <Ionicons
+                name={isAdded ? 'trash-outline' : 'add-circle-outline'}
+                size={16}
+                color={isAdded ? '#FFB4A8' : COLORS.bg}
+              />
+              <Text style={[styles.removeText, !isAdded && styles.addText]}>
+                {isAdded ? 'Remove from Utensils' : 'Add to Utensils'}
+              </Text>
             </>
           )}
         </TouchableOpacity>
+        {fromCatalog ? (
+          <TouchableOpacity style={styles.backButton} activeOpacity={0.9} onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>Back to Catalog</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
     </SafeAreaView>
   );
@@ -163,6 +187,28 @@ const styles = StyleSheet.create({
     gap: UI_TOKENS.spacing.xs,
   },
   removeText: { color: '#FFB4A8', fontSize: UI_TOKENS.typography.subtitle, fontWeight: '700' },
+  addButton: {
+    borderColor: 'rgba(245,201,106,0.45)',
+    backgroundColor: COLORS.accent,
+  },
+  addText: {
+    color: COLORS.bg,
+  },
+  backButton: {
+    marginTop: UI_TOKENS.spacing.xs,
+    minHeight: 40,
+    borderRadius: UI_TOKENS.radius.md,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.35)',
+    backgroundColor: COLORS.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backText: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta + 1,
+    fontWeight: '700',
+  },
   buttonDisabled: { opacity: 0.6 },
 });
 

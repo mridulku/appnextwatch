@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { useAuth } from '../../../context/AuthContext';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
-import { removeUserMachine } from '../../../core/api/gymMachinesDb';
+import { addUserMachine, removeUserMachine } from '../../../core/api/gymMachinesDb';
 import { ITEM_PLACEHOLDER_IMAGE } from '../../../core/placeholders';
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
@@ -12,34 +12,46 @@ import UI_TOKENS from '../../../ui/tokens';
 function MachineDetailScreen({ route, navigation }) {
   const { user } = useAuth();
   const { itemId, item } = route.params || {};
-  const [removing, setRemoving] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
+  const [isAdded, setIsAdded] = useState(route.params?.isAdded ?? true);
   const [inlineError, setInlineError] = useState('');
+  const fromCatalog = Boolean(route.params?.fromCatalog);
 
   const machineName = item?.name || route.params?.machineName || 'Machine';
   const subtitle = `${item?.zone || 'Gym Zone'} • ${Array.isArray(item?.primary_muscles) && item.primary_muscles.length ? item.primary_muscles.join(', ') : 'Strength'}`;
 
-  const onRemove = () => {
-    if (!itemId || removing) return;
+  const onToggleSaved = () => {
+    if (!itemId || isMutating) return;
 
-    Alert.alert('Remove machine?', 'This machine will be removed from your selected list.', [
+    const actionLabel = isAdded ? 'Remove' : 'Add';
+    const actionMessage = isAdded
+      ? 'This machine will be removed from your selected list.'
+      : 'This machine will be added to your selected list.';
+
+    Alert.alert(`${actionLabel} machine?`, actionMessage, [
       { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Remove',
-        style: 'destructive',
+        text: actionLabel,
+        style: isAdded ? 'destructive' : 'default',
         onPress: async () => {
           try {
-            setRemoving(true);
+            setIsMutating(true);
             setInlineError('');
             const appUser = await getOrCreateAppUser({
               username: user?.username || 'demo user',
               name: user?.name || 'Demo User',
             });
-            await removeUserMachine(appUser.id, itemId);
-            navigation.goBack();
+            if (isAdded) {
+              await removeUserMachine(appUser.id, itemId);
+              setIsAdded(false);
+            } else {
+              await addUserMachine(appUser.id, itemId);
+              setIsAdded(true);
+            }
           } catch (error) {
-            setInlineError(error?.message || 'Could not remove machine');
+            setInlineError(error?.message || `Could not ${isAdded ? 'remove' : 'add'} machine`);
           } finally {
-            setRemoving(false);
+            setIsMutating(false);
           }
         },
       },
@@ -72,20 +84,31 @@ function MachineDetailScreen({ route, navigation }) {
 
       <View style={styles.bottomActions}>
         <TouchableOpacity
-          style={[styles.removeButton, removing && styles.buttonDisabled]}
+          style={[styles.removeButton, !isAdded && styles.addButton, isMutating && styles.buttonDisabled]}
           activeOpacity={0.9}
-          onPress={onRemove}
-          disabled={removing}
+          onPress={onToggleSaved}
+          disabled={isMutating}
         >
-          {removing ? (
-            <ActivityIndicator size="small" color="#FFB4A8" />
+          {isMutating ? (
+            <ActivityIndicator size="small" color={isAdded ? '#FFB4A8' : COLORS.bg} />
           ) : (
             <>
-              <Ionicons name="trash-outline" size={16} color="#FFB4A8" />
-              <Text style={styles.removeText}>Remove from Machines</Text>
+              <Ionicons
+                name={isAdded ? 'trash-outline' : 'add-circle-outline'}
+                size={16}
+                color={isAdded ? '#FFB4A8' : COLORS.bg}
+              />
+              <Text style={[styles.removeText, !isAdded && styles.addText]}>
+                {isAdded ? 'Remove from Machines' : 'Add to Machines'}
+              </Text>
             </>
           )}
         </TouchableOpacity>
+        {fromCatalog ? (
+          <TouchableOpacity style={styles.backButton} activeOpacity={0.9} onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>Back to Catalog</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
     </SafeAreaView>
   );
@@ -158,6 +181,28 @@ const styles = StyleSheet.create({
     gap: UI_TOKENS.spacing.xs,
   },
   removeText: { color: '#FFB4A8', fontSize: UI_TOKENS.typography.subtitle, fontWeight: '700' },
+  addButton: {
+    borderColor: 'rgba(245,201,106,0.45)',
+    backgroundColor: COLORS.accent,
+  },
+  addText: {
+    color: COLORS.bg,
+  },
+  backButton: {
+    marginTop: UI_TOKENS.spacing.xs,
+    minHeight: 40,
+    borderRadius: UI_TOKENS.radius.md,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.35)',
+    backgroundColor: COLORS.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backText: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta + 1,
+    fontWeight: '700',
+  },
   buttonDisabled: { opacity: 0.6 },
 });
 

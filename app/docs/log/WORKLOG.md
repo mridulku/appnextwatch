@@ -262,3 +262,13 @@
 - Follow-ups / risks: Voice command actions in these tabs are currently placeholders (alerts), not full command flows.
 - Tag: nw-2026-02-18-1740-ui-bottom-docks
 - Notes: app/docs/sessions/2026-02-18/1740_ui-bottom-docks.md
+
+## 2026-02-18 - Session inventory-add-detail
+- Summary: Brought Food Add Items into the same detail-first catalog behavior used across the other wellness add flows.
+- Changes: `AddFoodItemsScreen` row tap now opens `FoodInventoryItemDetail`; detail screen now supports `fromCatalog` add/remove state while preserving existing inventory edit behavior; added focus rehydrate in Add screen to refresh ADDED states after returning.
+- Files: app/features/wellness/food/AddFoodItemsScreen.js, app/features/wellness/food/FoodInventoryItemDetailScreen.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: User-facing navigation/interaction change in Food Add Items flow (T1).
+- Validation performed: `npx expo export --platform ios` passed.
+- Follow-ups / risks: Dual add paths (row->detail and direct ADD) are intentional but should remain visually clear.
+- Tag: nw-2026-02-18-1847-navigation-inventory-detail
+- Notes: app/docs/sessions/2026-02-18/1847_inventory-add-detail.md

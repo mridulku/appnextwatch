@@ -161,8 +161,15 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
                       item: catalog,
                     })
                   }
-                  removeDisabled={selection.pendingRemoveId === item.exercise_id}
-                  onRemove={() => selection.removeCatalogItem(item.exercise_id)}
+                  topAction={{
+                    iconName: 'create-outline',
+                    onPress: () =>
+                      navigation.navigate('ExerciseDetail', {
+                        itemId: item.exercise_id,
+                        exerciseName: catalog?.name,
+                        item: catalog,
+                      }),
+                  }}
                 />
               );
             }}
