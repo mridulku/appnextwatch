@@ -2,21 +2,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  FlatList,
-  Modal,
-  Pressable,
   SafeAreaView,
-  ScrollView,
   SectionList,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 
+import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
 import CollapsibleSection from '../../../components/CollapsibleSection';
-import CatalogItemCard from '../../../components/cards/CatalogItemCard';
+import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import { useAuth } from '../../../context/AuthContext';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
 import { addUserMachine, fetchCatalogMachines, fetchUserMachines, removeUserMachine } from '../../../core/api/gymMachinesDb';
@@ -254,13 +250,11 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
               />
             )}
             renderItem={({ item }) => (
-              <CatalogItemCard
+              <SelectedCatalogItemCard
                 title={item.catalog_machine?.name || 'Machine'}
                 subtitle={`${normalizeMachineCategory(item.catalog_machine)} • ${item.catalog_machine?.zone || 'Gym Zone'}`}
                 badges={[{ label: '🏋️', tone: 'default' }]}
-                primaryActionLabel="REMOVE"
-                primaryActionVariant="danger"
-                onPrimaryAction={() => removeMachine(item.machine_id)}
+                onRemove={() => removeMachine(item.machine_id)}
               />
             )}
             contentContainerStyle={styles.listContent}
@@ -269,76 +263,27 @@ function GymHomeScreen({ embedded = false, showHeader = true }) {
         )}
       </View>
 
-      <Modal visible={addModalVisible} transparent animationType="fade" onRequestClose={closeAddModal}>
-        <View style={styles.modalRoot}>
-          <Pressable style={styles.modalBackdrop} onPress={closeAddModal} />
-          <View style={styles.addSheet}>
-            <View style={styles.sheetHandle} />
-            <Text style={styles.sheetTitle}>Add machines</Text>
-            <Text style={styles.sheetSubtitle}>Choose from catalog machines available at your gym.</Text>
-
-            <TextInput
-              style={styles.searchInput}
-              value={catalogSearchInput}
-              onChangeText={setCatalogSearchInput}
-              placeholder="Search machines"
-              placeholderTextColor={COLORS.muted}
-            />
-
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
-              {catalogCategoryFilters.map((category) => {
-                const active = category === selectedCategory;
-                return (
-                  <TouchableOpacity
-                    key={category}
-                    style={[styles.filterChip, active && styles.filterChipActive]}
-                    activeOpacity={0.9}
-                    onPress={() => setSelectedCategory(category)}
-                  >
-                    <Text style={[styles.filterChipText, active && styles.filterChipTextActive]}>{category}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-
-            {filteredCatalogMachines.length === 0 ? (
-              <View style={styles.catalogListEmptyWrap}>
-                <Text style={styles.catalogEmpty}>No machines match this filter.</Text>
-              </View>
-            ) : (
-              <FlatList
-                data={filteredCatalogMachines}
-                keyExtractor={(machine) => machine.id}
-                style={styles.catalogList}
-                contentContainerStyle={styles.catalogListContent}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item: machine }) => {
-                  const added = userMachineIdSet.has(machine.id);
-                  const pending = addPendingMachineId === machine.id;
-                  return (
-                    <CatalogItemCard
-                      title={machine.name}
-                      subtitle={`${normalizeMachineCategory(machine)} • ${machine.zone || 'Gym Zone'}`}
-                      badges={[{ label: '🏋️', tone: 'default' }]}
-                      selected={added}
-                      primaryActionLabel={added ? 'ADDED' : pending ? '...' : 'ADD'}
-                      primaryActionVariant={added ? 'success' : 'accent'}
-                      primaryActionDisabled={added || pending}
-                      onPrimaryAction={() => addMachine(machine.id)}
-                    />
-                  );
-                }}
-                initialNumToRender={8}
-                windowSize={6}
-              />
-            )}
-
-            <TouchableOpacity style={styles.closeSheetButton} activeOpacity={0.9} onPress={closeAddModal}>
-              <Text style={styles.closeSheetButtonText}>Done</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <CatalogPickerModal
+        visible={addModalVisible}
+        title="Add machines"
+        subtitle="Choose from catalog machines available at your gym."
+        searchPlaceholder="Search machines"
+        searchValue={catalogSearchInput}
+        onSearchChange={setCatalogSearchInput}
+        categories={catalogCategoryFilters}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+        items={filteredCatalogMachines}
+        selectedIdSet={userMachineIdSet}
+        pendingAddId={addPendingMachineId}
+        pendingRemoveId={null}
+        getItemId={(item) => item.id}
+        getItemTitle={(item) => item.name}
+        getItemSubtitle={(item) => `${normalizeMachineCategory(item)} • ${item.zone || 'Gym Zone'}`}
+        onAdd={addMachine}
+        onClose={closeAddModal}
+        emptyText="No machines match this filter."
+      />
     </RootContainer>
   );
 }

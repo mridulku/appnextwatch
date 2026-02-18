@@ -11,6 +11,7 @@
 | 0.6 | 2026-02-18 | Codex | Gym Machines now supports Supabase-backed user selection flow (`user_machines`) with empty state, add modal, categorized list, and remove |
 | 0.7 | 2026-02-18 | Codex | Reusable catalog-selection pattern extended to Gym Exercises, Food Utensils, and Food Recipes using `user_exercises` + `user_recipes` + shared picker/hook |
 | 0.8 | 2026-02-18 | Codex | Wellness catalog/user list rows refactored to reusable Swiggy-style card layout with shared placeholder imagery |
+| 0.9 | 2026-02-18 | Codex | Restored image-first selected-card layout and applied cleanup: non-overlapping remove control, compact shared stepper, full-height add modals with compact chips/results for Food Inventory + Gym Machines + Gym Exercises |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -48,6 +49,11 @@
   - Added reusable `CatalogItemCard` with image thumbnail + CTA action pattern.
   - Updated catalog add pickers and user-selected grouped rows for Inventory, Machines, Exercises, Utensils, and Recipes.
   - Introduced shared placeholder asset fallback for item thumbnails (`assets/placeholders/item.png`).
+- 2026-02-18: UI cleanup + regression restore for selection surfaces:
+  - Restored right-side thumbnail layout for selected cards via shared `SelectedCatalogItemCard`.
+  - Standardized remove affordance as a top-right icon control outside image tiles (no overlap).
+  - Introduced shared compact `QuantityStepper` and applied it to Inventory card rows and Add Item quantity controls.
+  - Upgraded add modals for Inventory/Machines/Exercises to full-height shared modal layout with compact horizontal category chips and larger scrollable results area.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

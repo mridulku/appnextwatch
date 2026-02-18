@@ -172,3 +172,13 @@
 - Follow-ups / risks: Visual tuning may still be needed after manual simulator pass (spacing/CTA overlap edge cases on smaller devices).
 - Tag: TBD (pending manual visual verification on iOS simulator/device)
 - Notes: app/docs/sessions/2026-02-18/1254_ui-swiggy-cards.md
+
+## 2026-02-18 - Session card-layout-restore-ui-cleanup
+- Summary: Restored selected-card image layout regression and completed UI cleanup for Food Inventory + Gym Machines + Gym Exercises.
+- Changes: Rolled feature files back to committed baseline, introduced shared `SelectedCatalogItemCard` + `QuantityStepper`, switched add flows to full-screen shared modal (`SelectFromCatalogModal` via `CatalogPickerModal`), and rewired targeted screens.
+- Files: app/components/catalog/CatalogPickerModal.js, app/components/cards/SelectedCatalogItemCard.js, app/components/cards/CatalogCardRow.js, app/components/catalog/CategoryChipRow.js, app/components/controls/QuantityStepper.js, app/components/modals/SelectFromCatalogModal.js, app/features/wellness/food/FoodInventoryScreen.js, app/features/wellness/gym/GymHomeScreen.js, app/features/wellness/gym/ExercisesHomeScreen.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: UI/UX only. No schema, policy, or CRUD behavior changes.
+- Validation performed: `npx expo export --platform ios --output-dir /tmp/appnextwatch-export-ui-restore` passed; `npx expo run:ios --device "iPhone 17 Pro" --port 8083` build/install/open passed.
+- Follow-ups / risks: Full in-flow visual QA (post-login into Inventory/Machines/Exercises) still requires manual simulator interaction.
+- Tag: NO (pending full manual visual verification of target tabs)
+- Notes: app/docs/sessions/2026-02-18/1332_restore-card-layout-ui-cleanup.md

@@ -3,11 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
-  FlatList,
   Modal,
   Pressable,
   SafeAreaView,
-  ScrollView,
   SectionList,
   StyleSheet,
   Text,
@@ -23,7 +21,10 @@ import {
   parseVoiceCommand,
 } from '../../../core/foodVoiceParser';
 import CollapsibleSection from '../../../components/CollapsibleSection';
-import CatalogItemCard from '../../../components/cards/CatalogItemCard';
+import CatalogCardRow from '../../../components/cards/CatalogCardRow';
+import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
+import QuantityStepper from '../../../components/controls/QuantityStepper';
+import SelectFromCatalogModal from '../../../components/modals/SelectFromCatalogModal';
 import { useAuth } from '../../../context/AuthContext';
 import {
   fetchCatalogIngredients,
@@ -575,38 +576,19 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
         </View>
       </View>
     ) : (
-      <View style={styles.stepperWrap}>
-        <TouchableOpacity
-          style={styles.removeIconButton}
-          activeOpacity={0.85}
-          onPress={() => setPendingRemoveItemId(item.id)}
-        >
-          <Ionicons name="trash-outline" size={14} color="#FFA674" />
-        </TouchableOpacity>
-        <View style={styles.stepper}>
-          <TouchableOpacity
-            style={styles.stepperButton}
-            activeOpacity={0.85}
-            onPress={() => adjustQuantity(item.id, -1)}
-          >
-            <Ionicons name="remove" size={16} color={COLORS.text} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.stepperButton, styles.stepperButtonAccent]}
-            activeOpacity={0.85}
-            onPress={() => adjustQuantity(item.id, 1)}
-          >
-            <Ionicons name="add" size={16} color={COLORS.bg} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <QuantityStepper
+        compact
+        onDecrement={() => adjustQuantity(item.id, -1)}
+        onIncrement={() => adjustQuantity(item.id, 1)}
+      />
     );
 
     return (
-      <CatalogItemCard
+      <SelectedCatalogItemCard
         title={item.name}
         subtitle={`${item.category} • ${formatQuantity(item.quantity, item.unitType)}`}
         badges={low ? [{ label: 'Low stock', tone: 'warn' }] : [{ label: item.icon || '🧺', tone: 'default' }]}
+        onRemove={() => setPendingRemoveItemId(item.id)}
         rightControls={rightControls}
       />
     );
@@ -812,148 +794,77 @@ function FoodInventoryScreen({ embedded = false, showHero = true }) {
         </View>
       </Modal>
 
-      <Modal visible={addItemVisible} transparent animationType="fade" onRequestClose={closeAddItemModal}>
-        <View style={styles.modalRoot}>
-          <Pressable style={styles.modalBackdrop} onPress={closeAddItemModal} />
-          <View style={[styles.addSheet, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-            <View style={styles.sheetHandle} />
-            <Text style={styles.sheetTitle}>Add Item</Text>
-            <Text style={styles.sheetSubtitle}>Pick from catalog and set quantity.</Text>
-
-            <Text style={styles.fieldLabel}>Search ingredient</Text>
-            <TextInput
-              style={styles.singleInput}
-              value={catalogSearchInput}
-              onChangeText={setCatalogSearchInput}
-              placeholder="Type ingredient name"
-              placeholderTextColor={COLORS.muted}
+      <SelectFromCatalogModal
+        visible={addItemVisible}
+        title="Add items"
+        subtitle="Pick from catalog and set quantity."
+        searchPlaceholder="Search ingredient"
+        searchValue={catalogSearchInput}
+        onSearchChange={setCatalogSearchInput}
+        categories={CATALOG_FILTER_ORDER}
+        selectedCategory={selectedCatalogCategory}
+        onSelectCategory={setSelectedCatalogCategory}
+        data={filteredCatalogItems}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          const selected = selectedCatalogItem?.id === item.id;
+          return (
+            <CatalogCardRow
+              title={item.name}
+              subtitle={`${normalizeCategory(item.category)} • ${item.unit_type || 'pcs'}`}
+              selected={selected}
+              actionLabel={selected ? 'ADDED' : 'ADD'}
+              actionVariant={selected ? 'success' : 'accent'}
+              actionDisabled={selected}
+              onAction={() => setSelectedCatalogItem(item)}
+              onPress={() => setSelectedCatalogItem(item)}
             />
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoryChipsRow}
-            >
-              {CATALOG_FILTER_ORDER.map((category) => {
-                const active = category === selectedCatalogCategory;
-                return (
-                  <TouchableOpacity
-                    key={category}
-                    style={[styles.categoryFilterChip, active && styles.categoryFilterChipActive]}
-                    activeOpacity={0.9}
-                    onPress={() => setSelectedCatalogCategory(category)}
-                  >
-                    <Text
-                      style={[
-                        styles.categoryFilterText,
-                        active && styles.categoryFilterTextActive,
-                      ]}
-                    >
-                      {category}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-
-            <View style={styles.catalogPickerWrap}>
-              <FlatList
-                data={filteredCatalogItems}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => {
-                  const selected = selectedCatalogItem?.id === item.id;
-                  return (
-                    <CatalogItemCard
-                      title={item.name}
-                      subtitle={`${normalizeCategory(item.category)} • ${item.unit_type || 'pcs'}`}
-                      badges={[{ label: CATEGORY_META[normalizeCategory(item.category)]?.emoji || '🧺', tone: 'default' }]}
-                      selected={selected}
-                      primaryActionLabel={selected ? 'ADDED' : 'ADD'}
-                      primaryActionVariant={selected ? 'success' : 'accent'}
-                      primaryActionDisabled={selected}
-                      onPrimaryAction={() => setSelectedCatalogItem(item)}
-                      onPress={() => setSelectedCatalogItem(item)}
-                    />
-                  );
-                }}
-                showsVerticalScrollIndicator={false}
-                initialNumToRender={8}
-                windowSize={6}
-                keyboardShouldPersistTaps="handled"
-                ListEmptyComponent={
-                  <Text style={styles.catalogEmpty}>No catalog items match your search.</Text>
+          );
+        }}
+        onClose={closeAddItemModal}
+        emptyText="No catalog items match your search."
+        footerContent={
+          selectedCatalogItem ? (
+            <View style={styles.catalogFooterCard}>
+              <Text style={styles.catalogFooterTitle}>Quantity</Text>
+              <QuantityStepper
+                valueLabel={formatQuantity(pickerQuantity, selectedCatalogItem.unit_type || 'pcs')}
+                onDecrement={() =>
+                  setPickerQuantity((prev) => {
+                    const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
+                    return Math.max(0, Number((prev - step).toFixed(3)));
+                  })
+                }
+                onIncrement={() =>
+                  setPickerQuantity((prev) => {
+                    const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
+                    return Number((prev + step).toFixed(3));
+                  })
                 }
               />
-            </View>
-
-            {selectedCatalogItem ? (
-              <View style={styles.quantityCard}>
-                <Text style={styles.fieldLabel}>Quantity</Text>
-                <View style={styles.quantityRow}>
-                  <TouchableOpacity
-                    style={styles.stepperButton}
-                    activeOpacity={0.9}
-                    onPress={() =>
-                      setPickerQuantity((prev) => {
-                        const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
-                        return Math.max(0, Number((prev - step).toFixed(3)));
-                      })
-                    }
-                  >
-                    <Ionicons name="remove" size={16} color={COLORS.text} />
-                  </TouchableOpacity>
-                  <View style={styles.quantityValueWrap}>
-                    <Text style={styles.quantityValueText}>
-                      {formatQuantity(pickerQuantity, selectedCatalogItem.unit_type || 'pcs')}
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    style={[styles.stepperButton, styles.stepperButtonAccent]}
-                    activeOpacity={0.9}
-                    onPress={() =>
-                      setPickerQuantity((prev) => {
-                        const step = getQuantityStep(selectedCatalogItem.unit_type || 'pcs');
-                        return Number((prev + step).toFixed(3));
-                      })
-                    }
-                  >
-                    <Ionicons name="add" size={16} color={COLORS.bg} />
-                  </TouchableOpacity>
-                </View>
-                <Text style={styles.quantityHint}>
-                  Unit: {selectedCatalogItem.unit_type || 'pcs'} (from catalog)
-                </Text>
-              </View>
-            ) : (
-              <Text style={styles.catalogEmpty}>Select an ingredient to set quantity.</Text>
-            )}
-
-            <View style={styles.sheetActions}>
+              <Text style={styles.catalogFooterHint}>
+                Unit: {selectedCatalogItem.unit_type || 'pcs'} (from catalog)
+              </Text>
               <TouchableOpacity
-                style={styles.cancelButton}
-                activeOpacity={0.9}
-                onPress={closeAddItemModal}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.confirmButton, addPending && styles.confirmButtonDisabled]}
+                style={[styles.catalogFooterAction, addPending && styles.confirmButtonDisabled]}
                 activeOpacity={0.9}
                 onPress={submitAddItem}
-                disabled={addPending || !selectedCatalogItem}
+                disabled={addPending}
               >
                 {addPending ? (
                   <ActivityIndicator color={COLORS.bg} size="small" />
                 ) : (
-                  <Text style={styles.confirmButtonText}>
+                  <Text style={styles.catalogFooterActionText}>
                     {selectedExistingInventoryItem ? 'Update' : 'Add'}
                   </Text>
                 )}
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
-      </Modal>
+          ) : (
+            <Text style={styles.catalogFooterEmpty}>Select an ingredient to set quantity.</Text>
+          )
+        }
+      />
     </RootContainer>
   );
 }
@@ -1556,6 +1467,40 @@ const styles = StyleSheet.create({
     fontSize: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
+  },
+  catalogFooterCard: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.24)',
+    backgroundColor: COLORS.card,
+    padding: 12,
+    gap: 10,
+  },
+  catalogFooterTitle: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  catalogFooterHint: {
+    color: COLORS.muted,
+    fontSize: 11,
+  },
+  catalogFooterAction: {
+    minHeight: 46,
+    borderRadius: 12,
+    backgroundColor: COLORS.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  catalogFooterActionText: {
+    color: COLORS.bg,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  catalogFooterEmpty: {
+    color: COLORS.muted,
+    fontSize: 12,
+    paddingHorizontal: 2,
   },
   quantityCard: {
     borderRadius: 12,

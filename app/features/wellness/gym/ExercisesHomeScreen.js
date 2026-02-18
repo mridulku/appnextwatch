@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
-import CatalogItemCard from '../../../components/cards/CatalogItemCard';
+import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
@@ -152,7 +152,7 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
               const localExerciseId = findLocalExerciseIdByName(catalog?.name);
 
               return (
-                <CatalogItemCard
+                <SelectedCatalogItemCard
                   title={catalog?.name || 'Exercise'}
                   subtitle={`${normalizeExerciseCategory(catalog)} • ${catalog?.type || 'exercise'} • ${catalog?.equipment || 'bodyweight'}`}
                   badges={[
@@ -167,10 +167,8 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
                           })
                       : undefined
                   }
-                  primaryActionLabel={selection.pendingRemoveId === item.exercise_id ? '...' : 'REMOVE'}
-                  primaryActionVariant="danger"
-                  primaryActionDisabled={selection.pendingRemoveId === item.exercise_id}
-                  onPrimaryAction={() => selection.removeCatalogItem(item.exercise_id)}
+                  removeDisabled={selection.pendingRemoveId === item.exercise_id}
+                  onRemove={() => selection.removeCatalogItem(item.exercise_id)}
                 />
               );
             }}
