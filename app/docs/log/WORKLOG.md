@@ -202,3 +202,13 @@
 - Follow-ups / risks: Manual interaction QA still required to confirm zero-gap behavior across repeated open/close + chip/search changes on all three target modals.
 - Tag: NO (gated until manual QA confirmation)
 - Notes: app/docs/sessions/2026-02-18/1415_fix-modal-gap-scrollview.md
+
+## 2026-02-18 - Session fix-modal-gap-layout
+- Summary: Fixed persistent add-modal blank gap as a layout/container contract issue (not scroll/data issue).
+- Changes: Updated `SelectFromCatalogModal` to explicit deterministic results layout (`resultsWrap/resultsScroll/resultsContent`) and removed scroll-reset effect hacks; ensured no bottom-alignment-prone styles (`minHeight/flexGrow/justifyContent`) in results content.
+- Files: app/components/modals/SelectFromCatalogModal.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: UI-only modal positioning fix; no CRUD/schema/business logic change.
+- Validation performed: `npx expo export --platform ios --output-dir /tmp/appnextwatch-export-modal-layout-gap-fix` passed.
+- Follow-ups / risks: Manual simulator QA across Add Item/Add Machines/Add Exercises still required for final sign-off.
+- Tag: NO (gated until manual QA confirmation)
+- Notes: app/docs/sessions/2026-02-18/1424_fix-modal-gap-layout.md

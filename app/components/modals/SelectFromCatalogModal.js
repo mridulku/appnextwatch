@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import CategoryChipsRow from '../../ui/components/CategoryChipsRow';
@@ -25,16 +24,6 @@ function SelectFromCatalogModal({
   footerContent,
   emptyText = 'No items match this filter.',
 }) {
-  const scrollRef = useRef(null);
-
-  useEffect(() => {
-    if (!visible) return;
-    const timer = setTimeout(() => {
-      scrollRef.current?.scrollTo?.({ y: 0, animated: false });
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [visible, selectedCategory, searchValue, data?.length]);
-
   return (
     <FullSheetModal
       visible={visible}
@@ -67,23 +56,26 @@ function SelectFromCatalogModal({
         onSelectCategory={onSelectCategory}
       />
 
-      <View style={styles.list}>
+      <View style={styles.resultsWrap}>
         <ScrollView
-          ref={scrollRef}
-          contentContainerStyle={styles.listContent}
+          style={styles.resultsScroll}
+          contentContainerStyle={styles.resultsContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentInsetAdjustmentBehavior="never"
           automaticallyAdjustContentInsets={false}
         >
-          {data.length === 0 ? (
-            <Text style={styles.emptyText}>{emptyText}</Text>
+          {data?.length ? (
+            data.map((item, index) => {
+              const key = keyExtractor ? keyExtractor(item, index) : String(index);
+              return (
+                <View key={key} style={styles.resultRow}>
+                  {renderItem({ item, index })}
+                </View>
+              );
+            })
           ) : (
-            data.map((item, index) => (
-              <View key={keyExtractor(item, index)} style={styles.rowWrap}>
-                {renderItem({ item, index })}
-              </View>
-            ))
+            <Text style={styles.emptyText}>{emptyText}</Text>
           )}
         </ScrollView>
       </View>
@@ -109,14 +101,17 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: UI_TOKENS.typography.subtitle,
   },
-  list: {
+  resultsWrap: {
     flex: 1,
-    marginTop: UI_TOKENS.spacing.xs,
   },
-  listContent: {
-    paddingBottom: UI_TOKENS.modal.footerHeight + UI_TOKENS.spacing.md,
+  resultsScroll: {
+    flex: 1,
   },
-  rowWrap: {
+  resultsContent: {
+    paddingTop: UI_TOKENS.spacing.sm,
+    paddingBottom: UI_TOKENS.modal.footerHeight + UI_TOKENS.spacing.lg,
+  },
+  resultRow: {
     marginBottom: UI_TOKENS.spacing.sm,
   },
   emptyText: {

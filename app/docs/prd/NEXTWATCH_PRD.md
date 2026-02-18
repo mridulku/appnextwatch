@@ -14,6 +14,7 @@
 | 0.9 | 2026-02-18 | Codex | Restored image-first selected-card layout and applied cleanup: non-overlapping remove control, compact shared stepper, full-height add modals with compact chips/results for Food Inventory + Gym Machines + Gym Exercises |
 | 1.0 | 2026-02-18 | Codex | Introduced `app/ui` design system tokens/components and standardized all catalog/add surfaces on shared full-sheet modal + card/chip primitives |
 | 1.1 | 2026-02-18 | Codex | Fixed persistent Add-modal list top-gap by using deterministic ScrollView renderer reset in shared modal layer (`SelectFromCatalogModal`) |
+| 1.2 | 2026-02-18 | Codex | Fixed add-modal blank-gap layout by removing bottom-alignment-prone list container rules and using explicit `resultsWrap/resultsScroll/resultsContent` layout contract |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -65,6 +66,10 @@
   - Replaced virtualized in-modal list behavior with deterministic ScrollView mapping in `SelectFromCatalogModal`.
   - Added explicit scroll-to-top reset on modal open/filter/search/data changes to prevent stale offset blank-gap artifacts.
   - Kept image-card UI and near-full-height modal layout unchanged.
+- 2026-02-18: Add-modal container layout correction:
+  - Removed list reset effects and any bottom-alignment-prone list container behavior.
+  - Results area now uses explicit layout contract: `resultsWrap (flex:1)` → `resultsScroll (flex:1)` → `resultsContent` with only small top padding + footer-safe bottom padding.
+  - Goal: first card always starts directly below category chips with no large blank vertical block.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.
