@@ -142,3 +142,13 @@
 - Follow-ups / risks: Current RLS for `user_machines` is aligned with local-auth app model (public policies); tighten when full Supabase auth is adopted.
 - Tag: nw-20260218-0855-gym-machines-catalog-flow
 - Notes: app/docs/sessions/2026-02-18/0855_gym-machines-catalog-flow.md
+
+## 2026-02-18 - Session user-machines-schema-cache-fix
+- Summary: Fixed Gym Machines runtime error caused by `user_machines` missing in REST schema cache and grant mismatch.
+- Changes: Applied DB grants + schema cache reload and added durable migration for the same steps.
+- Files: supabase/migrations/20260218090000_user_machines_grants_and_schema_reload.sql, app/docs/sessions/2026-02-18/0904_user-machines-schema-cache-fix.md, app/docs/sessions/INDEX.md, app/docs/sessions/LATEST.md, app/docs/log/WORKLOG.md.
+- Behavior impact: Gym Add Machines modal now loads catalog and user machine rows correctly.
+- Validation performed: Anon Supabase probe confirmed `user_machines` insert/read success.
+- Follow-ups / risks: Keep grant/cache-refresh migration in deploy order when provisioning fresh environments.
+- Tag: TBD
+- Notes: app/docs/sessions/2026-02-18/0904_user-machines-schema-cache-fix.md
