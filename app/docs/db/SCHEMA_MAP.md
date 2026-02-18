@@ -75,14 +75,19 @@
 - Surfaces: Food → Utensils.
 
 ### `user_utensils`
-- Purpose: User-owned utensil counts and notes.
-- Key columns: `id`, `user_id`, `utensil_id`, `count`, `note`.
-- Surfaces: Food → Utensils.
+- Purpose: Per-user selected utensil rows linked to catalog utensils.
+- Key columns: `id`, `user_id`, `utensil_id`, `count`, `note`, `created_at`.
+- Surfaces: Food → Utensils selected list and add/remove modal.
 
 ### `catalog_recipes`
 - Purpose: Recipe metadata catalog.
 - Key columns: `id`, `name`, `meal_type`, `servings`, `total_minutes`, `difficulty`.
-- Surfaces: Food → Recipes, Cooking session setup.
+- Surfaces: Food → Recipes add modal, Cooking session setup.
+
+### `user_recipes`
+- Purpose: Per-user saved recipe rows linked to catalog recipes.
+- Key columns: `id`, `user_id`, `recipe_id`, `created_at`.
+- Surfaces: Food → Recipes saved list and add/remove modal.
 
 ### `catalog_recipe_ingredients`
 - Purpose: Recipe ingredient amounts.
@@ -102,7 +107,12 @@
 ### `catalog_exercises`
 - Purpose: Exercise library metadata.
 - Key columns: `id`, `name`, `type`, `primary_muscle_group`, `equipment`.
-- Surfaces: Gym → Exercises, workout context.
+- Surfaces: Gym → Exercises add modal, workout context.
+
+### `user_exercises`
+- Purpose: Per-user selected exercise rows linked to catalog exercises.
+- Key columns: `id`, `user_id`, `exercise_id`, `created_at`.
+- Surfaces: Gym → Exercises selected list and add/remove modal.
 
 ### `workout_sessions`
 - Purpose: Workout session logs.

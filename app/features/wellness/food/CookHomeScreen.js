@@ -1,214 +1,216 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
+  ActivityIndicator,
   SafeAreaView,
-  ScrollView,
+  SectionList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
+import CatalogPickerModal from '../../../components/catalog/CatalogPickerModal';
 import CollapsibleSection from '../../../components/CollapsibleSection';
-import { FOOD_RECIPE_FILTERS, FOOD_RECIPES } from '../../../data/wellness/foodRecipes';
+import { useAuth } from '../../../context/AuthContext';
+import useCatalogSelection from '../../../hooks/useCatalogSelection';
+import { FOOD_RECIPES } from '../../../data/wellness/foodRecipes';
 import COLORS from '../../../theme/colors';
 
-const MEAL_CATEGORY_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
-const MEAL_CATEGORY_META = {
-  Breakfast: { icon: '🌅', note: 'Start light and balanced.' },
-  Lunch: { icon: '🍛', note: 'Midday meals and bowls.' },
-  Dinner: { icon: '🌙', note: 'Evening plates and warm comfort food.' },
-  Snacks: { icon: '🍿', note: 'Quick bites and fillers.' },
+const CATEGORY_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Other'];
+const CATEGORY_ICONS = {
+  Breakfast: '🌅',
+  Lunch: '🍛',
+  Dinner: '🌙',
+  Snacks: '🍿',
+  Other: '🍽️',
 };
 
-function formatDifficultyTone(difficulty) {
-  if (difficulty === 'Easy') {
-    return {
-      bg: 'rgba(79, 209, 126, 0.16)',
-      border: 'rgba(79, 209, 126, 0.35)',
-      text: '#6EE7A5',
-    };
-  }
+function normalizeMealType(row) {
+  const value = String(row?.meal_type || '').trim();
+  if (!value) return 'Other';
+  if (CATEGORY_ORDER.includes(value)) return value;
+  return 'Other';
+}
 
-  return {
-    bg: 'rgba(245, 201, 106, 0.16)',
-    border: 'rgba(245, 201, 106, 0.35)',
-    text: COLORS.accent,
-  };
+function findLocalRecipeIdByName(name) {
+  const normalized = String(name || '').trim().toLowerCase();
+  if (!normalized) return null;
+  const matched = FOOD_RECIPES.find((entry) => entry.name.trim().toLowerCase() === normalized);
+  return matched?.id ?? null;
 }
 
 function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
-  const [selectedFilter, setSelectedFilter] = useState('All');
-  const [expandedCategories, setExpandedCategories] = useState({});
+  const { user } = useAuth();
 
-  const filteredRecipes = useMemo(() => {
-    if (selectedFilter === 'All') return FOOD_RECIPES;
-    return FOOD_RECIPES.filter((recipe) =>
-      recipe.tags.some((tag) => tag.toLowerCase() === selectedFilter.toLowerCase()),
-    );
-  }, [selectedFilter]);
+  const selection = useCatalogSelection({
+    user,
+    config: {
+      catalogTable: 'catalog_recipes',
+      catalogSelect: 'id,name,meal_type,servings,total_minutes,difficulty',
+      userTable: 'user_recipes',
+      userSelect: 'id,user_id,recipe_id,catalog_recipe:catalog_recipes(id,name,meal_type,servings,total_minutes,difficulty)',
+      userFkColumn: 'recipe_id',
+      joinKey: 'catalog_recipe',
+      categoryOrder: CATEGORY_ORDER,
+      getCatalogCategory: normalizeMealType,
+      getCatalogSearchText: (row) =>
+        [row?.name, row?.meal_type, row?.difficulty]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase(),
+    },
+  });
 
-  const quickCount = useMemo(
-    () => FOOD_RECIPES.filter((recipe) => recipe.totalTimeMinutes <= 20).length,
-    [],
+  const sections = useMemo(
+    () =>
+      selection.groupedUserSections.map((section) => ({
+        ...section,
+        data: selection.expandedCategories[section.title] ? section.data : [],
+      })),
+    [selection.groupedUserSections, selection.expandedCategories],
   );
 
-  const groupedRecipes = useMemo(() => {
-    return MEAL_CATEGORY_ORDER.map((category) => ({
-      title: category,
-      meta: MEAL_CATEGORY_META[category],
-      recipes: filteredRecipes.filter(
-        (recipe) => (recipe.mealCategory ?? 'Dinner') === category,
-      ),
-    })).filter((group) => group.recipes.length > 0);
-  }, [filteredRecipes]);
-
-  const openRecipe = (recipe) => {
-    navigation.navigate('CookRecipe', { recipeId: recipe.id, recipeName: recipe.name });
-  };
-
-  const toggleCategory = (category) => {
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [category]: !prev[category],
-    }));
-  };
-
-  const renderRecipeCard = ({ item }) => {
-    const difficultyTone = formatDifficultyTone(item.difficulty);
-
-    return (
-      <TouchableOpacity
-        style={styles.recipeCard}
-        activeOpacity={0.9}
-        onPress={() => openRecipe(item)}
-      >
-        <LinearGradient
-          colors={item.imageColors}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.recipeHero}
-        >
-          <View style={styles.heroTopRow}>
-            <View style={styles.timeChip}>
-              <Ionicons name="time-outline" size={13} color={COLORS.text} />
-              <Text style={styles.timeChipText}>{item.totalTimeMinutes} min</Text>
-            </View>
-            <Text style={styles.heroEmoji}>{item.emoji}</Text>
-          </View>
-          <View style={styles.heroBottomRow}>
-            <Text style={styles.heroHint}>Guided cook mode</Text>
-          </View>
-        </LinearGradient>
-
-        <View style={styles.recipeBody}>
-          <View style={styles.nameRow}>
-            <Text style={styles.recipeName}>{item.name}</Text>
-            <Ionicons name="arrow-forward" size={16} color={COLORS.muted} />
-          </View>
-
-          <View style={styles.cardMetaRow}>
-            <View style={[styles.difficultyChip, { backgroundColor: difficultyTone.bg, borderColor: difficultyTone.border }]}>
-              <Text style={[styles.difficultyText, { color: difficultyTone.text }]}>{item.difficulty}</Text>
-            </View>
-            <Text style={styles.metaDot}>•</Text>
-            <Text style={styles.metaText}>{item.servings} servings</Text>
-          </View>
-
-          <View style={styles.tagsRow}>
-            {item.tags.map((tag) => (
-              <View key={`${item.id}_${tag}`} style={styles.tagChip}>
-                <Text style={styles.tagText}>{tag}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
   const RootContainer = embedded ? View : SafeAreaView;
+
+  if (selection.loading) {
+    return (
+      <RootContainer style={styles.safeArea}>
+        <View style={styles.loadingWrap}>
+          <ActivityIndicator color={COLORS.accent} />
+          <Text style={styles.loadingText}>Loading recipes...</Text>
+        </View>
+      </RootContainer>
+    );
+  }
 
   return (
     <RootContainer style={styles.safeArea}>
       <View style={[styles.container, embedded && styles.containerEmbedded]}>
-        <View style={[styles.headerWrap, !showHeader && styles.headerWrapCompact]}>
+        <View style={styles.headerWrap}>
           {showHeader ? (
             <>
-              <Text style={styles.title}>Cook</Text>
-              <Text style={styles.subtitle}>Guided recipes, step by step.</Text>
-
-              <View style={styles.statsRow}>
-                <View style={styles.statCard}>
-                  <Text style={styles.statValue}>{FOOD_RECIPES.length}</Text>
-                  <Text style={styles.statLabel}>recipes</Text>
-                </View>
-                <View style={styles.statCard}>
-                  <Text style={styles.statValue}>{quickCount}</Text>
-                  <Text style={styles.statLabel}>quick picks</Text>
-                </View>
-                <View style={styles.statCard}>
-                  <Text style={styles.statValue}>Chef</Text>
-                  <Text style={styles.statLabel}>assistant mode</Text>
-                </View>
-              </View>
+              <Text style={styles.title}>Recipes</Text>
+              <Text style={styles.subtitle}>Save recipes from catalog into your personal list.</Text>
             </>
           ) : null}
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filtersRow}
-          >
-            {FOOD_RECIPE_FILTERS.map((filter) => {
-              const active = selectedFilter === filter;
-              return (
-                <TouchableOpacity
-                  key={filter}
-                  style={[styles.filterChip, active && styles.filterChipActive]}
-                  activeOpacity={0.9}
-                  onPress={() => setSelectedFilter(filter)}
-                >
-                  <Text style={[styles.filterText, active && styles.filterTextActive]}>{filter}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={selection.openAddModal}>
+            <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
+            <Text style={styles.addButtonText}>Add recipes</Text>
+          </TouchableOpacity>
         </View>
 
-        <ScrollView
-          style={styles.groupsScroll}
-          contentContainerStyle={styles.groupsContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {groupedRecipes.length === 0 ? (
-            <View style={styles.emptyWrap}>
-              <Text style={styles.emptyTitle}>No recipes in this filter</Text>
-              <Text style={styles.emptySubtle}>Try another category to continue cooking.</Text>
-            </View>
-          ) : (
-            groupedRecipes.map((group) => (
+        {selection.error ? (
+          <View style={styles.errorCard}>
+            <Text style={styles.errorText}>{selection.error}</Text>
+            <TouchableOpacity style={styles.retryButton} activeOpacity={0.9} onPress={selection.hydrate}>
+              <Text style={styles.retryText}>Retry</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
+        {selection.groupedUserSections.length === 0 ? (
+          <View style={styles.emptyWrap}>
+            <Text style={styles.emptyTitle}>No saved recipes yet</Text>
+            <Text style={styles.emptySubtitle}>Add recipes you actually cook to build your own short list.</Text>
+            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={selection.openAddModal}>
+              <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
+              <Text style={styles.emptyCtaText}>Add recipes</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <SectionList
+            sections={sections}
+            keyExtractor={(item) => item.id}
+            stickySectionHeadersEnabled={false}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            renderSectionHeader={({ section }) => (
               <CollapsibleSection
-                key={group.title}
-                title={group.title}
-                subtitle={group.meta.note}
-                icon={group.meta.icon}
+                title={section.title}
+                subtitle="Saved recipes"
+                icon={CATEGORY_ICONS[section.title] || '🍽️'}
                 iconIsEmoji
-                expanded={Boolean(expandedCategories[group.title])}
-                onToggle={() => toggleCategory(group.title)}
-                countLabel={`${group.recipes.length} recipes`}
+                expanded={Boolean(selection.expandedCategories[section.title])}
+                onToggle={() => selection.toggleCategory(section.title)}
+                countLabel={`${section.itemCount}`}
                 style={styles.groupSection}
-                contentStyle={styles.groupContent}
-              >
-                {group.recipes.map((recipe) => (
-                  <View key={recipe.id}>{renderRecipeCard({ item: recipe })}</View>
-                ))}
-              </CollapsibleSection>
-            ))
-          )}
-        </ScrollView>
+              />
+            )}
+            renderItem={({ item }) => {
+              const recipe = item.catalog_recipe;
+              const localRecipeId = findLocalRecipeIdByName(recipe?.name);
+
+              return (
+                <TouchableOpacity
+                  style={styles.itemRow}
+                  activeOpacity={0.9}
+                  onPress={() => {
+                    if (localRecipeId) {
+                      navigation.navigate('CookRecipe', {
+                        recipeId: localRecipeId,
+                        recipeName: recipe?.name,
+                      });
+                    }
+                  }}
+                  disabled={!localRecipeId}
+                >
+                  <View style={styles.itemLeft}>
+                    <View style={styles.itemIconWrap}>
+                      <Text style={styles.itemEmoji}>{CATEGORY_ICONS[normalizeMealType(recipe)] || '🍽️'}</Text>
+                    </View>
+                    <View style={styles.itemTextWrap}>
+                      <Text style={styles.itemTitle}>{recipe?.name || 'Recipe'}</Text>
+                      <Text style={styles.itemMeta}>
+                        {normalizeMealType(recipe)} • {recipe?.total_minutes || '--'} min • {recipe?.difficulty || 'Easy'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.rowActions}>
+                    {localRecipeId ? <Ionicons name="chevron-forward" size={14} color={COLORS.muted} /> : null}
+                    <TouchableOpacity
+                      style={styles.removeButton}
+                      activeOpacity={0.9}
+                      disabled={selection.pendingRemoveId === item.recipe_id}
+                      onPress={() => selection.removeCatalogItem(item.recipe_id)}
+                    >
+                      <Text style={styles.removeButtonText}>
+                        {selection.pendingRemoveId === item.recipe_id ? '...' : 'Remove'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        )}
       </View>
+
+      <CatalogPickerModal
+        visible={selection.modalVisible}
+        title="Add recipes"
+        subtitle="Pick from catalog recipes to build your saved cooking list."
+        searchPlaceholder="Search recipes"
+        searchValue={selection.searchInput}
+        onSearchChange={selection.setSearchInput}
+        categories={selection.categoryFilters}
+        selectedCategory={selection.selectedCategory}
+        onSelectCategory={selection.setSelectedCategory}
+        items={selection.filteredCatalogRows}
+        selectedIdSet={selection.selectedCatalogIdSet}
+        pendingAddId={selection.pendingAddId}
+        pendingRemoveId={selection.pendingRemoveId}
+        getItemId={(item) => item.id}
+        getItemTitle={(item) => item.name}
+        getItemSubtitle={(item) => `${normalizeMealType(item)} • ${item.total_minutes || '--'} min • ${item.difficulty || 'Easy'}`}
+        getItemIcon={(item) => CATEGORY_ICONS[normalizeMealType(item)] || '🍽️'}
+        onAdd={selection.addCatalogItem}
+        onRemove={selection.removeCatalogItem}
+        onClose={selection.closeAddModal}
+        emptyText="No recipes match this filter."
+      />
     </RootContainer>
   );
 }
@@ -222,212 +224,178 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bg,
     paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingTop: 8,
   },
   containerEmbedded: {
     paddingTop: 6,
   },
-  headerWrap: {
-    marginBottom: 10,
+  loadingWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
   },
-  headerWrapCompact: {
+  loadingText: {
+    color: COLORS.muted,
+    fontSize: 13,
+  },
+  headerWrap: {
     marginBottom: 8,
+    gap: 10,
   },
   title: {
     color: COLORS.text,
     fontSize: 30,
     fontWeight: '700',
-    letterSpacing: 0.2,
   },
   subtitle: {
     color: COLORS.muted,
-    fontSize: 13,
-    marginTop: 3,
-    marginBottom: 12,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: COLORS.card,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  statValue: {
-    color: COLORS.text,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  statLabel: {
-    color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 12,
     marginTop: 2,
-    textTransform: 'uppercase',
-    letterSpacing: 0.3,
   },
-  filtersRow: {
-    gap: 8,
-    paddingBottom: 2,
-  },
-  filterChip: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.3)',
-    backgroundColor: COLORS.card,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  filterChipActive: {
-    borderColor: 'rgba(245,201,106,0.5)',
-    backgroundColor: 'rgba(245,201,106,0.16)',
-  },
-  filterText: {
-    color: COLORS.muted,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  filterTextActive: {
-    color: COLORS.accent,
-  },
-  groupsScroll: {
-    flex: 1,
-  },
-  groupsContent: {
-    paddingBottom: 24,
-  },
-  groupSection: {
-    marginTop: 0,
-  },
-  groupContent: {
-    paddingTop: 8,
-  },
-  recipeCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.18)',
-    overflow: 'hidden',
-    marginBottom: 12,
-    shadowColor: COLORS.shadow,
-    shadowOpacity: 0.22,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  recipeHero: {
-    height: 124,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    justifyContent: 'space-between',
-  },
-  heroTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  timeChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: 'rgba(8,10,16,0.28)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
-  },
-  timeChipText: {
-    color: COLORS.text,
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  heroEmoji: {
-    fontSize: 32,
-  },
-  heroBottomRow: {
-    alignItems: 'flex-start',
-  },
-  heroHint: {
-    color: 'rgba(245,246,248,0.92)',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  recipeBody: {
-    paddingHorizontal: 12,
+  addButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.accent,
+    borderRadius: 16,
+    paddingHorizontal: 16,
     paddingVertical: 12,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  recipeName: {
-    color: COLORS.text,
-    fontSize: 18,
-    fontWeight: '700',
-    flex: 1,
-    marginRight: 8,
-  },
-  cardMetaRow: {
-    marginTop: 8,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
-  difficultyChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    borderWidth: 1,
-  },
-  difficultyText: {
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  metaDot: {
-    color: COLORS.muted,
-    marginHorizontal: 8,
-  },
-  metaText: {
-    color: COLORS.muted,
-    fontSize: 12,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginTop: 10,
-  },
-  tagChip: {
-    borderRadius: 999,
-    backgroundColor: COLORS.cardSoft,
-    borderWidth: 1,
-    borderColor: 'rgba(90,209,232,0.24)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  tagText: {
-    color: COLORS.accent2,
-    fontSize: 10,
-    fontWeight: '600',
-  },
-  emptyWrap: {
-    marginTop: 28,
-    alignItems: 'center',
-  },
-  emptyTitle: {
-    color: COLORS.text,
+  addButtonText: {
+    color: COLORS.bg,
     fontSize: 15,
     fontWeight: '700',
   },
-  emptySubtle: {
-    color: COLORS.muted,
+  errorCard: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,124,123,0.4)',
+    backgroundColor: 'rgba(255,124,123,0.12)',
+    padding: 12,
+    marginBottom: 10,
+  },
+  errorText: {
+    color: '#FFB4A8',
+    fontSize: 14,
+  },
+  retryButton: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,124,123,0.45)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  retryText: {
+    color: '#FFB4A8',
+    fontWeight: '700',
     fontSize: 12,
+  },
+  emptyWrap: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 28,
+  },
+  emptyTitle: {
+    color: COLORS.text,
+    fontSize: 36,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    color: COLORS.muted,
+    fontSize: 24,
+    textAlign: 'center',
+    marginTop: 8,
+    lineHeight: 29,
+  },
+  emptyCta: {
+    marginTop: 16,
+    backgroundColor: COLORS.accent,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  emptyCtaText: {
+    color: COLORS.bg,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  listContent: {
+    paddingBottom: 28,
+  },
+  groupSection: {
     marginTop: 4,
+  },
+  itemRow: {
+    marginTop: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.18)',
+    backgroundColor: COLORS.card,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  itemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+  },
+  itemIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(90,209,232,0.3)',
+    backgroundColor: 'rgba(90,209,232,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  itemEmoji: {
+    fontSize: 16,
+  },
+  itemTextWrap: {
+    flex: 1,
+  },
+  itemTitle: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  itemMeta: {
+    color: COLORS.muted,
+    fontSize: 11,
+    marginTop: 2,
+  },
+  rowActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  removeButton: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,124,123,0.45)',
+    backgroundColor: 'rgba(255,124,123,0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  removeButtonText: {
+    color: '#FF9C92',
+    fontSize: 12,
+    fontWeight: '700',
   },
 });
 

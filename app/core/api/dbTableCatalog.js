@@ -97,9 +97,9 @@ export const DB_TABLE_GROUPS = [
       },
       {
         name: 'user_utensils',
-        description: 'Per-user utensil ownership/count records.',
-        surfaces: ['Food > Utensils'],
-        keyColumns: ['id', 'user_id', 'utensil_id', 'count', 'note'],
+        description: 'Per-user utensil selection rows linked to catalog utensils.',
+        surfaces: ['Food > Utensils selected list', 'Food > Utensils add/remove modal'],
+        keyColumns: ['id', 'user_id', 'utensil_id', 'count', 'note', 'created_at'],
       },
       {
         name: 'user_machines',
@@ -110,8 +110,14 @@ export const DB_TABLE_GROUPS = [
       {
         name: 'catalog_recipes',
         description: 'Recipe catalog with meal type and timing metadata.',
-        surfaces: ['Food > Recipes', 'Cooking sessions'],
+        surfaces: ['Food > Recipes add modal', 'Cooking sessions'],
         keyColumns: ['id', 'name', 'meal_type', 'servings', 'total_minutes'],
+      },
+      {
+        name: 'user_recipes',
+        description: 'Per-user saved recipes linked to catalog recipe rows.',
+        surfaces: ['Food > Recipes saved list', 'Food > Recipes add/remove modal'],
+        keyColumns: ['id', 'user_id', 'recipe_id', 'created_at'],
       },
       {
         name: 'catalog_recipe_ingredients',
@@ -128,8 +134,14 @@ export const DB_TABLE_GROUPS = [
       {
         name: 'catalog_exercises',
         description: 'Exercise library with type/equipment/muscle metadata.',
-        surfaces: ['Gym > Exercises', 'Workout sessions'],
+        surfaces: ['Gym > Exercises add modal', 'Workout sessions'],
         keyColumns: ['id', 'name', 'type', 'primary_muscle_group', 'equipment'],
+      },
+      {
+        name: 'user_exercises',
+        description: 'Per-user selected exercise list linked to catalog exercises.',
+        surfaces: ['Gym > Exercises selected list', 'Gym > Exercises add/remove modal'],
+        keyColumns: ['id', 'user_id', 'exercise_id', 'created_at'],
       },
       {
         name: 'workout_sessions',

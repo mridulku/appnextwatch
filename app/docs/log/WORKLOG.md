@@ -152,3 +152,13 @@
 - Follow-ups / risks: Keep grant/cache-refresh migration in deploy order when provisioning fresh environments.
 - Tag: TBD
 - Notes: app/docs/sessions/2026-02-18/0904_user-machines-schema-cache-fix.md
+
+## 2026-02-18 - Session catalog-selection-reuse
+- Summary: Extended the Supabase catalog→user-selected pattern across Gym Exercises, Food Utensils, and Food Recipes using a reusable shared implementation.
+- Changes: Added shared selection DB helper/hook/modal, rewired three feature screens to empty-state + add modal + grouped list + remove, and added migrations for `user_exercises`, `user_recipes`, and `user_utensils` policy alignment.
+- Files: app/core/api/catalogSelectionDb.js, app/hooks/useCatalogSelection.js, app/components/catalog/CatalogPickerModal.js, app/features/wellness/gym/ExercisesHomeScreen.js, app/features/wellness/food/FoodUtensilsScreen.js, app/features/wellness/food/CookHomeScreen.js, supabase/migrations/20260218102000_add_user_exercises_and_user_recipes.sql, supabase/migrations/20260218105000_user_utensils_public_policy.sql, app/core/api/dbTableCatalog.js, app/docs/db/SCHEMA_MAP.md, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: Gym Exercises, Food Utensils, and Food Recipes are now user-specific Supabase-backed selection flows with reusable UX and data wiring.
+- Validation performed: `supabase db push` succeeded for both migrations; anon Supabase probes confirmed table access/counts; insert/read/delete checks passed for `user_exercises`, `user_recipes`, and (after policy migration) `user_utensils`; Expo Metro booted successfully in CI mode on port 8083.
+- Follow-ups / risks: Recipe detail route currently opens only when saved recipe name matches a local seeded recipe ID; consider full DB-native recipe detail to remove this dependency.
+- Tag: nw-2026-02-18-1147-ui-catalog-selection
+- Notes: app/docs/sessions/2026-02-18/1146_catalog-selection-reuse.md

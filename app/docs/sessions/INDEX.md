@@ -2,6 +2,7 @@
 
 | Date | Time | Tag | Commit | Title (1 line) | Notes link |
 |---|---|---|---|---|---|
+| 2026-02-18 | 11:46 | nw-2026-02-18-1147-ui-catalog-selection | TBD | reusable catalog selection for exercises/utensils/recipes | [1146_catalog-selection-reuse.md](2026-02-18/1146_catalog-selection-reuse.md) |
 | 2026-02-18 | 09:04 | TBD | TBD | user_machines schema cache fix | [0904_user-machines-schema-cache-fix.md](2026-02-18/0904_user-machines-schema-cache-fix.md) |
 | 2026-02-18 | 08:55 | nw-20260218-0855-gym-machines-catalog-flow | TBD | gym machines empty/add/group/remove | [0855_gym-machines-catalog-flow.md](2026-02-18/0855_gym-machines-catalog-flow.md) |
 | 2026-02-18 | 08:39 | nw-20260218-0839-test-tables-schema-map | TBD | test tables grouped UX + schema map | [0839_test-tables-schema-map.md](2026-02-18/0839_test-tables-schema-map.md) |

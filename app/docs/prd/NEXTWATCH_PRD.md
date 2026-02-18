@@ -9,6 +9,7 @@
 | 0.4 | 2026-02-17 | Codex | Food Inventory now reads/writes Supabase (`user_ingredients` + `catalog_ingredients`) with empty state + catalog picker add/upsert flow |
 | 0.5 | 2026-02-17 | Codex | Food Inventory UX polish: remove flow (micro-confirm + delete), Add Item sheet category chips + stepper quantity + catalog-unit lock |
 | 0.6 | 2026-02-18 | Codex | Gym Machines now supports Supabase-backed user selection flow (`user_machines`) with empty state, add modal, categorized list, and remove |
+| 0.7 | 2026-02-18 | Codex | Reusable catalog-selection pattern extended to Gym Exercises, Food Utensils, and Food Recipes using `user_exercises` + `user_recipes` + shared picker/hook |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -37,6 +38,11 @@
   - Add modal supports search + category filtering over `catalog_machines`.
   - Added machine rows are stored in `user_machines` (one row per user+machine).
   - Main list renders user machines grouped by category with remove action.
+- 2026-02-18: Reused one catalog-selection implementation across three more sections:
+  - Gym → Exercises now uses `catalog_exercises` + `user_exercises` (empty state, add modal, grouped list, remove).
+  - Food → Utensils now uses `catalog_utensils` + `user_utensils` with the same user-selection UX model.
+  - Food → Recipes is now a saved-list flow backed by `catalog_recipes` + `user_recipes`.
+  - Shared modules introduced: `app/hooks/useCatalogSelection.js`, `app/components/catalog/CatalogPickerModal.js`, `app/core/api/catalogSelectionDb.js`.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.
@@ -250,9 +256,11 @@ Code references:
 | US-11 | Session user | cooking step guidance with timer/chat/voice simulation | I can complete recipes in session mode | P0 | Cooking runner tracks steps/timer and logs completed/abandoned sessions to history | `screens/CookRecipeScreen.js`, `core/sessionHistoryStorage.js` |
 | US-12 | Wellness user | session history grouped by date | I can review completed and abandoned sessions | P0 | Sessions home loads AsyncStorage records, groups by date labels, links to session summary | `screens/SessionsHomeScreen.js`, `screens/SessionSummaryScreen.js`, `core/sessionHistoryStorage.js` |
 | US-13 | Food user | pantry management with quick adjust, clean remove flow, and DB-backed catalog add sheet | I can keep inventory updated efficiently with real persisted data and safe deletion UX | P0 | Inventory loads user rows from Supabase, shows empty state when no rows, supports searchable category-filtered catalog picker, uses stepper-based quantity with catalog-locked unit, supports explicit delete and decrement-to-remove confirm, and persists updates immediately | `app/features/wellness/food/FoodInventoryScreen.js`, `app/core/api/foodInventoryDb.js`, `app/core/integrations/supabase.js`, `supabase/migrations/20260217164500_inventory_user_ingredients_public_policies.sql`, `supabase/migrations/20260217195500_user_ingredients_user_ingredient_unique.sql` |
-| US-14 | Food user | utensil inventory management | I can track kitchen equipment counts and notes | P1 | Utensils supports category sections, add/edit modal, count steppers, persistence | `screens/FoodUtensilsScreen.js`, `core/foodUtensilsStorage.js` |
+| US-14 | Food user | utensil selection from a shared catalog | I can track kitchen equipment I actually have | P1 | Utensils starts empty, supports catalog search/category add modal, renders grouped user selections, and supports remove with Supabase persistence | `app/features/wellness/food/FoodUtensilsScreen.js`, `app/hooks/useCatalogSelection.js`, `app/core/api/catalogSelectionDb.js`, `supabase/migrations/20260218105000_user_utensils_public_policy.sql` |
 | US-15 | Gym user | maintain a personalized machine list from gym catalog | I can plan workouts based on machines actually available to me | P1 | Gym Machines shows empty state when no rows, Add modal lists catalog machines with search/category filters, selected machines persist in `user_machines`, and remove updates list immediately | `app/features/wellness/gym/GymHomeScreen.js`, `app/core/api/gymMachinesDb.js`, `supabase/migrations/20260218084500_add_user_machines.sql` |
 | US-16 | User/admin | settings and profile stats persistence | I can retain personal targets and preferences in wellness mode | P1 | Home settings loads/saves profile settings and can reset to defaults | `screens/HomeSettingsScreen.js`, `core/wellnessProfileStorage.js`, `screens/SettingsProfileScreen.js` |
+| US-17 | Gym user | save exercises from catalog into my own list | I can keep workout planning focused on relevant movements | P1 | Gym Exercises starts empty, add modal supports search/category filters from `catalog_exercises`, selected rows persist in `user_exercises`, and remove is supported | `app/features/wellness/gym/ExercisesHomeScreen.js`, `app/hooks/useCatalogSelection.js`, `supabase/migrations/20260218102000_add_user_exercises_and_user_recipes.sql` |
+| US-18 | Food user | save recipes from catalog into my own list | I can keep a personal short list for repeat cooking | P1 | Food Recipes starts empty, add modal supports meal-type category and search, selected rows persist in `user_recipes`, grouped list supports remove, and recipe detail opens when a local recipe mapping exists | `app/features/wellness/food/CookHomeScreen.js`, `app/hooks/useCatalogSelection.js`, `supabase/migrations/20260218102000_add_user_exercises_and_user_recipes.sql` |
 
 ### 6.1 QA Checklist (code-aligned)
 - [ ] Login failure/success paths return expected messages and auth transitions.
