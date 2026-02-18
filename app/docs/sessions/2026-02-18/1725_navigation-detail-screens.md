@@ -1,5 +1,5 @@
 # Session Notes — 2026-02-18 17:25 — Utensil/Machine/Exercise Detail Screens
-- Tag: nw-2026-02-18-1725-navigation-detail-screens
+- Tag: TBD (recommended: nw-2026-02-18-1725-navigation-detail-screens)
 - Commit: TBD
 - Previous tag: nw-2026-02-18-1616-ui-card-schema
 - Codex chat link: N/A

@@ -250,5 +250,5 @@
 - Behavior impact: User-facing navigation improvement; selected list items in Utensils/Machines/Exercises now open detail pages with hero/details UI and back navigation.
 - Validation performed: `npx expo export --platform ios` passed; `npx expo run:ios --no-build-cache` build/install/open succeeded.
 - Follow-ups / risks: Full manual tap-through verification of all three detail routes is still required to confirm end-to-end interaction paths on simulator/device.
-- Tag: nw-2026-02-18-1725-navigation-detail-screens
+- Tag: NO (recommended: nw-2026-02-18-1725-navigation-detail-screens; pending manual end-to-end tap verification for all 3 routes)
 - Notes: app/docs/sessions/2026-02-18/1725_navigation-detail-screens.md
