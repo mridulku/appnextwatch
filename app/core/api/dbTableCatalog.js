@@ -102,6 +102,12 @@ export const DB_TABLE_GROUPS = [
         keyColumns: ['id', 'user_id', 'utensil_id', 'count', 'note'],
       },
       {
+        name: 'user_machines',
+        description: 'Per-user selected machine list for gym personalization.',
+        surfaces: ['Gym > Machines'],
+        keyColumns: ['id', 'user_id', 'machine_id', 'is_active', 'notes'],
+      },
+      {
         name: 'catalog_recipes',
         description: 'Recipe catalog with meal type and timing metadata.',
         surfaces: ['Food > Recipes', 'Cooking sessions'],

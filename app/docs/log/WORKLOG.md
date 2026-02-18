@@ -132,3 +132,13 @@
 - Follow-ups / risks: Keep `dbTableCatalog.js` and `SCHEMA_MAP.md` synchronized when migrations add/rename tables.
 - Tag: nw-20260218-0839-test-tables-schema-map
 - Notes: app/docs/sessions/2026-02-18/0839_test-tables-schema-map.md
+
+## 2026-02-18 - Session gym-machines-catalog-flow
+- Summary: Implemented Gym → Machines as a Supabase-backed user selection flow with empty state, add modal, grouped list, and remove action.
+- Changes: Added `user_machines` migration + policies, introduced `gymMachinesDb` API module, replaced Gym Machines placeholder UI, and updated schema metadata/docs.
+- Files: supabase/migrations/20260218084500_add_user_machines.sql, app/core/api/gymMachinesDb.js, app/features/wellness/gym/GymHomeScreen.js, app/core/api/dbTableCatalog.js, app/docs/db/SCHEMA_MAP.md, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*, app/docs/log/WORKLOG.md.
+- Behavior impact: Gym Machines now persists user-selected machine availability from catalog and supports remove with immediate UI updates.
+- Validation performed: psql migration apply + table existence checks, live add/remove behavior script, and `npx expo export --platform ios` compile success.
+- Follow-ups / risks: Current RLS for `user_machines` is aligned with local-auth app model (public policies); tighten when full Supabase auth is adopted.
+- Tag: nw-20260218-0855-gym-machines-catalog-flow
+- Notes: app/docs/sessions/2026-02-18/0855_gym-machines-catalog-flow.md

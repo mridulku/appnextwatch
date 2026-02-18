@@ -94,6 +94,11 @@
 - Key columns: `id`, `name`, `zone`, `primary_muscles`.
 - Surfaces: Gym → Machines.
 
+### `user_machines`
+- Purpose: Per-user selected machine records for personalized gym availability.
+- Key columns: `id`, `user_id`, `machine_id`, `is_active`, `notes`.
+- Surfaces: Gym → Machines (empty state, add modal, categorized list, remove).
+
 ### `catalog_exercises`
 - Purpose: Exercise library metadata.
 - Key columns: `id`, `name`, `type`, `primary_muscle_group`, `equipment`.

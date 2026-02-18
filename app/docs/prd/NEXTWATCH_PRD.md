@@ -8,6 +8,7 @@
 | 0.3 | 2026-02-16 | Codex | Added Wellness `Test` tab (Tables + Chat) for Supabase/OpenAI connectivity validation; existing product flows unchanged |
 | 0.4 | 2026-02-17 | Codex | Food Inventory now reads/writes Supabase (`user_ingredients` + `catalog_ingredients`) with empty state + catalog picker add/upsert flow |
 | 0.5 | 2026-02-17 | Codex | Food Inventory UX polish: remove flow (micro-confirm + delete), Add Item sheet category chips + stepper quantity + catalog-unit lock |
+| 0.6 | 2026-02-18 | Codex | Gym Machines now supports Supabase-backed user selection flow (`user_machines`) with empty state, add modal, categorized list, and remove |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -31,6 +32,11 @@
   - Main row now supports explicit remove affordance (`trash`) and quantity-to-zero path prompts `Remove?` micro-confirm before delete.
   - Add sheet now uses category chips + virtualized catalog list and a quantity stepper; unit is read-only from catalog.
   - Add button label switches to `Update` for existing user rows, and upsert now sets chosen quantity (instead of always incrementing).
+- 2026-02-18: Gym → Machines moved from static placeholder to user-specific Supabase state:
+  - Empty state appears when user has no selected machines.
+  - Add modal supports search + category filtering over `catalog_machines`.
+  - Added machine rows are stored in `user_machines` (one row per user+machine).
+  - Main list renders user machines grouped by category with remove action.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.
@@ -245,7 +251,7 @@ Code references:
 | US-12 | Wellness user | session history grouped by date | I can review completed and abandoned sessions | P0 | Sessions home loads AsyncStorage records, groups by date labels, links to session summary | `screens/SessionsHomeScreen.js`, `screens/SessionSummaryScreen.js`, `core/sessionHistoryStorage.js` |
 | US-13 | Food user | pantry management with quick adjust, clean remove flow, and DB-backed catalog add sheet | I can keep inventory updated efficiently with real persisted data and safe deletion UX | P0 | Inventory loads user rows from Supabase, shows empty state when no rows, supports searchable category-filtered catalog picker, uses stepper-based quantity with catalog-locked unit, supports explicit delete and decrement-to-remove confirm, and persists updates immediately | `app/features/wellness/food/FoodInventoryScreen.js`, `app/core/api/foodInventoryDb.js`, `app/core/integrations/supabase.js`, `supabase/migrations/20260217164500_inventory_user_ingredients_public_policies.sql`, `supabase/migrations/20260217195500_user_ingredients_user_ingredient_unique.sql` |
 | US-14 | Food user | utensil inventory management | I can track kitchen equipment counts and notes | P1 | Utensils supports category sections, add/edit modal, count steppers, persistence | `screens/FoodUtensilsScreen.js`, `core/foodUtensilsStorage.js` |
-| US-15 | Gym user | browsable machine and exercise libraries with details | I can plan and execute workouts with context | P1 | Gym hub switches segments, supports collapsible grouped lists, and navigates to detail screens | `screens/GymHubScreen.js`, `screens/GymHomeScreen.js`, `screens/ExercisesHomeScreen.js`, `screens/GymMachineDetailScreen.js`, `screens/ExerciseDetailScreen.js` |
+| US-15 | Gym user | maintain a personalized machine list from gym catalog | I can plan workouts based on machines actually available to me | P1 | Gym Machines shows empty state when no rows, Add modal lists catalog machines with search/category filters, selected machines persist in `user_machines`, and remove updates list immediately | `app/features/wellness/gym/GymHomeScreen.js`, `app/core/api/gymMachinesDb.js`, `supabase/migrations/20260218084500_add_user_machines.sql` |
 | US-16 | User/admin | settings and profile stats persistence | I can retain personal targets and preferences in wellness mode | P1 | Home settings loads/saves profile settings and can reset to defaults | `screens/HomeSettingsScreen.js`, `core/wellnessProfileStorage.js`, `screens/SettingsProfileScreen.js` |
 
 ### 6.1 QA Checklist (code-aligned)
