@@ -180,5 +180,5 @@
 - Behavior impact: UI/UX only. No schema, policy, or CRUD behavior changes.
 - Validation performed: `npx expo export --platform ios --output-dir /tmp/appnextwatch-export-ui-restore` passed; `npx expo run:ios --device "iPhone 17 Pro" --port 8083` build/install/open passed.
 - Follow-ups / risks: Full in-flow visual QA (post-login into Inventory/Machines/Exercises) still requires manual simulator interaction.
-- Tag: NO (pending full manual visual verification of target tabs)
+- Tag: nw-2026-02-18-1338-ui-card-restore (T1: user-facing UI flow/layout changes)
 - Notes: app/docs/sessions/2026-02-18/1332_restore-card-layout-ui-cleanup.md

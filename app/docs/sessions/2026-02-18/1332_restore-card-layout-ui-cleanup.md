@@ -1,6 +1,6 @@
 # Session Notes — 2026-02-18 13:32 — Restore Card Image Layout + UI Cleanup
-- Tag: TBD
-- Commit: TBD
+- Tag: nw-2026-02-18-1338-ui-card-restore
+- Commit: d2ffa34
 - Previous tag: nw-2026-02-18-1147-ui-catalog-selection
 - Codex chat link: N/A
 - Local transcript pointer: UNKNOWN
@@ -66,5 +66,5 @@
 
 ## 6) Open questions / next session plan
 - Perform manual in-app visual pass on the three target tabs after login and confirm remove/stepper/modal ergonomics.
-- If manual QA passes, create milestone tag for this restore+cleanup pass.
+- Milestone tag has been created for this restore+cleanup pass; remaining follow-up is visual fine-tuning if needed.
 - Optional follow-up: remove dead style blocks left in feature files after modal consolidation.
