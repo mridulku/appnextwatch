@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   SafeAreaView,
   SectionList,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import CatalogItemCard from '../../../components/cards/CatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
@@ -43,6 +45,7 @@ function findLocalRecipeIdByName(name) {
 
 function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const selection = useCatalogSelection({
     user,
@@ -79,6 +82,9 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
   );
 
   const RootContainer = embedded ? View : SafeAreaView;
+  const openAddScreen = () => navigation?.navigate('AddRecipes');
+  const openVoiceCommand = () =>
+    Alert.alert('Voice Command', 'Recipe voice command is coming soon.');
 
   if (selection.loading) {
     return (
@@ -102,10 +108,6 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
             </>
           ) : null}
 
-          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={() => navigation?.navigate('AddRecipes')}>
-            <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
-            <Text style={styles.addButtonText}>Add recipes</Text>
-          </TouchableOpacity>
         </View>
 
         {selection.error ? (
@@ -121,7 +123,7 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
           <View style={styles.emptyWrap}>
             <Text style={styles.emptyTitle}>No saved recipes yet</Text>
             <Text style={styles.emptySubtitle}>Add recipes you actually cook to build your own short list.</Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={() => navigation?.navigate('AddRecipes')}>
+            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={openAddScreen}>
               <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
               <Text style={styles.emptyCtaText}>Add recipes</Text>
             </TouchableOpacity>
@@ -131,7 +133,7 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
             sections={sections}
             keyExtractor={(item) => item.id}
             stickySectionHeadersEnabled={false}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[styles.listContent, { paddingBottom: 130 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
             renderSectionHeader={({ section }) => (
               <CollapsibleSection
@@ -171,6 +173,16 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
             }}
           />
         )}
+      </View>
+      <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
+        <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceCommand}>
+          <Ionicons name="mic" size={18} color={COLORS.bg} />
+          <Text style={styles.voiceButtonText}>Voice Command</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomAddButton} activeOpacity={0.9} onPress={openAddScreen}>
+          <Ionicons name="add-circle-outline" size={16} color={COLORS.text} />
+          <Text style={styles.bottomAddButtonText}>Add Recipe</Text>
+        </TouchableOpacity>
       </View>
     </RootContainer>
   );
@@ -213,21 +225,6 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: 12,
     marginTop: 2,
-  },
-  addButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: COLORS.accent,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  addButtonText: {
-    color: COLORS.bg,
-    fontSize: 15,
-    fontWeight: '700',
   },
   errorCard: {
     borderRadius: 14,
@@ -357,6 +354,51 @@ const styles = StyleSheet.create({
     color: '#FF9C92',
     fontSize: 12,
     fontWeight: '700',
+  },
+  bottomBar: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    backgroundColor: 'rgba(14,15,20,0.96)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.24)',
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  voiceButton: {
+    flex: 1,
+    borderRadius: 14,
+    backgroundColor: COLORS.accent,
+    minHeight: 46,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  voiceButtonText: {
+    color: COLORS.bg,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  bottomAddButton: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.35)',
+    backgroundColor: COLORS.card,
+    minHeight: 46,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  bottomAddButtonText: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
 

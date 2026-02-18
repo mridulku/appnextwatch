@@ -19,6 +19,7 @@
 | 1.4 | 2026-02-18 | Codex | Food Inventory now separates browse vs edit: list rows are read-only with edit affordance; quantity/remove moved to dedicated item detail screen; Add Items now adds directly with default quantity |
 | 1.5 | 2026-02-18 | Codex | Unified Wellness card row schema to consistent 3-column layout (left thumbnail, middle text, right action) across catalog and selected surfaces |
 | 1.6 | 2026-02-18 | Codex | Added tappable detail surfaces for selected Wellness items: Utensils, Machines, and Exercises now navigate to dedicated detail screens with hero/details sections and back navigation |
+| 1.7 | 2026-02-18 | Codex | Standardized Food/Gym list tabs with Inventory-style bottom action dock (`Voice Command` + `Add`) and removed top add buttons on Recipes, Utensils, Machines, and Exercises |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -91,6 +92,10 @@
   - Added `UtensilDetail`, `MachineDetail`, and refreshed `ExerciseDetail` screens as dedicated surfaces with hero + placeholder details + back navigation.
   - Wired taps from selected lists to these screens without changing add/remove persistence semantics.
   - Kept inline remove actions on list cards intact; detail screens add an additional remove action path.
+- 2026-02-18: Bottom action dock alignment across Wellness list tabs:
+  - Added the same bottom dock pattern used by Food Inventory (`Voice Command` + `Add`) to Recipes, Utensils, Machines, and Exercises.
+  - Removed top inline add buttons from those screens to keep action placement consistent and reduce header clutter.
+  - Existing add routes and selection logic are unchanged; voice actions in these tabs are currently placeholder alerts.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

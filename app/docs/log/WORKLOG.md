@@ -252,3 +252,13 @@
 - Follow-ups / risks: Full manual tap-through verification of all three detail routes is still required to confirm end-to-end interaction paths on simulator/device.
 - Tag: NO (recommended: nw-2026-02-18-1725-navigation-detail-screens; pending manual end-to-end tap verification for all 3 routes)
 - Notes: app/docs/sessions/2026-02-18/1725_navigation-detail-screens.md
+
+## 2026-02-18 - Session ui-bottom-docks
+- Summary: Standardized Wellness list tabs to use Inventory-style bottom action dock and removed top add buttons.
+- Changes: Added `Voice Command` + `Add` dock to Recipes, Utensils, Machines, and Exercises screens; removed top add buttons and adjusted list bottom padding for dock clearance.
+- Files: app/features/wellness/food/CookHomeScreen.js, app/features/wellness/food/FoodUtensilsScreen.js, app/features/wellness/gym/GymHomeScreen.js, app/features/wellness/gym/ExercisesHomeScreen.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: User-facing UI action placement change only; add routes and selection data logic remain unchanged.
+- Validation performed: `npx expo export --platform ios` passed after refactor.
+- Follow-ups / risks: Voice command actions in these tabs are currently placeholders (alerts), not full command flows.
+- Tag: nw-2026-02-18-1740-ui-bottom-docks
+- Notes: app/docs/sessions/2026-02-18/1740_ui-bottom-docks.md

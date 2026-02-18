@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   SafeAreaView,
   SectionList,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
@@ -44,6 +46,7 @@ function normalizeExerciseCategory(row) {
 
 function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const selection = useCatalogSelection({
     user,
@@ -80,6 +83,9 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
   );
 
   const RootContainer = embedded ? View : SafeAreaView;
+  const openAddScreen = () => navigation?.navigate('AddExercises');
+  const openVoiceCommand = () =>
+    Alert.alert('Voice Command', 'Exercise voice command is coming soon.');
 
   if (selection.loading) {
     return (
@@ -103,10 +109,6 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
             </>
           ) : null}
 
-          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={() => navigation?.navigate('AddExercises')}>
-            <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
-            <Text style={styles.addButtonText}>Add exercises</Text>
-          </TouchableOpacity>
         </View>
 
         {selection.error ? (
@@ -122,7 +124,7 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
           <View style={styles.emptyWrap}>
             <Text style={styles.emptyTitle}>No exercises yet</Text>
             <Text style={styles.emptySubtitle}>Add exercises from the catalog to shape your workout library.</Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={() => navigation?.navigate('AddExercises')}>
+            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={openAddScreen}>
               <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
               <Text style={styles.emptyCtaText}>Add exercises</Text>
             </TouchableOpacity>
@@ -132,7 +134,7 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
             sections={sections}
             keyExtractor={(item) => item.id}
             stickySectionHeadersEnabled={false}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[styles.listContent, { paddingBottom: 130 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
             renderSectionHeader={({ section }) => (
               <CollapsibleSection
@@ -166,6 +168,16 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
             }}
           />
         )}
+      </View>
+      <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
+        <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceCommand}>
+          <Ionicons name="mic" size={18} color={COLORS.bg} />
+          <Text style={styles.voiceButtonText}>Voice Command</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomAddButton} activeOpacity={0.9} onPress={openAddScreen}>
+          <Ionicons name="add-circle-outline" size={16} color={COLORS.text} />
+          <Text style={styles.bottomAddButtonText}>Add Exercise</Text>
+        </TouchableOpacity>
       </View>
     </RootContainer>
   );
@@ -208,21 +220,6 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: 12,
     marginTop: 2,
-  },
-  addButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: COLORS.accent,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  addButtonText: {
-    color: COLORS.bg,
-    fontSize: 15,
-    fontWeight: '700',
   },
   errorCard: {
     borderRadius: 14,
@@ -332,6 +329,51 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 2,
     textTransform: 'capitalize',
+  },
+  bottomBar: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    backgroundColor: 'rgba(14,15,20,0.96)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.24)',
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  voiceButton: {
+    flex: 1,
+    borderRadius: 14,
+    backgroundColor: COLORS.accent,
+    minHeight: 46,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  voiceButtonText: {
+    color: COLORS.bg,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  bottomAddButton: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.35)',
+    backgroundColor: COLORS.card,
+    minHeight: 46,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  bottomAddButtonText: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '600',
   },
   rowActions: {
     flexDirection: 'row',

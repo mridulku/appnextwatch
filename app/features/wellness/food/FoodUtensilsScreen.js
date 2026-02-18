@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   SafeAreaView,
   SectionList,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import CatalogItemCard from '../../../components/cards/CatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
@@ -32,6 +34,7 @@ function normalizeCategory(row) {
 
 function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const selection = useCatalogSelection({
     user,
@@ -66,6 +69,9 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
   );
 
   const RootContainer = embedded ? View : SafeAreaView;
+  const openAddScreen = () => navigation?.navigate('AddUtensils');
+  const openVoiceCommand = () =>
+    Alert.alert('Voice Command', 'Utensil voice command is coming soon.');
 
   if (selection.loading) {
     return (
@@ -89,10 +95,6 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
             </>
           ) : null}
 
-          <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={() => navigation?.navigate('AddUtensils')}>
-            <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
-            <Text style={styles.addButtonText}>Add utensils</Text>
-          </TouchableOpacity>
         </View>
 
         {selection.error ? (
@@ -108,7 +110,7 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
           <View style={styles.emptyWrap}>
             <Text style={styles.emptyTitle}>No utensils yet</Text>
             <Text style={styles.emptySubtitle}>Add utensils from catalog to set up your kitchen profile.</Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={() => navigation?.navigate('AddUtensils')}>
+            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={openAddScreen}>
               <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
               <Text style={styles.emptyCtaText}>Add utensils</Text>
             </TouchableOpacity>
@@ -118,7 +120,7 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
             sections={sections}
             keyExtractor={(item) => item.id}
             stickySectionHeadersEnabled={false}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[styles.listContent, { paddingBottom: 130 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
             renderSectionHeader={({ section }) => (
               <CollapsibleSection
@@ -153,6 +155,16 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
             }}
           />
         )}
+      </View>
+      <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
+        <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceCommand}>
+          <Ionicons name="mic" size={18} color={COLORS.bg} />
+          <Text style={styles.voiceButtonText}>Voice Command</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomAddButton} activeOpacity={0.9} onPress={openAddScreen}>
+          <Ionicons name="add-circle-outline" size={16} color={COLORS.text} />
+          <Text style={styles.bottomAddButtonText}>Add Utensil</Text>
+        </TouchableOpacity>
       </View>
     </RootContainer>
   );
@@ -195,21 +207,6 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: 12,
     marginTop: 2,
-  },
-  addButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: COLORS.accent,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  addButtonText: {
-    color: COLORS.bg,
-    fontSize: 15,
-    fontWeight: '700',
   },
   errorCard: {
     borderRadius: 14,
@@ -321,6 +318,51 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: 11,
     marginTop: 2,
+  },
+  bottomBar: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    backgroundColor: 'rgba(14,15,20,0.96)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.24)',
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  voiceButton: {
+    flex: 1,
+    borderRadius: 14,
+    backgroundColor: COLORS.accent,
+    minHeight: 46,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  voiceButtonText: {
+    color: COLORS.bg,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  bottomAddButton: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.35)',
+    backgroundColor: COLORS.card,
+    minHeight: 46,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  bottomAddButtonText: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '600',
   },
   removeButton: {
     borderRadius: 10,

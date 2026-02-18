@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   SafeAreaView,
   SectionList,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
@@ -40,6 +42,7 @@ function normalizeMachineCategory(machine) {
 
 function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [inlineError, setInlineError] = useState('');
 
@@ -104,6 +107,8 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const openAddScreen = () => {
     navigation?.navigate('AddMachines');
   };
+  const openVoiceCommand = () =>
+    Alert.alert('Voice Command', 'Machine voice command is coming soon.');
 
   const removeMachine = async (machineId) => {
     if (!appUserId) return;
@@ -142,12 +147,6 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
             </>
           ) : null}
 
-          <View style={styles.topActionsRow}>
-            <TouchableOpacity style={styles.addMachinesButton} activeOpacity={0.9} onPress={openAddScreen}>
-              <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
-              <Text style={styles.addMachinesButtonText}>Add machines</Text>
-            </TouchableOpacity>
-          </View>
         </View>
 
         {inlineError ? (
@@ -204,10 +203,20 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
                 onRemove={() => removeMachine(item.machine_id)}
               />
             )}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[styles.listContent, { paddingBottom: 130 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
           />
         )}
+      </View>
+      <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
+        <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceCommand}>
+          <Ionicons name="mic" size={18} color={COLORS.bg} />
+          <Text style={styles.voiceButtonText}>Voice Command</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomAddButton} activeOpacity={0.9} onPress={openAddScreen}>
+          <Ionicons name="add-circle-outline" size={16} color={COLORS.text} />
+          <Text style={styles.bottomAddButtonText}>Add Machine</Text>
+        </TouchableOpacity>
       </View>
     </RootContainer>
   );
@@ -239,25 +248,6 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: 13,
     marginTop: 3,
-  },
-  topActionsRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-  },
-  addMachinesButton: {
-    borderRadius: 12,
-    minHeight: 42,
-    backgroundColor: COLORS.accent,
-    paddingHorizontal: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 7,
-  },
-  addMachinesButtonText: {
-    color: COLORS.bg,
-    fontSize: 13,
-    fontWeight: '700',
   },
   loadingWrap: {
     flex: 1,
@@ -330,6 +320,51 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 100,
+  },
+  bottomBar: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    backgroundColor: 'rgba(14,15,20,0.96)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.24)',
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  voiceButton: {
+    flex: 1,
+    borderRadius: 14,
+    backgroundColor: COLORS.accent,
+    minHeight: 46,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  voiceButtonText: {
+    color: COLORS.bg,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  bottomAddButton: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(162,167,179,0.35)',
+    backgroundColor: COLORS.card,
+    minHeight: 46,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  bottomAddButtonText: {
+    color: COLORS.text,
+    fontSize: 13,
+    fontWeight: '600',
   },
   groupSection: {
     marginTop: 8,
