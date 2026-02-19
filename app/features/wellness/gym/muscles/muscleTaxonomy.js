@@ -6,6 +6,7 @@ export const MUSCLE_GROUPS = [
     subgroups: [
       { key: 'upper_chest', label: 'Upper Chest', muscleKeys: ['upper_chest'] },
       { key: 'mid_chest', label: 'Mid Chest', muscleKeys: ['mid_chest', 'chest'] },
+      { key: 'lower_chest', label: 'Lower Chest', muscleKeys: ['lower_chest'] },
     ],
   },
   {
@@ -61,6 +62,15 @@ export const MUSCLE_GROUPS = [
       { key: 'lower_abs', label: 'Lower Abs', muscleKeys: ['lower_abs'] },
     ],
   },
+];
+
+export const MUSCLE_GROUP_ORDER = [
+  'chest',
+  'back',
+  'legs',
+  'shoulders',
+  'arms',
+  'core',
 ];
 
 export function getMuscleGroupByKey(groupKey) {

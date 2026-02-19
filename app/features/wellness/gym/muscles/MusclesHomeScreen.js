@@ -13,9 +13,7 @@ import {
 import CatalogItemCard from '../../../../ui/components/CatalogItemCard';
 import COLORS from '../../../../theme/colors';
 import UI_TOKENS from '../../../../ui/tokens';
-import { MUSCLE_GROUPS } from './muscleTaxonomy';
-import { getGroupExerciseCount } from './muscleMapping';
-import useMuscleCatalog from './useMuscleCatalog';
+import useMuscleExplorer from './useMuscleExplorer';
 
 function ChevronAction() {
   return (
@@ -26,15 +24,28 @@ function ChevronAction() {
 }
 
 function MusclesHomeScreen({ navigation, embedded = false, showHeader = true }) {
-  const { loading, error, exercises, refresh } = useMuscleCatalog();
+  const { loading, error, muscles, subgroups, exerciseMaps, refresh } = useMuscleExplorer();
 
   const groups = useMemo(
-    () =>
-      MUSCLE_GROUPS.map((group) => ({
-        ...group,
-        exerciseCount: getGroupExerciseCount(group.key, exercises),
-      })),
-    [exercises],
+    () => muscles.map((muscle) => {
+      const subgroupIds = subgroups
+        .filter((subgroup) => subgroup.muscle_id === muscle.id)
+        .map((subgroup) => subgroup.id);
+      const exerciseCount = new Set(
+        exerciseMaps
+          .filter((map) => subgroupIds.includes(map.muscle_subgroup_id))
+          .map((map) => map.exercise_id),
+      ).size;
+
+      return {
+        id: muscle.id,
+        key: muscle.name_key,
+        label: muscle.name,
+        subgroupCount: subgroupIds.length,
+        exerciseCount,
+      };
+    }),
+    [muscles, subgroups, exerciseMaps],
   );
 
   const RootContainer = embedded ? View : SafeAreaView;
@@ -79,7 +90,7 @@ function MusclesHomeScreen({ navigation, embedded = false, showHeader = true }) 
         renderItem={({ item }) => (
           <CatalogItemCard
             title={item.label}
-            subtitle={`${item.subgroups.length} sub-groups • ${item.exerciseCount} exercises`}
+            subtitle={`${item.subgroupCount} sub-groups • ${item.exerciseCount} exercises`}
             actionLabel="View"
             actionVariant="muted"
             onPress={() =>

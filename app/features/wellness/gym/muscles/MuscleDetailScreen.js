@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -12,9 +13,8 @@ import {
 import CatalogItemCard from '../../../../ui/components/CatalogItemCard';
 import COLORS from '../../../../theme/colors';
 import UI_TOKENS from '../../../../ui/tokens';
-import { filterExercisesForMuscle, filterMachinesForMuscle } from './muscleMapping';
-import { getMuscleGroupByKey, getMuscleSubgroupByKey } from './muscleTaxonomy';
-import useMuscleCatalog from './useMuscleCatalog';
+import { buildMuscleStats, sortMappingsByPriorityAndName } from './muscleMapping';
+import useMuscleExplorer from './useMuscleExplorer';
 
 const VIEW_TABS = ['Exercises', 'Machines'];
 
@@ -30,27 +30,51 @@ function MuscleDetailScreen({ navigation, route }) {
   const [activeTab, setActiveTab] = useState('Exercises');
   const groupKey = route.params?.groupKey;
   const subKey = route.params?.subKey;
-  const group = getMuscleGroupByKey(groupKey);
-  const subgroup = getMuscleSubgroupByKey(groupKey, subKey);
-  const { loading, error, exercises, machines } = useMuscleCatalog();
 
-  const exerciseRows = useMemo(
+  const {
+    loading,
+    error,
+    muscles,
+    subgroups,
+    exerciseMaps,
+    machineMaps,
+    sessionHistory,
+  } = useMuscleExplorer();
+
+  const group = useMemo(
+    () => muscles.find((muscle) => muscle.name_key === groupKey) || null,
+    [muscles, groupKey],
+  );
+  const subgroup = useMemo(
     () =>
-      filterExercisesForMuscle(groupKey, subKey, exercises).sort((a, b) =>
-        String(a.name || '').localeCompare(String(b.name || '')),
-      ),
-    [groupKey, subKey, exercises],
+      subgroups.find(
+        (entry) => entry.muscle_id === group?.id && entry.name_key === subKey,
+      ) || null,
+    [subgroups, group?.id, subKey],
   );
 
-  const machineRows = useMemo(
+  const mappedExercises = useMemo(() => {
+    if (!subgroup) return [];
+    const rows = exerciseMaps.filter((map) => map.muscle_subgroup_id === subgroup.id);
+    return sortMappingsByPriorityAndName(rows, 'catalog_exercise');
+  }, [exerciseMaps, subgroup]);
+
+  const mappedMachines = useMemo(() => {
+    if (!subgroup) return [];
+    const rows = machineMaps.filter((map) => map.muscle_subgroup_id === subgroup.id);
+    return sortMappingsByPriorityAndName(rows, 'catalog_machine');
+  }, [machineMaps, subgroup]);
+
+  const stats = useMemo(
     () =>
-      filterMachinesForMuscle(groupKey, subKey, machines).sort((a, b) =>
-        String(a.name || '').localeCompare(String(b.name || '')),
-      ),
-    [groupKey, subKey, machines],
+      buildMuscleStats({
+        mappedExercises: mappedExercises.map((map) => map.catalog_exercise).filter(Boolean),
+        sessionHistory,
+      }),
+    [mappedExercises, sessionHistory],
   );
 
-  const data = activeTab === 'Exercises' ? exerciseRows : machineRows;
+  const data = activeTab === 'Exercises' ? mappedExercises : mappedMachines;
 
   if (!group || !subgroup) {
     return (
@@ -86,15 +110,13 @@ function MuscleDetailScreen({ navigation, route }) {
         ListHeaderComponent={
           <>
             <View style={styles.heroCard}>
-              <Text style={styles.heroTitle}>Target: {subgroup.label}</Text>
-              <Text style={styles.heroSubtitle}>
-                {group.label} muscle explorer
-              </Text>
+              <Text style={styles.heroTitle}>Target: {subgroup.name}</Text>
+              <Text style={styles.heroSubtitle}>{group.name} muscle explorer</Text>
 
               <View style={styles.segmentWrap}>
                 {VIEW_TABS.map((tab) => {
                   const active = tab === activeTab;
-                  const count = tab === 'Exercises' ? exerciseRows.length : machineRows.length;
+                  const count = tab === 'Exercises' ? mappedExercises.length : mappedMachines.length;
                   return (
                     <TouchableOpacity
                       key={tab}
@@ -111,6 +133,28 @@ function MuscleDetailScreen({ navigation, route }) {
               </View>
             </View>
 
+            <View style={styles.statsCard}>
+              <Text style={styles.statsTitle}>Stats</Text>
+              <View style={styles.statsGrid}>
+                <View style={styles.statsItem}>
+                  <Text style={styles.statsLabel}>Last trained</Text>
+                  <Text style={styles.statsValue}>{stats.lastTrainedLabel}</Text>
+                </View>
+                <View style={styles.statsItem}>
+                  <Text style={styles.statsLabel}>Sets this week</Text>
+                  <Text style={styles.statsValue}>{stats.setsThisWeek}</Text>
+                </View>
+                <View style={styles.statsItem}>
+                  <Text style={styles.statsLabel}>Weekly volume proxy</Text>
+                  <Text style={styles.statsValue}>{stats.weeklyVolumeProxy} kg</Text>
+                </View>
+                <View style={styles.statsItem}>
+                  <Text style={styles.statsLabel}>Suggested focus</Text>
+                  <Text style={styles.statsValue}>{stats.suggestedFocus}</Text>
+                </View>
+              </View>
+            </View>
+
             {error ? (
               <View style={styles.errorCard}>
                 <Text style={styles.errorText}>{error}</Text>
@@ -118,39 +162,49 @@ function MuscleDetailScreen({ navigation, route }) {
             ) : null}
           </>
         }
-        renderItem={({ item }) => (
-          <CatalogItemCard
-            title={item.name || (activeTab === 'Exercises' ? 'Exercise' : 'Machine')}
-            subtitle={
-              activeTab === 'Exercises'
-                ? `${item.primary_muscle_group || group.label} • ${item.type || 'exercise'} • ${item.equipment || 'bodyweight'}`
-                : `${item.zone || group.label} • ${Array.isArray(item.primary_muscles) ? item.primary_muscles.join(', ') : 'machine'}`
-            }
-            actionLabel="View"
-            actionVariant="muted"
-            onPress={() => {
-              if (activeTab === 'Exercises') {
-                navigation.navigate('ExerciseDetail', {
-                  itemId: item.id,
-                  item,
-                  exerciseName: item.name,
+        renderItem={({ item }) => {
+          const mapped = activeTab === 'Exercises' ? item.catalog_exercise : item.catalog_machine;
+          const title = mapped?.name || (activeTab === 'Exercises' ? 'Exercise' : 'Machine');
+          const subtitle =
+            activeTab === 'Exercises'
+              ? `${mapped?.primary_muscle_group || group.name} • ${mapped?.type || 'exercise'} • ${mapped?.equipment || 'bodyweight'}`
+              : `${mapped?.zone || group.name} • ${Array.isArray(mapped?.primary_muscles) ? mapped.primary_muscles.join(', ') : 'machine'}`;
+
+          return (
+            <CatalogItemCard
+              title={title}
+              subtitle={subtitle}
+              badges={
+                item.is_primary
+                  ? [{ label: 'Primary', tone: 'warn' }]
+                  : []
+              }
+              actionLabel="View"
+              actionVariant="muted"
+              onPress={() => {
+                if (activeTab === 'Exercises') {
+                  navigation.navigate('ExerciseDetail', {
+                    itemId: item.exercise_id,
+                    item: mapped,
+                    exerciseName: mapped?.name,
+                    fromCatalog: true,
+                    isAdded: false,
+                  });
+                  return;
+                }
+
+                navigation.navigate('MachineDetail', {
+                  itemId: item.machine_id,
+                  item: mapped,
+                  machineName: mapped?.name,
                   fromCatalog: true,
                   isAdded: false,
                 });
-                return;
-              }
-
-              navigation.navigate('MachineDetail', {
-                itemId: item.id,
-                item,
-                machineName: item.name,
-                fromCatalog: true,
-                isAdded: false,
-              });
-            }}
-            rightAction={<ChevronAction />}
-          />
-        )}
+              }}
+              rightAction={<ChevronAction />}
+            />
+          );
+        }}
         ListEmptyComponent={
           <View style={styles.emptyCard}>
             <Text style={styles.emptyCardTitle}>
@@ -162,14 +216,13 @@ function MuscleDetailScreen({ navigation, route }) {
               style={styles.emptyCardCta}
               activeOpacity={0.9}
               onPress={() =>
-                navigation.navigate('GymHome', {
-                  initialSegment: activeTab === 'Exercises' ? 'Exercises' : 'Machines',
-                })
+                Alert.alert(
+                  'Add mappings',
+                  'Run from repo root:\nnode scripts/seed_muscles_and_mappings.js',
+                )
               }
             >
-              <Text style={styles.emptyCardCtaText}>
-                {activeTab === 'Exercises' ? 'Add exercises to catalog' : 'Add machines to catalog'}
-              </Text>
+              <Text style={styles.emptyCardCtaText}>Add mappings</Text>
             </TouchableOpacity>
           </View>
         }
@@ -237,8 +290,53 @@ const styles = StyleSheet.create({
   segmentTextActive: {
     color: COLORS.accent,
   },
+  statsCard: {
+    borderRadius: UI_TOKENS.radius.md,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.24)',
+    backgroundColor: COLORS.card,
+    padding: UI_TOKENS.spacing.md,
+    marginBottom: UI_TOKENS.spacing.sm,
+  },
+  statsTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.subtitle + 1,
+    fontWeight: '700',
+  },
+  statsGrid: {
+    marginTop: UI_TOKENS.spacing.sm,
+    gap: UI_TOKENS.spacing.xs,
+  },
+  statsItem: {
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.2)',
+    backgroundColor: COLORS.cardSoft,
+    paddingHorizontal: UI_TOKENS.spacing.sm,
+    paddingVertical: UI_TOKENS.spacing.xs,
+  },
+  statsLabel: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+  },
+  statsValue: {
+    marginTop: 2,
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.subtitle,
+    fontWeight: '700',
+  },
   separator: {
     height: UI_TOKENS.spacing.sm,
+  },
+  chevronAction: {
+    width: UI_TOKENS.control.iconButton,
+    height: UI_TOKENS.control.iconButton,
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.32)',
+    backgroundColor: COLORS.card,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   emptyCard: {
     borderRadius: UI_TOKENS.radius.md,
@@ -267,16 +365,6 @@ const styles = StyleSheet.create({
     color: COLORS.accent,
     fontSize: UI_TOKENS.typography.meta + 1,
     fontWeight: '700',
-  },
-  chevronAction: {
-    width: UI_TOKENS.control.iconButton,
-    height: UI_TOKENS.control.iconButton,
-    borderRadius: UI_TOKENS.radius.sm,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.32)',
-    backgroundColor: COLORS.card,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   errorCard: {
     borderRadius: UI_TOKENS.radius.md,

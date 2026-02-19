@@ -1,136 +1,98 @@
-import { getMuscleGroupByKey } from './muscleTaxonomy';
-
-function norm(value) {
+function normalizeText(value) {
   return String(value || '')
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '');
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ');
 }
 
-const GROUP_ALIASES = {
-  chest: 'chest',
-  back: 'back',
-  legs: 'legs',
-  shoulders: 'shoulders',
-  arms: 'arms',
-  core: 'core',
-  cardio: 'core',
-};
-
-const MACHINE_MUSCLE_ALIASES = {
-  lats: 'lats',
-  upper_back: 'upper_back',
-  mid_back: 'mid_back',
-  lower_back: 'lower_back',
-  traps: 'traps',
-  quads: 'quads',
-  hamstrings: 'hamstrings',
-  glutes: 'glutes',
-  calves: 'calves',
-  biceps: 'biceps',
-  triceps: 'triceps',
-  shoulders: 'front_delts',
-  chest: 'mid_chest',
-  abs: 'abs',
-  obliques: 'obliques',
-  cardio: 'abs',
-};
-
-function inferSubgroupFromExerciseName(groupKey, nameKey = '') {
-  const key = norm(nameKey);
-
-  if (groupKey === 'arms') {
-    if (key.includes('tricep') || key.includes('pushdown')) return 'triceps';
-    if (key.includes('curl')) return 'biceps';
-    return 'forearms';
-  }
-
-  if (groupKey === 'back') {
-    if (key.includes('pulldown') || key.includes('pull_up') || key.includes('lat')) return 'lats';
-    if (key.includes('row')) return 'mid_back';
-    if (key.includes('shrug') || key.includes('trap')) return 'traps';
-    if (key.includes('deadlift') || key.includes('hyperextension')) return 'lower_back';
-    return 'upper_back';
-  }
-
-  if (groupKey === 'legs') {
-    if (key.includes('curl') || key.includes('hamstring')) return 'hamstrings';
-    if (key.includes('glute') || key.includes('hip_thrust')) return 'glutes';
-    if (key.includes('calf')) return 'calves';
-    return 'quads';
-  }
-
-  if (groupKey === 'shoulders') {
-    if (key.includes('rear') || key.includes('reverse_fly')) return 'rear_delts';
-    if (key.includes('lateral') || key.includes('side')) return 'side_delts';
-    return 'front_delts';
-  }
-
-  if (groupKey === 'chest') {
-    if (key.includes('incline') || key.includes('upper')) return 'upper_chest';
-    return 'mid_chest';
-  }
-
-  if (groupKey === 'core') {
-    if (key.includes('oblique')) return 'obliques';
-    if (key.includes('lower')) return 'lower_abs';
-    return 'abs';
-  }
-
-  return null;
+function toDateOrNull(value) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
 }
 
-export function mapExerciseToGroupKey(exercise) {
-  const primary = norm(exercise?.primary_muscle_group);
-  return GROUP_ALIASES[primary] || null;
+function getWeekStart(now) {
+  const next = new Date(now);
+  const day = next.getDay();
+  const offset = day === 0 ? 6 : day - 1;
+  next.setDate(next.getDate() - offset);
+  next.setHours(0, 0, 0, 0);
+  return next;
 }
 
-export function mapExerciseToSubgroupKey(exercise) {
-  const groupKey = mapExerciseToGroupKey(exercise);
-  if (!groupKey) return null;
-  return inferSubgroupFromExerciseName(groupKey, exercise?.name_key || exercise?.name || '');
-}
-
-export function mapMachineToSubgroupKeys(machine) {
-  const raw = Array.isArray(machine?.primary_muscles) ? machine.primary_muscles : [];
-  const keys = raw
-    .map((value) => MACHINE_MUSCLE_ALIASES[norm(value)] || null)
-    .filter(Boolean);
-  return Array.from(new Set(keys));
-}
-
-export function getGroupExerciseCount(groupKey, exercises) {
-  return exercises.filter((exercise) => mapExerciseToGroupKey(exercise) === groupKey).length;
-}
-
-export function getSubgroupExerciseCount(groupKey, subKey, exercises) {
-  return exercises.filter(
-    (exercise) =>
-      mapExerciseToGroupKey(exercise) === groupKey &&
-      mapExerciseToSubgroupKey(exercise) === subKey,
-  ).length;
-}
-
-export function getSubgroupMachineCount(subKey, machines) {
-  return machines.filter((machine) => mapMachineToSubgroupKeys(machine).includes(subKey)).length;
-}
-
-export function filterExercisesForMuscle(groupKey, subKey, exercises) {
-  return exercises.filter((exercise) => {
-    if (mapExerciseToGroupKey(exercise) !== groupKey) return false;
-    if (!subKey) return true;
-    return mapExerciseToSubgroupKey(exercise) === subKey;
+function formatShortDate(value) {
+  const parsed = toDateOrNull(value);
+  if (!parsed) return 'Not yet trained';
+  return parsed.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
   });
 }
 
-export function filterMachinesForMuscle(groupKey, subKey, machines) {
-  const group = getMuscleGroupByKey(groupKey);
-  const validSubgroups = new Set(group?.subgroups.map((s) => s.key) || []);
-  return machines.filter((machine) => {
-    const mapped = mapMachineToSubgroupKeys(machine);
-    if (!mapped.length) return false;
-    if (!subKey) return mapped.some((key) => validSubgroups.has(key));
-    return mapped.includes(subKey);
+export function buildMuscleStats({
+  mappedExercises,
+  sessionHistory,
+  now = new Date(),
+}) {
+  const normalizedExerciseNames = new Set(
+    (mappedExercises || [])
+      .map((exercise) => normalizeText(exercise?.name))
+      .filter(Boolean),
+  );
+
+  const workouts = (sessionHistory || []).filter((record) => record?.type === 'workout');
+
+  const matchedSessions = workouts.filter((record) => {
+    const timeline = Array.isArray(record?.summary?.timeline) ? record.summary.timeline : [];
+    return timeline.some((entry) => normalizedExerciseNames.has(normalizeText(entry?.title)));
   });
+
+  const latestSession = matchedSessions
+    .slice()
+    .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())[0];
+
+  const weekStart = getWeekStart(now);
+  const weeklySessions = matchedSessions.filter((record) => {
+    const startedAt = toDateOrNull(record?.startedAt);
+    return startedAt && startedAt >= weekStart;
+  });
+
+  const setsThisWeek = weeklySessions.reduce(
+    (sum, record) => sum + Math.max(0, Number(record?.summary?.setsCount) || 0),
+    0,
+  );
+  const weeklyVolumeProxy = weeklySessions.reduce(
+    (sum, record) => sum + Math.max(0, Number(record?.summary?.volumeKg) || 0),
+    0,
+  );
+
+  const lastTrainedAt = latestSession?.startedAt || null;
+  const lastTrainedDate = toDateOrNull(lastTrainedAt);
+
+  let suggestedFocus = 'Not trained yet';
+  if (lastTrainedDate) {
+    const elapsedDays = (now.getTime() - lastTrainedDate.getTime()) / (1000 * 60 * 60 * 24);
+    suggestedFocus = elapsedDays > 7 ? 'Due' : 'On track';
+  }
+
+  return {
+    lastTrainedAt,
+    lastTrainedLabel: formatShortDate(lastTrainedAt),
+    setsThisWeek,
+    weeklyVolumeProxy,
+    suggestedFocus,
+    matchedSessionCount: matchedSessions.length,
+  };
+}
+
+export function sortMappingsByPriorityAndName(rows, keyName) {
+  return rows
+    .slice()
+    .sort((a, b) => {
+      const primaryDelta = Number(Boolean(b.is_primary)) - Number(Boolean(a.is_primary));
+      if (primaryDelta !== 0) return primaryDelta;
+      return String(a?.[keyName]?.name || '').localeCompare(String(b?.[keyName]?.name || ''));
+    });
 }

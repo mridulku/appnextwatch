@@ -12,9 +12,7 @@ import {
 import CatalogItemCard from '../../../../ui/components/CatalogItemCard';
 import COLORS from '../../../../theme/colors';
 import UI_TOKENS from '../../../../ui/tokens';
-import { getSubgroupExerciseCount, getSubgroupMachineCount } from './muscleMapping';
-import { getMuscleGroupByKey } from './muscleTaxonomy';
-import useMuscleCatalog from './useMuscleCatalog';
+import useMuscleExplorer from './useMuscleExplorer';
 
 function ChevronAction() {
   return (
@@ -26,17 +24,32 @@ function ChevronAction() {
 
 function MuscleGroupScreen({ navigation, route }) {
   const groupKey = route.params?.groupKey;
-  const group = getMuscleGroupByKey(groupKey);
-  const { loading, error, exercises, machines, refresh } = useMuscleCatalog();
+  const { loading, error, muscles, subgroups, exerciseMaps, machineMaps, refresh } = useMuscleExplorer();
+  const group = useMemo(
+    () => muscles.find((muscle) => muscle.name_key === groupKey) || null,
+    [muscles, groupKey],
+  );
 
   const subgroupRows = useMemo(() => {
     if (!group) return [];
-    return group.subgroups.map((subgroup) => ({
-      ...subgroup,
-      exerciseCount: getSubgroupExerciseCount(group.key, subgroup.key, exercises),
-      machineCount: getSubgroupMachineCount(subgroup.key, machines),
-    }));
-  }, [group, exercises, machines]);
+    return subgroups
+      .filter((subgroup) => subgroup.muscle_id === group.id)
+      .map((subgroup) => ({
+        id: subgroup.id,
+        key: subgroup.name_key,
+        label: subgroup.name,
+        exerciseCount: new Set(
+          exerciseMaps
+            .filter((map) => map.muscle_subgroup_id === subgroup.id)
+            .map((map) => map.exercise_id),
+        ).size,
+        machineCount: new Set(
+          machineMaps
+            .filter((map) => map.muscle_subgroup_id === subgroup.id)
+            .map((map) => map.machine_id),
+        ).size,
+      }));
+  }, [group, subgroups, exerciseMaps, machineMaps]);
 
   if (!group) {
     return (
@@ -72,7 +85,7 @@ function MuscleGroupScreen({ navigation, route }) {
         ListHeaderComponent={
           <>
             <View style={styles.headerWrap}>
-              <Text style={styles.title}>{group.label}</Text>
+              <Text style={styles.title}>{group.name}</Text>
               <Text style={styles.subtitle}>Choose a sub-group to inspect mapped exercises.</Text>
             </View>
             {error ? (
@@ -93,7 +106,7 @@ function MuscleGroupScreen({ navigation, route }) {
             actionVariant="muted"
             onPress={() =>
               navigation.navigate('MuscleDetail', {
-                groupKey: group.key,
+                groupKey: group.name_key,
                 subKey: item.key,
                 subLabel: item.label,
               })
