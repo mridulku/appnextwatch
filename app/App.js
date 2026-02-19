@@ -29,6 +29,9 @@ import MachineDetailScreen from './features/wellness/gym/MachineDetailScreen';
 import ExerciseDetailScreen from './features/wellness/gym/ExerciseDetailScreen';
 import AddMachinesScreen from './features/wellness/gym/AddMachinesScreen';
 import AddExercisesScreen from './features/wellness/gym/AddExercisesScreen';
+import GymStatsEditScreen from './features/wellness/gym/GymStatsEditScreen';
+import MuscleGroupScreen from './features/wellness/gym/muscles/MuscleGroupScreen';
+import MuscleDetailScreen from './features/wellness/gym/muscles/MuscleDetailScreen';
 import CookRecipeScreen from './features/wellness/shared/CookRecipeScreen';
 import FoodHubScreen from './features/wellness/food/FoodHubScreen';
 import AddFoodItemsScreen from './features/wellness/food/AddFoodItemsScreen';
@@ -36,6 +39,7 @@ import FoodInventoryItemDetailScreen from './features/wellness/food/FoodInventor
 import UtensilDetailScreen from './features/wellness/food/UtensilDetailScreen';
 import AddUtensilsScreen from './features/wellness/food/AddUtensilsScreen';
 import AddRecipesScreen from './features/wellness/food/AddRecipesScreen';
+import FoodStatsEditScreen from './features/wellness/food/FoodStatsEditScreen';
 import SessionsHomeScreen from './features/wellness/sessions/SessionsHomeScreen';
 import WorkoutSessionSetupScreen from './features/wellness/sessions/WorkoutSessionSetupScreen';
 import CookingSessionSetupScreen from './features/wellness/sessions/CookingSessionSetupScreen';
@@ -337,6 +341,21 @@ function GymStackScreens() {
         component={AddExercisesScreen}
         options={{ title: 'Add Exercises' }}
       />
+      <WellnessGymStack.Screen
+        name="GymStatsEdit"
+        component={GymStatsEditScreen}
+        options={{ title: 'Edit Gym Stats' }}
+      />
+      <WellnessGymStack.Screen
+        name="MuscleGroup"
+        component={MuscleGroupScreen}
+        options={({ route }) => ({ title: route.params?.groupLabel ?? 'Muscle Group' })}
+      />
+      <WellnessGymStack.Screen
+        name="MuscleDetail"
+        component={MuscleDetailScreen}
+        options={({ route }) => ({ title: route.params?.subLabel ?? 'Muscle Detail' })}
+      />
     </WellnessGymStack.Navigator>
   );
 }
@@ -378,6 +397,11 @@ function FoodStackScreens() {
         name="AddRecipes"
         component={AddRecipesScreen}
         options={{ title: 'Add Recipes' }}
+      />
+      <WellnessFoodStack.Screen
+        name="FoodStatsEdit"
+        component={FoodStatsEditScreen}
+        options={{ title: 'Edit Food Stats' }}
       />
     </WellnessFoodStack.Navigator>
   );

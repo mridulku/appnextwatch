@@ -7,13 +7,22 @@ import { GYM_MACHINES } from '../../../data/wellness/gymMachines';
 import ExercisesHomeScreen from './ExercisesHomeScreen';
 import GymHomeScreen from './GymHomeScreen';
 import GymMyStatsScreen from './GymMyStatsScreen';
+import MusclesHomeScreen from './muscles/MusclesHomeScreen';
 import COLORS from '../../../theme/colors';
 
-const SEGMENTS = ['Machines', 'Exercises', 'My Stats'];
+const SEGMENTS = ['Machines', 'Exercises', 'Muscles', 'My Stats'];
 
 function GymHubScreen({ navigation, route }) {
   const initialSegment = route.params?.initialSegment;
-  const [segment, setSegment] = useState(initialSegment === 'Exercises' ? 'Exercises' : initialSegment === 'My Stats' ? 'My Stats' : 'Machines');
+  const [segment, setSegment] = useState(
+    initialSegment === 'Exercises'
+      ? 'Exercises'
+      : initialSegment === 'Muscles'
+        ? 'Muscles'
+        : initialSegment === 'My Stats'
+          ? 'My Stats'
+          : 'Machines',
+  );
 
   useEffect(() => {
     if (route.params?.initialSegment === 'Exercises') {
@@ -22,6 +31,10 @@ function GymHubScreen({ navigation, route }) {
     }
     if (route.params?.initialSegment === 'My Stats') {
       setSegment('My Stats');
+      return;
+    }
+    if (route.params?.initialSegment === 'Muscles') {
+      setSegment('Muscles');
       return;
     }
     if (route.params?.initialSegment === 'Machines') {
@@ -43,8 +56,12 @@ function GymHubScreen({ navigation, route }) {
       return <ExercisesHomeScreen navigation={navigation} embedded showHeader={false} />;
     }
 
+    if (segment === 'Muscles') {
+      return <MusclesHomeScreen navigation={navigation} embedded showHeader={false} />;
+    }
+
     if (segment === 'My Stats') {
-      return <GymMyStatsScreen />;
+      return <GymMyStatsScreen navigation={navigation} />;
     }
 
     return <GymHomeScreen navigation={navigation} embedded showHeader={false} />;
