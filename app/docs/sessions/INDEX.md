@@ -2,7 +2,7 @@
 
 | Date | Time | Tag | Commit | Title (1 line) | Notes link |
 |---|---|---|---|---|---|
-| 2026-02-20 | 18:20 | nw-2026-02-20-1820-navigation-gym-onboarding | TBD | gym plan/logs IA + onboarding milestone checkpoint | [1820_gym-plan-logs-onboarding-milestone.md](2026-02-20/1820_gym-plan-logs-onboarding-milestone.md) |
+| 2026-02-20 | 18:13 | nw-2026-02-20-1813-navigation-gym-onboarding | TBD | gym plan/logs IA + onboarding milestone checkpoint | [1813_gym-plan-logs-onboarding-milestone.md](2026-02-20/1813_gym-plan-logs-onboarding-milestone.md) |
 | 2026-02-18 | 18:47 | nw-2026-02-18-1847-navigation-inventory-detail | TBD | food add-items row tap now opens detail-first add/remove | [1847_inventory-add-detail.md](2026-02-18/1847_inventory-add-detail.md) |
 | 2026-02-18 | 17:40 | nw-2026-02-18-1740-ui-bottom-docks | TBD | unify wellness bottom action docks across list tabs | [1740_ui-bottom-docks.md](2026-02-18/1740_ui-bottom-docks.md) |
 | 2026-02-18 | 17:25 | TBD (recommended: nw-2026-02-18-1725-navigation-detail-screens) | TBD | add detail screens for utensils/machines/exercises | [1725_navigation-detail-screens.md](2026-02-18/1725_navigation-detail-screens.md) |

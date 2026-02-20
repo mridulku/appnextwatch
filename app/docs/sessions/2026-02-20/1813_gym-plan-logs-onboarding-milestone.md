@@ -1,5 +1,5 @@
-# Session Notes — 2026-02-20 18:20 — Gym Plan/Logs IA + Onboarding Milestone
-- Tag: nw-2026-02-20-1820-navigation-gym-onboarding
+# Session Notes — 2026-02-20 18:13 — Gym Plan/Logs IA + Onboarding Milestone
+- Tag: nw-2026-02-20-1813-navigation-gym-onboarding
 - Commit: TBD
 - Previous tag: nw-2026-02-18-1847-navigation-inventory-detail
 - Codex chat link: N/A
@@ -43,7 +43,7 @@
 - `app/docs/log/WORKLOG.md`
 - `app/docs/sessions/INDEX.md`
 - `app/docs/sessions/LATEST.md`
-- `app/docs/sessions/2026-02-20/1820_gym-plan-logs-onboarding-milestone.md`
+- `app/docs/sessions/2026-02-20/1813_gym-plan-logs-onboarding-milestone.md`
 
 ## 5) What we considered but did NOT do
 - No backend persistence for onboarding answers/program seed.

@@ -288,5 +288,5 @@
 - Behavior impact: User-visible navigation and workflow changes in Gym + Test; no production DB schema migration required for onboarding sandboxes.
 - Validation performed: `npx expo export --platform ios` (run for this checkpoint).
 - Follow-ups / risks: Persist onboarding answers/program seed to backend profile state in a future milestone; keep Test sandboxes isolated from production onboarding state.
-- Tag: nw-2026-02-20-1820-navigation-gym-onboarding
-- Notes: app/docs/sessions/2026-02-20/1820_gym-plan-logs-onboarding-milestone.md
+- Tag: nw-2026-02-20-1813-navigation-gym-onboarding
+- Notes: app/docs/sessions/2026-02-20/1813_gym-plan-logs-onboarding-milestone.md
