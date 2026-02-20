@@ -18,6 +18,8 @@ import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogIt
 import { useAuth } from '../../../context/AuthContext';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
 import { fetchUserMachines } from '../../../core/api/gymMachinesDb';
+import { MODULE_KEYS } from '../../../core/api/userModuleStateDb';
+import ModuleReadyChip from '../../../ui/components/ModuleReadyChip';
 import COLORS from '../../../theme/colors';
 
 const MACHINE_GROUP_ORDER = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio', 'Other'];
@@ -202,6 +204,8 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
         )}
       </View>
       <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
+        <ModuleReadyChip moduleKey={MODULE_KEYS.GYM_MACHINES} />
+
         <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceCommand}>
           <Ionicons name="mic" size={18} color={COLORS.bg} />
           <Text style={styles.voiceButtonText}>Voice Command</Text>

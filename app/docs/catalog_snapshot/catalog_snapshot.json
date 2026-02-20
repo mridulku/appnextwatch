@@ -1,0 +1,768 @@
+{
+  "generated_at": "2026-02-19T04:22:20.736Z",
+  "env": {
+    "source": "remote",
+    "supabase_url": "https://ytku...e.co"
+  },
+  "tables": {
+    "machines": [
+      {
+        "id": "bf43bda0-cd08-40ac-a833-4a759d7f6980",
+        "name": "Lat Pulldown Machine",
+        "name_key": "lat pulldown machine",
+        "zone": "Cable",
+        "primary_muscles": [
+          "Lats",
+          "Upper Back"
+        ]
+      },
+      {
+        "id": "5543c7f2-1f72-4f4a-8bed-9ff4eda92255",
+        "name": "Seated Row Machine",
+        "name_key": "seated row machine",
+        "zone": "Cable",
+        "primary_muscles": [
+          "Mid Back",
+          "Lats"
+        ]
+      },
+      {
+        "id": "8bf6bdd9-40d3-43a8-b9a4-069f97c8330e",
+        "name": "Rowing Machine",
+        "name_key": "rowing machine",
+        "zone": "Cardio",
+        "primary_muscles": [
+          "Back",
+          "Cardio"
+        ]
+      },
+      {
+        "id": "cf9c117b-0840-44f5-b42c-84a75240be52",
+        "name": "Treadmill",
+        "name_key": "treadmill",
+        "zone": "Cardio",
+        "primary_muscles": [
+          "Cardio"
+        ]
+      },
+      {
+        "id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+        "name": "Bench Press Station",
+        "name_key": "bench press station",
+        "zone": "Free Weights",
+        "primary_muscles": [
+          "Chest",
+          "Triceps"
+        ]
+      },
+      {
+        "id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+        "name": "Incline Bench",
+        "name_key": "incline bench",
+        "zone": "Free Weights",
+        "primary_muscles": [
+          "Chest",
+          "Shoulders"
+        ]
+      },
+      {
+        "id": "415e8c59-29c7-4b9a-89c4-3707144f7b2b",
+        "name": "Leg Curl Machine",
+        "name_key": "leg curl machine",
+        "zone": "Machines",
+        "primary_muscles": [
+          "Hamstrings"
+        ]
+      },
+      {
+        "id": "e93f04b6-f2e2-4f51-b127-96d1b6fc5c9c",
+        "name": "Leg Extension Machine",
+        "name_key": "leg extension machine",
+        "zone": "Machines",
+        "primary_muscles": [
+          "Quads"
+        ]
+      },
+      {
+        "id": "7e2c9841-6cfd-470b-8705-3188f9148814",
+        "name": "Leg Press Machine",
+        "name_key": "leg press machine",
+        "zone": "Machines",
+        "primary_muscles": [
+          "Quads",
+          "Glutes"
+        ]
+      },
+      {
+        "id": "b4a71ccd-3b3a-4662-a439-2c18835df137",
+        "name": "Pec Deck",
+        "name_key": "pec deck",
+        "zone": "Machines",
+        "primary_muscles": [
+          "Chest"
+        ]
+      }
+    ],
+    "exercises": [
+      {
+        "id": "68a08b31-7829-42a8-aae7-bd0bdc499fdc",
+        "name": "Biceps Curl",
+        "name_key": "biceps curl",
+        "type": "isolation",
+        "primary_muscle_group": "Arms",
+        "equipment": "Dumbbell"
+      },
+      {
+        "id": "251920ae-4b93-4da4-b873-5adf0657d489",
+        "name": "Triceps Pushdown",
+        "name_key": "triceps pushdown",
+        "type": "isolation",
+        "primary_muscle_group": "Arms",
+        "equipment": "Cable"
+      },
+      {
+        "id": "09e94363-2def-4b2d-b35c-2a2a280dfba4",
+        "name": "Lat Pulldown",
+        "name_key": "lat pulldown",
+        "type": "compound",
+        "primary_muscle_group": "Back",
+        "equipment": "Cable"
+      },
+      {
+        "id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+        "name": "Seated Cable Row",
+        "name_key": "seated cable row",
+        "type": "compound",
+        "primary_muscle_group": "Back",
+        "equipment": "Cable"
+      },
+      {
+        "id": "22da0254-d5d7-48f9-839b-9235a8135926",
+        "name": "Bench Press",
+        "name_key": "bench press",
+        "type": "compound",
+        "primary_muscle_group": "Chest",
+        "equipment": "Barbell"
+      },
+      {
+        "id": "f90a1f8b-c3d6-4c74-8dbc-be06acbc4804",
+        "name": "Incline Dumbbell Press",
+        "name_key": "incline dumbbell press",
+        "type": "compound",
+        "primary_muscle_group": "Chest",
+        "equipment": "Dumbbell"
+      },
+      {
+        "id": "d6c3cb23-3638-4e46-a746-463ab76fb8b2",
+        "name": "Back Squat",
+        "name_key": "back squat",
+        "type": "compound",
+        "primary_muscle_group": "Legs",
+        "equipment": "Barbell"
+      },
+      {
+        "id": "f6e14b77-111b-4c4a-8c45-9d5cac861a7c",
+        "name": "Leg Press",
+        "name_key": "leg press",
+        "type": "compound",
+        "primary_muscle_group": "Legs",
+        "equipment": "Machine"
+      },
+      {
+        "id": "8a737165-7b00-4deb-a2b4-4aabd3ddd9c5",
+        "name": "Lateral Raise",
+        "name_key": "lateral raise",
+        "type": "isolation",
+        "primary_muscle_group": "Shoulders",
+        "equipment": "Dumbbell"
+      },
+      {
+        "id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+        "name": "Shoulder Press",
+        "name_key": "shoulder press",
+        "type": "compound",
+        "primary_muscle_group": "Shoulders",
+        "equipment": "Dumbbell"
+      }
+    ],
+    "inventory_items": [
+      {
+        "id": "78c21f00-7c25-4361-b184-536657522d16",
+        "name": "Curd",
+        "name_key": "curd",
+        "category": "Dairy",
+        "unit_type": "g"
+      },
+      {
+        "id": "d6d34645-e962-4df3-ac8d-40fd6143c7f7",
+        "name": "Milk",
+        "name_key": "milk",
+        "category": "Dairy",
+        "unit_type": "ml"
+      },
+      {
+        "id": "77d8a229-b9e6-48d2-9279-4454797266bf",
+        "name": "Olive Oil",
+        "name_key": "olive oil",
+        "category": "Oils",
+        "unit_type": "ml"
+      },
+      {
+        "id": "a3d4f6cf-e803-4f5c-a1b5-a251ef834dac",
+        "name": "Chicken Breast",
+        "name_key": "chicken breast",
+        "category": "Protein",
+        "unit_type": "kg"
+      },
+      {
+        "id": "56357478-bbba-45d9-8c67-c7bd0389a8d0",
+        "name": "Egg",
+        "name_key": "egg",
+        "category": "Protein",
+        "unit_type": "pcs"
+      },
+      {
+        "id": "4ed79947-169d-4318-8d33-0845963135a9",
+        "name": "Paneer",
+        "name_key": "paneer",
+        "category": "Protein",
+        "unit_type": "g"
+      },
+      {
+        "id": "62c8ba12-5c09-4617-8896-8d900a5bbe28",
+        "name": "Black Pepper",
+        "name_key": "black pepper",
+        "category": "Spices",
+        "unit_type": "g"
+      },
+      {
+        "id": "1573734f-a92c-4114-abc4-c17b700e7c59",
+        "name": "Coriander Powder",
+        "name_key": "coriander powder",
+        "category": "Spices",
+        "unit_type": "g"
+      },
+      {
+        "id": "b4030731-bd15-422d-ba76-eb9baeb358c1",
+        "name": "Cumin Seeds",
+        "name_key": "cumin seeds",
+        "category": "Spices",
+        "unit_type": "g"
+      },
+      {
+        "id": "a9e033e9-034c-429c-a724-8f65e51e3b4b",
+        "name": "Garam Masala",
+        "name_key": "garam masala",
+        "category": "Spices",
+        "unit_type": "g"
+      },
+      {
+        "id": "e34bba59-d81b-47e7-9b1d-3b3c0039d92c",
+        "name": "Mustard Seeds",
+        "name_key": "mustard seeds",
+        "category": "Spices",
+        "unit_type": "g"
+      },
+      {
+        "id": "1d8904cb-381d-4485-8724-816699b317e4",
+        "name": "Red Chili Powder",
+        "name_key": "red chili powder",
+        "category": "Spices",
+        "unit_type": "g"
+      },
+      {
+        "id": "c0701f99-7d34-4b0b-a665-5f4aa61abc3f",
+        "name": "Salt",
+        "name_key": "salt",
+        "category": "Spices",
+        "unit_type": "g"
+      },
+      {
+        "id": "c103841e-f7ee-4cde-82d0-e77f12fd098c",
+        "name": "Turmeric",
+        "name_key": "turmeric",
+        "category": "Spices",
+        "unit_type": "g"
+      },
+      {
+        "id": "227b70e1-2751-4250-95e0-3f4e3145ecc7",
+        "name": "Atta",
+        "name_key": "atta",
+        "category": "Staples",
+        "unit_type": "kg"
+      },
+      {
+        "id": "2c6ce6be-1fa3-4ba2-8bad-af713abd95ae",
+        "name": "Moong Dal",
+        "name_key": "moong dal",
+        "category": "Staples",
+        "unit_type": "kg"
+      },
+      {
+        "id": "f011d2eb-5ee1-4f36-b916-d57a7e4788c2",
+        "name": "Oats",
+        "name_key": "oats",
+        "category": "Staples",
+        "unit_type": "kg"
+      },
+      {
+        "id": "6edd81ce-8b10-48c8-9c2d-89e20fed8809",
+        "name": "Poha",
+        "name_key": "poha",
+        "category": "Staples",
+        "unit_type": "kg"
+      },
+      {
+        "id": "a1ba143d-2892-4948-85fa-049cd50526f2",
+        "name": "Rice",
+        "name_key": "rice",
+        "category": "Staples",
+        "unit_type": "kg"
+      },
+      {
+        "id": "bc5a6547-574e-4c28-9a0e-3e2703fa03f5",
+        "name": "Toor Dal",
+        "name_key": "toor dal",
+        "category": "Staples",
+        "unit_type": "kg"
+      },
+      {
+        "id": "93643ff3-1200-4646-9250-d9d25c0170db",
+        "name": "Capsicum",
+        "name_key": "capsicum",
+        "category": "Vegetables",
+        "unit_type": "pcs"
+      },
+      {
+        "id": "b4d08c45-93aa-4daa-a368-a3cef05e12cd",
+        "name": "Carrot",
+        "name_key": "carrot",
+        "category": "Vegetables",
+        "unit_type": "kg"
+      },
+      {
+        "id": "7d10d64b-24ad-4f21-a743-df712a80a54b",
+        "name": "Garlic",
+        "name_key": "garlic",
+        "category": "Vegetables",
+        "unit_type": "g"
+      },
+      {
+        "id": "f3a6d7f0-9874-4bf9-b142-39842e49b622",
+        "name": "Ginger",
+        "name_key": "ginger",
+        "category": "Vegetables",
+        "unit_type": "g"
+      },
+      {
+        "id": "447ac748-6523-46c5-9357-6cad0da6cd84",
+        "name": "Green Chili",
+        "name_key": "green chili",
+        "category": "Vegetables",
+        "unit_type": "pcs"
+      },
+      {
+        "id": "c13b4a8a-1693-45e7-94e5-15896cbbeb5b",
+        "name": "Onion",
+        "name_key": "onion",
+        "category": "Vegetables",
+        "unit_type": "kg"
+      },
+      {
+        "id": "4b1944c6-ef05-42cc-a043-0a72abc2e750",
+        "name": "Peas",
+        "name_key": "peas",
+        "category": "Vegetables",
+        "unit_type": "g"
+      },
+      {
+        "id": "ff0596ef-5069-4d89-8933-fc718f1d6abe",
+        "name": "Potato",
+        "name_key": "potato",
+        "category": "Vegetables",
+        "unit_type": "kg"
+      },
+      {
+        "id": "9b978660-85ef-4789-b81f-3214eba010d4",
+        "name": "Spinach",
+        "name_key": "spinach",
+        "category": "Vegetables",
+        "unit_type": "bunch"
+      },
+      {
+        "id": "03f5ed55-35ab-465b-a701-528e95c0836c",
+        "name": "Tomato",
+        "name_key": "tomato",
+        "category": "Vegetables",
+        "unit_type": "kg"
+      }
+    ],
+    "recipes": [
+      {
+        "id": "1a827982-2dd0-4dc9-8066-eac935ff7fb9",
+        "name": "Bread Omelette",
+        "name_key": "bread omelette",
+        "meal_type": "Breakfast",
+        "servings": 1,
+        "total_minutes": 12,
+        "difficulty": "Easy"
+      },
+      {
+        "id": "5e77fe20-5f8d-4abb-a67c-bb77583ced33",
+        "name": "Veg Poha",
+        "name_key": "veg poha",
+        "meal_type": "Breakfast",
+        "servings": 2,
+        "total_minutes": 20,
+        "difficulty": "Easy"
+      },
+      {
+        "id": "3919d16f-d742-440f-a244-15f7b4e215fb",
+        "name": "Chicken Rice Bowl",
+        "name_key": "chicken rice bowl",
+        "meal_type": "Dinner",
+        "servings": 2,
+        "total_minutes": 30,
+        "difficulty": "Medium"
+      },
+      {
+        "id": "530f923d-912d-4bca-b38f-7188a3f04144",
+        "name": "Paneer Stir Fry",
+        "name_key": "paneer stir fry",
+        "meal_type": "Dinner",
+        "servings": 2,
+        "total_minutes": 25,
+        "difficulty": "Easy"
+      },
+      {
+        "id": "decd93fa-3fea-4140-ae17-bf20fac7c32e",
+        "name": "Dal Tadka",
+        "name_key": "dal tadka",
+        "meal_type": "Lunch",
+        "servings": 3,
+        "total_minutes": 35,
+        "difficulty": "Medium"
+      }
+    ],
+    "utensils": [
+      {
+        "id": "aac3b9ae-2431-4113-a6b7-1e0873966a79",
+        "name": "Mixer Grinder",
+        "name_key": "mixer grinder",
+        "category": "Appliances",
+        "note": "Grinding masalas and purees"
+      },
+      {
+        "id": "c50bf806-00a7-487d-8928-60af3098c028",
+        "name": "Pressure Cooker",
+        "name_key": "pressure cooker",
+        "category": "Appliances",
+        "note": "Dal and rice fast cook"
+      },
+      {
+        "id": "7c431a0a-e9e8-4414-b3cf-150ca4de9fe8",
+        "name": "Storage Container",
+        "name_key": "storage container",
+        "category": "Containers",
+        "note": "Prep and leftovers"
+      },
+      {
+        "id": "40993397-8f01-4f33-9b4e-7e0d9216c274",
+        "name": "Chef Knife",
+        "name_key": "chef knife",
+        "category": "Knives",
+        "note": "General chopping"
+      },
+      {
+        "id": "de644c4d-1a87-46e9-b3a8-4ce7930ad555",
+        "name": "Paring Knife",
+        "name_key": "paring knife",
+        "category": "Knives",
+        "note": "Fine cutting work"
+      },
+      {
+        "id": "1f734aa6-5ad3-42cc-b806-feb909b862d4",
+        "name": "Frying Pan",
+        "name_key": "frying pan",
+        "category": "Pans",
+        "note": "Daily saute and shallow fry"
+      },
+      {
+        "id": "0b1f6be0-d086-4379-a3f3-87c34be78a9b",
+        "name": "Kadai",
+        "name_key": "kadai",
+        "category": "Pans",
+        "note": "Deep cooking and curries"
+      },
+      {
+        "id": "27dd208b-f49c-45d7-85e2-3a63a30a196c",
+        "name": "Saucepan",
+        "name_key": "saucepan",
+        "category": "Pans",
+        "note": "Boiling and simmering"
+      },
+      {
+        "id": "c47631ec-5e58-45fb-9e38-25feaa3f886d",
+        "name": "Measuring Cups",
+        "name_key": "measuring cups",
+        "category": "Tools",
+        "note": "Portion consistency"
+      },
+      {
+        "id": "24e26089-30e8-4776-9bbd-ef103716679d",
+        "name": "Spatula",
+        "name_key": "spatula",
+        "category": "Tools",
+        "note": "Stir and flip"
+      }
+    ],
+    "categories": [
+      {
+        "entity": "exercises",
+        "field": "primary_muscle_group",
+        "value": "Arms"
+      },
+      {
+        "entity": "exercises",
+        "field": "primary_muscle_group",
+        "value": "Back"
+      },
+      {
+        "entity": "exercises",
+        "field": "primary_muscle_group",
+        "value": "Chest"
+      },
+      {
+        "entity": "exercises",
+        "field": "primary_muscle_group",
+        "value": "Legs"
+      },
+      {
+        "entity": "exercises",
+        "field": "primary_muscle_group",
+        "value": "Shoulders"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "category",
+        "value": "Dairy"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "category",
+        "value": "Oils"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "category",
+        "value": "Protein"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "category",
+        "value": "Spices"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "category",
+        "value": "Staples"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "category",
+        "value": "Vegetables"
+      },
+      {
+        "entity": "machines",
+        "field": "zone",
+        "value": "Cable"
+      },
+      {
+        "entity": "machines",
+        "field": "zone",
+        "value": "Cardio"
+      },
+      {
+        "entity": "machines",
+        "field": "zone",
+        "value": "Free Weights"
+      },
+      {
+        "entity": "machines",
+        "field": "zone",
+        "value": "Machines"
+      },
+      {
+        "entity": "recipes",
+        "field": "meal_type",
+        "value": "Breakfast"
+      },
+      {
+        "entity": "recipes",
+        "field": "meal_type",
+        "value": "Dinner"
+      },
+      {
+        "entity": "recipes",
+        "field": "meal_type",
+        "value": "Lunch"
+      },
+      {
+        "entity": "utensils",
+        "field": "category",
+        "value": "Appliances"
+      },
+      {
+        "entity": "utensils",
+        "field": "category",
+        "value": "Containers"
+      },
+      {
+        "entity": "utensils",
+        "field": "category",
+        "value": "Knives"
+      },
+      {
+        "entity": "utensils",
+        "field": "category",
+        "value": "Pans"
+      },
+      {
+        "entity": "utensils",
+        "field": "category",
+        "value": "Tools"
+      }
+    ],
+    "tags": [
+      {
+        "entity": "exercises",
+        "field": "equipment",
+        "value": "Barbell"
+      },
+      {
+        "entity": "exercises",
+        "field": "equipment",
+        "value": "Cable"
+      },
+      {
+        "entity": "exercises",
+        "field": "equipment",
+        "value": "Dumbbell"
+      },
+      {
+        "entity": "exercises",
+        "field": "equipment",
+        "value": "Machine"
+      },
+      {
+        "entity": "exercises",
+        "field": "type",
+        "value": "compound"
+      },
+      {
+        "entity": "exercises",
+        "field": "type",
+        "value": "isolation"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "unit_type",
+        "value": "bunch"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "unit_type",
+        "value": "g"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "unit_type",
+        "value": "kg"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "unit_type",
+        "value": "ml"
+      },
+      {
+        "entity": "inventory_items",
+        "field": "unit_type",
+        "value": "pcs"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Back"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Cardio"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Chest"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Glutes"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Hamstrings"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Lats"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Mid Back"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Quads"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Shoulders"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Triceps"
+      },
+      {
+        "entity": "machines",
+        "field": "primary_muscles",
+        "value": "Upper Back"
+      },
+      {
+        "entity": "recipes",
+        "field": "difficulty",
+        "value": "Easy"
+      },
+      {
+        "entity": "recipes",
+        "field": "difficulty",
+        "value": "Medium"
+      }
+    ]
+  },
+  "counts": {
+    "machines": 10,
+    "exercises": 10,
+    "inventory_items": 30,
+    "recipes": 5,
+    "utensils": 10,
+    "categories": 23,
+    "tags": 24
+  }
+}

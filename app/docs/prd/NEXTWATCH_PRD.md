@@ -21,6 +21,7 @@
 | 1.6 | 2026-02-18 | Codex | Added tappable detail surfaces for selected Wellness items: Utensils, Machines, and Exercises now navigate to dedicated detail screens with hero/details sections and back navigation |
 | 1.7 | 2026-02-18 | Codex | Standardized Food/Gym list tabs with Inventory-style bottom action dock (`Voice Command` + `Add`) and removed top add buttons on Recipes, Utensils, Machines, and Exercises |
 | 1.8 | 2026-02-18 | Codex | Food Add Items now supports detail-first flow: catalog row tap opens item detail with add/remove state, while Add button still supports direct add |
+| 1.9 | 2026-02-20 | Codex | Gym IA and onboarding milestone: Plan/Logs/Library tab architecture, Training Program timeline + onboarding interview in Plan, Logs/Log Detail UX upgrades, shared full-width segmented controls, and Test-only Chat/Form onboarding sandboxes |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -101,6 +102,15 @@
   - `AddFoodItems` catalog cards now open `FoodInventoryItemDetail` on row tap (same discovery flow as Machines/Exercises/Utensils/Recipes).
   - `FoodInventoryItemDetail` now supports `fromCatalog` mode with `Add to inventory` and `Remove from inventory` actions.
   - Returning from detail rehydrates `AddFoodItems` so `ADD/ADDED` state updates immediately.
+- 2026-02-20: Gym IA and onboarding feature expansion:
+  - Gym top-level tabs were consolidated to `Plan`, `Logs`, and `Library`; `Library` now hosts nested `Muscles/Exercises/Machines`.
+  - Added reusable full-width segmented control primitive and applied it to both Gym top tabs and Library subtabs.
+  - Added training block model + `ProgramTimelineScreen`, with program status card surfaced in Plan.
+  - Added `OnboardingInterviewScreen` entry from Plan (`Set up your plan`) with local draft/completion state.
+  - Refactored Gym log detail UX into `Planned/Actual` tabs with collapsible "Why this plan?" panel, expandable per-set cards, and modal logging flow.
+  - Added Test-only onboarding sandboxes under Test Tools:
+    - `Chat Onboarding` (`TestOnboardingSandboxScreen`)
+    - `Form Onboarding` (`TestFormOnboardingSandboxScreen`) with deterministic program-seed summary/export.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

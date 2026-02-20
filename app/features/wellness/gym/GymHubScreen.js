@@ -1,113 +1,148 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { FITNESS_EXERCISES } from '../../../data/wellness/fitnessExercises';
-import { GYM_MACHINES } from '../../../data/wellness/gymMachines';
 import ExercisesHomeScreen from './ExercisesHomeScreen';
 import GymHomeScreen from './GymHomeScreen';
+import GymLogsScreen from './GymLogsScreen';
 import GymMyStatsScreen from './GymMyStatsScreen';
 import MusclesHomeScreen from './muscles/MusclesHomeScreen';
+import SegmentedControl from '../../../ui/components/SegmentedControl';
 import COLORS from '../../../theme/colors';
+import UI_TOKENS from '../../../ui/tokens';
+import GymProgramBannerCard from './components/GymProgramBannerCard';
+import { useGymOnboardingState } from './onboarding/gymOnboardingStore';
 
-const SEGMENTS = ['Machines', 'Exercises', 'Muscles', 'My Stats'];
+const PRIMARY_TABS = [
+  { key: 'plan', label: 'Plan', icon: '🧭' },
+  { key: 'logs', label: 'Logs', icon: '🗒️' },
+  { key: 'library', label: 'Library', icon: '📚' },
+];
+
+const LIBRARY_TABS = [
+  { key: 'muscles', label: 'Muscles', icon: '💪' },
+  { key: 'exercises', label: 'Exercises', icon: '🤸' },
+  { key: 'machines', label: 'Machines', icon: '🏋️' },
+];
+
+function normalizePrimarySegment(value) {
+  if (value === 'Logs' || value === 'logs') return 'logs';
+  if (value === 'Library' || value === 'library') return 'library';
+  if (value === 'Plan' || value === 'plan' || value === 'My Stats' || value === 'my_stats') return 'plan';
+  if (value === 'Machines' || value === 'Exercises' || value === 'Muscles') return 'library';
+  return 'plan';
+}
+
+function normalizeLibrarySegment(value) {
+  if (value === 'Exercises' || value === 'exercises') return 'exercises';
+  if (value === 'Machines' || value === 'machines') return 'machines';
+  return 'muscles';
+}
 
 function GymHubScreen({ navigation, route }) {
-  const initialSegment = route.params?.initialSegment;
-  const [segment, setSegment] = useState(
-    initialSegment === 'Exercises'
-      ? 'Exercises'
-      : initialSegment === 'Muscles'
-        ? 'Muscles'
-        : initialSegment === 'My Stats'
-          ? 'My Stats'
-          : 'Machines',
-  );
+  const [segment, setSegment] = useState(normalizePrimarySegment(route.params?.initialSegment));
+  const [librarySegment, setLibrarySegment] = useState(normalizeLibrarySegment(route.params?.initialSegment));
+  const { onboardingCompleted } = useGymOnboardingState();
+  const [showOnboardingToast, setShowOnboardingToast] = useState(false);
 
   useEffect(() => {
-    if (route.params?.initialSegment === 'Exercises') {
-      setSegment('Exercises');
-      return;
-    }
-    if (route.params?.initialSegment === 'My Stats') {
-      setSegment('My Stats');
-      return;
-    }
-    if (route.params?.initialSegment === 'Muscles') {
-      setSegment('Muscles');
-      return;
-    }
-    if (route.params?.initialSegment === 'Machines') {
-      setSegment('Machines');
-    }
+    const incoming = route.params?.initialSegment;
+    setSegment(normalizePrimarySegment(incoming));
+    if (incoming) setLibrarySegment(normalizeLibrarySegment(incoming));
   }, [route.params?.initialSegment]);
 
-  const summary = useMemo(
-    () => ({
-      machines: GYM_MACHINES.length,
-      exercises: FITNESS_EXERCISES.length,
-      active: segment,
-    }),
-    [segment],
-  );
+  useEffect(() => {
+    if (!route.params?.onboardingToastTs) return;
+    setShowOnboardingToast(true);
+    const timer = setTimeout(() => setShowOnboardingToast(false), 2400);
+    return () => clearTimeout(timer);
+  }, [route.params?.onboardingToastTs]);
 
-  const renderContent = () => {
-    if (segment === 'Exercises') {
+  const libraryContent = useMemo(() => {
+    if (librarySegment === 'exercises') {
       return <ExercisesHomeScreen navigation={navigation} embedded showHeader={false} />;
     }
-
-    if (segment === 'Muscles') {
-      return <MusclesHomeScreen navigation={navigation} embedded showHeader={false} />;
+    if (librarySegment === 'machines') {
+      return <GymHomeScreen navigation={navigation} embedded showHeader={false} />;
     }
+    return <MusclesHomeScreen navigation={navigation} embedded showHeader={false} />;
+  }, [librarySegment, navigation]);
 
-    if (segment === 'My Stats') {
-      return <GymMyStatsScreen navigation={navigation} />;
+  const renderContent = () => {
+    if (segment === 'plan') {
+      return (
+        <GymMyStatsScreen
+          navigation={navigation}
+          embedded
+          showHeader={false}
+          topContent={(
+            <View style={styles.planTopWrap}>
+              {showOnboardingToast ? (
+                <View style={styles.onboardingToast}>
+                  <Ionicons name="checkmark-circle" size={14} color="#79E3B9" />
+                  <Text style={styles.onboardingToastText}>Onboarding saved. Plan personalized.</Text>
+                </View>
+              ) : null}
+
+              {!onboardingCompleted ? (
+                <TouchableOpacity
+                  style={styles.onboardingCtaCard}
+                  activeOpacity={0.92}
+                  onPress={() => navigation?.navigate('OnboardingInterview')}
+                >
+                  <View style={styles.onboardingCtaLeft}>
+                    <Text style={styles.onboardingCtaTitle}>Set up your plan</Text>
+                    <Text style={styles.onboardingCtaSub}>Answer a few questions to personalize your block.</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={16} color={COLORS.accent} />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.onboardingUpdateLink}
+                  activeOpacity={0.9}
+                  onPress={() => navigation?.navigate('OnboardingInterview')}
+                >
+                  <Text style={styles.onboardingUpdateLinkText}>Update onboarding answers</Text>
+                  <Ionicons name="chevron-forward" size={14} color={COLORS.muted} />
+                </TouchableOpacity>
+              )}
+
+              <GymProgramBannerCard onPress={() => navigation?.navigate('ProgramTimeline')} />
+              <Text style={styles.planSectionLabel}>My Stats</Text>
+            </View>
+          )}
+        />
+      );
     }
-
-    return <GymHomeScreen navigation={navigation} embedded showHeader={false} />;
+    if (segment === 'logs') {
+      return <GymLogsScreen navigation={navigation} />;
+    }
+    return (
+      <View style={styles.libraryWrap}>
+        <View style={styles.libraryTabsWrap}>
+          <SegmentedControl
+            items={LIBRARY_TABS}
+            selectedIndex={LIBRARY_TABS.findIndex((item) => item.key === librarySegment)}
+            onChange={(_, item) => setLibrarySegment(item.key)}
+            variant="secondary"
+          />
+        </View>
+        <View style={styles.libraryContentWrap}>{libraryContent}</View>
+      </View>
+    );
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.topCard}>
-          <View style={styles.topTitleRow}>
-            <View>
-              <Text style={styles.title}>Gym</Text>
-              <Text style={styles.subtitle}>Machines, exercises, and your body stats in one hub.</Text>
-            </View>
-            <View style={styles.badgePill}>
-              <Ionicons name="barbell-outline" size={13} color={COLORS.accent2} />
-              <Text style={styles.badgeText}>{summary.active}</Text>
-            </View>
-          </View>
+          <Text style={styles.title}>Gym</Text>
 
-          <View style={styles.quickStatsRow}>
-            <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatValue}>{summary.machines}</Text>
-              <Text style={styles.quickStatLabel}>machines</Text>
-            </View>
-            <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatValue}>{summary.exercises}</Text>
-              <Text style={styles.quickStatLabel}>exercises</Text>
-            </View>
-          </View>
-
-          <View style={styles.segmentWrap}>
-            {SEGMENTS.map((item) => {
-              const active = segment === item;
-              return (
-                <TouchableOpacity
-                  key={item}
-                  style={[styles.segmentButton, active && styles.segmentButtonActive]}
-                  activeOpacity={0.9}
-                  onPress={() => setSegment(item)}
-                >
-                  <Text style={[styles.segmentText, active && styles.segmentTextActive]}>{item}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          <SegmentedControl
+            items={PRIMARY_TABS}
+            selectedIndex={PRIMARY_TABS.findIndex((item) => item.key === segment)}
+            onChange={(_, item) => setSegment(item.key)}
+          />
         </View>
 
         <View style={styles.contentWrap}>{renderContent()}</View>
@@ -127,17 +162,11 @@ const styles = StyleSheet.create({
   },
   topCard: {
     paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 10,
+    paddingTop: 6,
+    paddingBottom: 6,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(162,167,179,0.12)',
     backgroundColor: COLORS.bg,
-  },
-  topTitleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 12,
   },
   title: {
     color: COLORS.text,
@@ -145,84 +174,89 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.2,
   },
-  subtitle: {
-    marginTop: 3,
-    color: COLORS.muted,
-    fontSize: 12,
-    maxWidth: 270,
+  contentWrap: {
+    flex: 1,
+    paddingBottom: UI_TOKENS.spacing.xs,
   },
-  badgePill: {
+  planTopWrap: {
+    gap: UI_TOKENS.spacing.sm,
+  },
+  onboardingToast: {
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(113,228,179,0.44)',
+    backgroundColor: 'rgba(113,228,179,0.14)',
+    paddingHorizontal: UI_TOKENS.spacing.sm,
+    paddingVertical: UI_TOKENS.spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  onboardingToastText: {
+    color: '#79E3B9',
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+  },
+  onboardingCtaCard: {
+    borderRadius: UI_TOKENS.radius.md,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(245,201,106,0.42)',
+    backgroundColor: 'rgba(245,201,106,0.1)',
+    paddingHorizontal: UI_TOKENS.spacing.md,
+    paddingVertical: UI_TOKENS.spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: UI_TOKENS.spacing.sm,
+  },
+  onboardingCtaLeft: {
+    flex: 1,
+    minWidth: 0,
+  },
+  onboardingCtaTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.subtitle + 1,
+    fontWeight: '700',
+  },
+  onboardingCtaSub: {
+    marginTop: 2,
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+  },
+  onboardingUpdateLink: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.3)',
+    backgroundColor: COLORS.card,
+    paddingHorizontal: UI_TOKENS.spacing.sm,
+    paddingVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(90,209,232,0.4)',
-    backgroundColor: 'rgba(90,209,232,0.12)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
   },
-  badgeText: {
-    color: COLORS.accent2,
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  quickStatsRow: {
-    marginTop: 10,
-    flexDirection: 'row',
-    gap: 8,
-  },
-  quickStatCard: {
-    flex: 1,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.18)',
-    backgroundColor: COLORS.card,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  quickStatValue: {
-    color: COLORS.text,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  quickStatLabel: {
+  onboardingUpdateLinkText: {
     color: COLORS.muted,
-    fontSize: 10,
-    marginTop: 2,
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+  },
+  planSectionLabel: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta + 1,
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.3,
+    letterSpacing: 0.4,
   },
-  segmentWrap: {
-    marginTop: 10,
-    borderRadius: 999,
-    padding: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.22)',
-    backgroundColor: COLORS.card,
-    flexDirection: 'row',
-    gap: 6,
-  },
-  segmentButton: {
+  libraryWrap: {
     flex: 1,
-    borderRadius: 999,
-    paddingVertical: 8,
-    alignItems: 'center',
   },
-  segmentButtonActive: {
-    backgroundColor: 'rgba(245,201,106,0.2)',
-    borderWidth: 1,
-    borderColor: 'rgba(245,201,106,0.48)',
+  libraryTabsWrap: {
+    paddingHorizontal: 16,
+    paddingTop: 2,
+    paddingBottom: 2,
+    backgroundColor: COLORS.bg,
   },
-  segmentText: {
-    color: COLORS.muted,
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  segmentTextActive: {
-    color: COLORS.accent,
-  },
-  contentWrap: {
+  libraryContentWrap: {
     flex: 1,
   },
 });

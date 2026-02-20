@@ -29,6 +29,8 @@ import {
   listUserIngredients,
   updateUserIngredientQuantity,
 } from '../../../core/api/foodInventoryDb';
+import { MODULE_KEYS } from '../../../core/api/userModuleStateDb';
+import ModuleReadyChip from '../../../ui/components/ModuleReadyChip';
 import COLORS from '../../../theme/colors';
 
 const CATEGORY_META = {
@@ -514,6 +516,8 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
       </View>
 
       <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
+        <ModuleReadyChip moduleKey={MODULE_KEYS.FOOD_INVENTORY} />
+
         <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceModal}>
           <Ionicons name="mic" size={18} color={COLORS.bg} />
           <Text style={styles.voiceButtonText}>Voice Command</Text>

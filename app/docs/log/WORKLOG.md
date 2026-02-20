@@ -272,3 +272,21 @@
 - Follow-ups / risks: Dual add paths (row->detail and direct ADD) are intentional but should remain visually clear.
 - Tag: nw-2026-02-18-1847-navigation-inventory-detail
 - Notes: app/docs/sessions/2026-02-18/1847_inventory-add-detail.md
+
+## 2026-02-20 - Session gym-plan-logs-onboarding-milestone
+- Summary: Delivered Gym information-architecture and onboarding milestone, including Plan/Logs/Library tabs, Program timeline + onboarding interview flows, Logs detail UX refactor, and Test-only onboarding sandboxes.
+- Changes:
+  - Reworked Gym tab model to `Plan` (default), `Logs`, `Library`, with `Library` sub-tabs for `Muscles/Exercises/Machines`.
+  - Added full-width shared segmented control usage for Gym top tabs and Library nested tabs.
+  - Added training block program module and `ProgramTimelineScreen`; surfaced program status card in Plan.
+  - Added Plan entry into `OnboardingInterviewScreen` with multi-step local draft/completion behavior.
+  - Upgraded Gym log detail flows (`Planned/Actual`, collapsible "Why this plan?", set-level expand + log modal, completion/skip states).
+  - Added Test Tools onboarding split:
+    - `Chat Onboarding` sandbox
+    - `Form Onboarding` sandbox with deterministic `programSeed` and local JSON export UI.
+- Files: app/features/wellness/gym/*, app/features/wellness/test/*, app/ui/components/SegmentedControl.js, app/ui/components/ScrollableTabBar.js, app/App.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: User-visible navigation and workflow changes in Gym + Test; no production DB schema migration required for onboarding sandboxes.
+- Validation performed: `npx expo export --platform ios` (run for this checkpoint).
+- Follow-ups / risks: Persist onboarding answers/program seed to backend profile state in a future milestone; keep Test sandboxes isolated from production onboarding state.
+- Tag: nw-2026-02-20-1820-navigation-gym-onboarding
+- Notes: app/docs/sessions/2026-02-20/1820_gym-plan-logs-onboarding-milestone.md

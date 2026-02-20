@@ -29,6 +29,9 @@ import MachineDetailScreen from './features/wellness/gym/MachineDetailScreen';
 import ExerciseDetailScreen from './features/wellness/gym/ExerciseDetailScreen';
 import AddMachinesScreen from './features/wellness/gym/AddMachinesScreen';
 import AddExercisesScreen from './features/wellness/gym/AddExercisesScreen';
+import GymLogDetailScreen from './features/wellness/gym/GymLogDetailScreen';
+import ProgramTimelineScreen from './features/wellness/gym/ProgramTimelineScreen';
+import OnboardingInterviewScreen from './features/wellness/gym/OnboardingInterviewScreen';
 import GymStatsEditScreen from './features/wellness/gym/GymStatsEditScreen';
 import MuscleGroupScreen from './features/wellness/gym/muscles/MuscleGroupScreen';
 import MuscleDetailScreen from './features/wellness/gym/muscles/MuscleDetailScreen';
@@ -52,6 +55,8 @@ import CategorySelectorScreen from './features/shared/category/CategorySelectorS
 import TestHomeScreen from './features/wellness/test/TestHomeScreen';
 import TestTablesScreen from './features/wellness/test/TestTablesScreen';
 import TestChatScreen from './features/wellness/test/TestChatScreen';
+import TestOnboardingSandboxScreen from './features/wellness/test/TestOnboardingSandboxScreen';
+import TestFormOnboardingSandboxScreen from './features/wellness/test/TestFormOnboardingSandboxScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PreferencesProvider } from './context/PreferencesContext';
 import { APP_CATEGORY, getSavedCategory } from './core/storage/categoryMode';
@@ -347,6 +352,21 @@ function GymStackScreens() {
         options={{ title: 'Edit Gym Stats' }}
       />
       <WellnessGymStack.Screen
+        name="GymLogDetail"
+        component={GymLogDetailScreen}
+        options={{ title: 'Log Detail' }}
+      />
+      <WellnessGymStack.Screen
+        name="ProgramTimeline"
+        component={ProgramTimelineScreen}
+        options={{ title: 'Training Program' }}
+      />
+      <WellnessGymStack.Screen
+        name="OnboardingInterview"
+        component={OnboardingInterviewScreen}
+        options={{ headerShown: false }}
+      />
+      <WellnessGymStack.Screen
         name="MuscleGroup"
         component={MuscleGroupScreen}
         options={({ route }) => ({ title: route.params?.groupLabel ?? 'Muscle Group' })}
@@ -424,6 +444,16 @@ function TestStackScreens() {
         name="TestChat"
         component={TestChatScreen}
         options={{ title: 'Chat' }}
+      />
+      <WellnessTestStack.Screen
+        name="TestOnboardingSandbox"
+        component={TestOnboardingSandboxScreen}
+        options={{ title: 'Onboarding Sandbox' }}
+      />
+      <WellnessTestStack.Screen
+        name="TestFormOnboardingSandbox"
+        component={TestFormOnboardingSandboxScreen}
+        options={{ title: 'Form Onboarding' }}
       />
     </WellnessTestStack.Navigator>
   );

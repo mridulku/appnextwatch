@@ -18,6 +18,8 @@ import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
 import { FOOD_RECIPES } from '../../../data/wellness/foodRecipes';
+import { MODULE_KEYS } from '../../../core/api/userModuleStateDb';
+import ModuleReadyChip from '../../../ui/components/ModuleReadyChip';
 import COLORS from '../../../theme/colors';
 
 const CATEGORY_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Other'];
@@ -185,6 +187,8 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
         )}
       </View>
       <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
+        <ModuleReadyChip moduleKey={MODULE_KEYS.FOOD_RECIPES} />
+
         <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceCommand}>
           <Ionicons name="mic" size={18} color={COLORS.bg} />
           <Text style={styles.voiceButtonText}>Voice Command</Text>

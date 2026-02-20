@@ -1,1 +1,1 @@
-[Latest session notes](2026-02-18/1847_inventory-add-detail.md)
+[Latest session notes](2026-02-20/1820_gym-plan-logs-onboarding-milestone.md)

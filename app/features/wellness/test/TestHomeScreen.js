@@ -38,6 +38,20 @@ function TestHomeScreen({ navigation }) {
           icon="chatbubble-ellipses-outline"
           onPress={() => navigation.navigate('TestChat')}
         />
+
+        <ToolCard
+          title="Chat Onboarding"
+          subtitle="Chat-based onboarding sandbox"
+          icon="sparkles-outline"
+          onPress={() => navigation.navigate('TestOnboardingSandbox')}
+        />
+
+        <ToolCard
+          title="Form Onboarding"
+          subtitle="Structured inputs + algorithm seed"
+          icon="list-outline"
+          onPress={() => navigation.navigate('TestFormOnboardingSandbox')}
+        />
       </View>
     </SafeAreaView>
   );

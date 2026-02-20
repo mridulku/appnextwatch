@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import COLORS from '../../../theme/colors';
+import SetupWidget from '../../../ui/components/SetupWidget';
+import useSetupStatus from './useSetupStatus';
 
 const MEAL_BLUEPRINT = [
   {
@@ -60,6 +62,12 @@ function WellnessHomeScreen({ navigation }) {
     lunch: 'planned',
     dinner: 'planned',
   });
+  const {
+    sections: setupSections,
+    completedCount,
+    totalCount,
+    loading: setupLoading,
+  } = useSetupStatus();
 
   const completedMeals = useMemo(
     () => Object.values(mealStatus).filter((value) => value === 'done').length,
@@ -83,9 +91,34 @@ function WellnessHomeScreen({ navigation }) {
     switchTab('Sessions', { screen: 'WorkoutSessionSetup' });
   };
 
+  const goToSetupSection = (section) => {
+    if (!section) return;
+    if (section.targetTab === 'Gym') {
+      switchTab('Gym', {
+        screen: 'GymHome',
+        params: { initialSegment: section.initialSegment },
+      });
+      return;
+    }
+    if (section.targetTab === 'Food') {
+      switchTab('Food', {
+        screen: 'FoodHome',
+        params: { initialSegment: section.initialSegment },
+      });
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <SetupWidget
+          sections={setupSections}
+          completedCount={completedCount}
+          totalCount={totalCount}
+          loading={setupLoading}
+          onPressSection={goToSetupSection}
+        />
+
         <View style={styles.heroWrap}>
           <Text style={styles.dateText}>{formatDateText()}</Text>
           <Text style={styles.greetingText}>{getGreeting()}, Mridul</Text>
