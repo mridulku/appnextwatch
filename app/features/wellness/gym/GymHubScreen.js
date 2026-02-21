@@ -12,10 +12,12 @@ import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
 import GymProgramBannerCard from './components/GymProgramBannerCard';
 import { useGymOnboardingState } from './onboarding/gymOnboardingStore';
+import GymChatScreen from './GymChatScreen';
 
 const PRIMARY_TABS = [
+  { key: 'chat', label: 'Chat', icon: '💬' },
+  { key: 'logs', label: 'Sessions', icon: '🗒️' },
   { key: 'plan', label: 'Plan', icon: '🧭' },
-  { key: 'logs', label: 'Logs', icon: '🗒️' },
   { key: 'library', label: 'Library', icon: '📚' },
 ];
 
@@ -26,11 +28,12 @@ const LIBRARY_TABS = [
 ];
 
 function normalizePrimarySegment(value) {
+  if (value === 'Chat' || value === 'chat') return 'chat';
   if (value === 'Logs' || value === 'logs') return 'logs';
   if (value === 'Library' || value === 'library') return 'library';
   if (value === 'Plan' || value === 'plan' || value === 'My Stats' || value === 'my_stats') return 'plan';
   if (value === 'Machines' || value === 'Exercises' || value === 'Muscles') return 'library';
-  return 'plan';
+  return 'chat';
 }
 
 function normalizeLibrarySegment(value) {
@@ -69,6 +72,9 @@ function GymHubScreen({ navigation, route }) {
   }, [librarySegment, navigation]);
 
   const renderContent = () => {
+    if (segment === 'chat') {
+      return <GymChatScreen />;
+    }
     if (segment === 'plan') {
       return (
         <GymMyStatsScreen

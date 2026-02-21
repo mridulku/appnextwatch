@@ -57,6 +57,7 @@ import TestTablesScreen from './features/wellness/test/TestTablesScreen';
 import TestChatScreen from './features/wellness/test/TestChatScreen';
 import TestOnboardingSandboxScreen from './features/wellness/test/TestOnboardingSandboxScreen';
 import TestFormOnboardingSandboxScreen from './features/wellness/test/TestFormOnboardingSandboxScreen';
+import TestHomeLaterScreen from './features/wellness/test/TestHomeLaterScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PreferencesProvider } from './context/PreferencesContext';
 import { APP_CATEGORY, getSavedCategory } from './core/storage/categoryMode';
@@ -72,6 +73,7 @@ const WellnessHomeStack = createNativeStackNavigator();
 const WellnessGymStack = createNativeStackNavigator();
 const WellnessFoodStack = createNativeStackNavigator();
 const WellnessTestStack = createNativeStackNavigator();
+const WellnessTestHomeLaterStack = createNativeStackNavigator();
 
 const SHARED_STACK_OPTIONS = {
   headerStyle: { backgroundColor: COLORS.bg },
@@ -291,18 +293,7 @@ function WellnessHomeStackScreens() {
       <WellnessHomeStack.Screen
         name="WellnessHome"
         component={WellnessHomeScreen}
-        options={({ navigation }) => ({
-          title: 'Home',
-          headerRight: () => (
-            <TouchableOpacity
-              style={styles.homeHeaderSettingsButton}
-              activeOpacity={0.9}
-              onPress={() => navigation.navigate('HomeSettings')}
-            >
-              <Ionicons name="settings-outline" size={17} color={COLORS.text} />
-            </TouchableOpacity>
-          ),
-        })}
+        options={{ title: 'Home' }}
       />
       <WellnessHomeStack.Screen
         name="HomeSettings"
@@ -455,14 +446,52 @@ function TestStackScreens() {
         component={TestFormOnboardingSandboxScreen}
         options={{ title: 'Form Onboarding' }}
       />
+      <WellnessTestStack.Screen
+        name="TestHomeLater"
+        component={TestHomeLaterStackScreens}
+        options={{ title: 'Home (Later)', headerShown: false }}
+      />
+      <WellnessTestStack.Screen
+        name="TestSessionsLater"
+        component={SessionStackScreens}
+        options={{ title: 'Sessions (Later)', headerShown: false }}
+      />
     </WellnessTestStack.Navigator>
+  );
+}
+
+function TestHomeLaterStackScreens() {
+  return (
+    <WellnessTestHomeLaterStack.Navigator screenOptions={SHARED_STACK_OPTIONS}>
+      <WellnessTestHomeLaterStack.Screen
+        name="TestHomeLaterMain"
+        component={TestHomeLaterScreen}
+        options={({ navigation }) => ({
+          title: 'Home (Later)',
+          headerRight: () => (
+            <TouchableOpacity
+              style={styles.homeHeaderSettingsButton}
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('TestHomeLaterSettings')}
+            >
+              <Ionicons name="settings-outline" size={17} color={COLORS.text} />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <WellnessTestHomeLaterStack.Screen
+        name="TestHomeLaterSettings"
+        component={HomeSettingsScreen}
+        options={{ title: 'Settings' }}
+      />
+    </WellnessTestHomeLaterStack.Navigator>
   );
 }
 
 function WellnessAppNavigator() {
   return (
     <WellnessTab.Navigator
-      initialRouteName="Home"
+      initialRouteName="Gym"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: styles.wellnessTabBar,
@@ -471,8 +500,6 @@ function WellnessAppNavigator() {
         tabBarLabelStyle: styles.wellnessTabLabel,
         tabBarIcon: ({ color }) => {
           const icons = {
-            Home: 'home-outline',
-            Sessions: 'pulse-outline',
             Gym: 'barbell-outline',
             Food: 'restaurant-outline',
             Test: 'flask-outline',
@@ -481,22 +508,6 @@ function WellnessAppNavigator() {
         },
       })}
     >
-      <WellnessTab.Screen
-        name="Home"
-        component={WellnessHomeStackScreens}
-        options={{
-          title: 'Home',
-          tabBarLabel: 'Home',
-        }}
-      />
-      <WellnessTab.Screen
-        name="Sessions"
-        component={SessionStackScreens}
-        options={{
-          title: 'Sessions',
-          tabBarLabel: 'Sessions',
-        }}
-      />
       <WellnessTab.Screen
         name="Gym"
         component={GymStackScreens}

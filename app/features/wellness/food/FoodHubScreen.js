@@ -1,48 +1,83 @@
-import { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import CookHomeScreen from './CookHomeScreen';
+import FoodChatScreen from './FoodChatScreen';
 import FoodInventoryScreen from './FoodInventoryScreen';
 import FoodMyStatsScreen from './FoodMyStatsScreen';
 import FoodUtensilsScreen from './FoodUtensilsScreen';
+import SegmentedControl from '../../../ui/components/SegmentedControl';
 import COLORS from '../../../theme/colors';
+import UI_TOKENS from '../../../ui/tokens';
 
-const SEGMENTS = ['Inventory', 'Recipes', 'Utensils', 'My Stats'];
-const SEGMENT_EMOJI = {
-  Inventory: '🥕',
-  Recipes: '🍳',
-  Utensils: '🍽️',
-  'My Stats': '📊',
-};
+const PRIMARY_TABS = [
+  { key: 'chat', label: 'Chat', icon: '💬' },
+  { key: 'recipes', label: 'Sessions', icon: '🍳' },
+  { key: 'plan', label: 'Plan', icon: '📊' },
+  { key: 'library', label: 'Library', icon: '📚' },
+];
 
-function normalizeSegment(value) {
-  if (value === 'Recipes') return 'Recipes';
-  if (value === 'Utensils') return 'Utensils';
-  if (value === 'My Stats') return 'My Stats';
-  return 'Inventory';
+const LIBRARY_TABS = [
+  { key: 'inventory', label: 'Inventory', icon: '🥕' },
+  { key: 'utensils', label: 'Utensils', icon: '🍽️' },
+];
+
+function normalizePrimarySegment(value) {
+  if (value === 'chat' || value === 'Chat') return 'chat';
+  if (value === 'recipes' || value === 'Recipes') return 'recipes';
+  if (value === 'plan' || value === 'Plan' || value === 'my_stats' || value === 'My Stats') return 'plan';
+  if (value === 'library' || value === 'Library' || value === 'Inventory' || value === 'Utensils') return 'library';
+  return 'chat';
+}
+
+function normalizeLibrarySegment(value) {
+  if (value === 'utensils' || value === 'Utensils') return 'utensils';
+  return 'inventory';
 }
 
 function FoodHubScreen({ navigation, route }) {
-  const [segment, setSegment] = useState(normalizeSegment(route.params?.initialSegment));
+  const [segment, setSegment] = useState(normalizePrimarySegment(route.params?.initialSegment));
+  const [librarySegment, setLibrarySegment] = useState(normalizeLibrarySegment(route.params?.initialSegment));
 
   useEffect(() => {
-    setSegment(normalizeSegment(route.params?.initialSegment));
+    const incoming = route.params?.initialSegment;
+    setSegment(normalizePrimarySegment(incoming));
+    if (incoming) setLibrarySegment(normalizeLibrarySegment(incoming));
   }, [route.params?.initialSegment]);
 
+  const libraryContent = useMemo(() => {
+    if (librarySegment === 'utensils') {
+      return <FoodUtensilsScreen navigation={navigation} embedded showHero={false} />;
+    }
+    return <FoodInventoryScreen navigation={navigation} embedded showHero={false} />;
+  }, [librarySegment, navigation]);
+
   const renderContent = () => {
-    if (segment === 'Recipes') {
+    if (segment === 'chat') {
+      return <FoodChatScreen />;
+    }
+
+    if (segment === 'recipes') {
       return <CookHomeScreen navigation={navigation} embedded showHeader={false} />;
     }
 
-    if (segment === 'Utensils') {
-      return <FoodUtensilsScreen navigation={navigation} embedded showHero={false} />;
-    }
-
-    if (segment === 'My Stats') {
+    if (segment === 'plan') {
       return <FoodMyStatsScreen navigation={navigation} />;
     }
 
-    return <FoodInventoryScreen navigation={navigation} embedded showHero={false} />;
+    return (
+      <View style={styles.libraryWrap}>
+        <View style={styles.libraryTabsWrap}>
+          <SegmentedControl
+            items={LIBRARY_TABS}
+            selectedIndex={LIBRARY_TABS.findIndex((item) => item.key === librarySegment)}
+            onChange={(_, item) => setLibrarySegment(item.key)}
+            variant="secondary"
+          />
+        </View>
+        <View style={styles.libraryContentWrap}>{libraryContent}</View>
+      </View>
+    );
   };
 
   return (
@@ -51,23 +86,11 @@ function FoodHubScreen({ navigation, route }) {
         <View style={styles.topCard}>
           <Text style={styles.title}>Food</Text>
 
-          <View style={styles.segmentWrap}>
-            {SEGMENTS.map((item) => {
-              const active = segment === item;
-              return (
-                <TouchableOpacity
-                  key={item}
-                  style={[styles.segmentButton, active && styles.segmentButtonActive]}
-                  activeOpacity={0.9}
-                  onPress={() => setSegment(item)}
-                >
-                  <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
-                    {SEGMENT_EMOJI[item]} {item}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          <SegmentedControl
+            items={PRIMARY_TABS}
+            selectedIndex={PRIMARY_TABS.findIndex((item) => item.key === segment)}
+            onChange={(_, item) => setSegment(item.key)}
+          />
         </View>
 
         <View style={styles.contentWrap}>{renderContent()}</View>
@@ -87,8 +110,8 @@ const styles = StyleSheet.create({
   },
   topCard: {
     paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 10,
+    paddingTop: 6,
+    paddingBottom: 6,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(162,167,179,0.12)',
     backgroundColor: COLORS.bg,
@@ -99,36 +122,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.2,
   },
-  segmentWrap: {
-    marginTop: 10,
-    borderRadius: 999,
-    padding: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.22)',
-    backgroundColor: COLORS.card,
-    flexDirection: 'row',
-    gap: 6,
-  },
-  segmentButton: {
-    flex: 1,
-    borderRadius: 999,
-    paddingVertical: 8,
-    alignItems: 'center',
-  },
-  segmentButtonActive: {
-    backgroundColor: 'rgba(245,201,106,0.2)',
-    borderWidth: 1,
-    borderColor: 'rgba(245,201,106,0.48)',
-  },
-  segmentText: {
-    color: COLORS.muted,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  segmentTextActive: {
-    color: COLORS.accent,
-  },
   contentWrap: {
+    flex: 1,
+    paddingBottom: UI_TOKENS.spacing.xs,
+  },
+  libraryWrap: {
+    flex: 1,
+  },
+  libraryTabsWrap: {
+    paddingHorizontal: 16,
+    paddingTop: 2,
+    paddingBottom: 2,
+    backgroundColor: COLORS.bg,
+  },
+  libraryContentWrap: {
     flex: 1,
   },
 });

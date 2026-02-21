@@ -290,3 +290,13 @@
 - Follow-ups / risks: Persist onboarding answers/program seed to backend profile state in a future milestone; keep Test sandboxes isolated from production onboarding state.
 - Tag: nw-2026-02-20-1813-navigation-gym-onboarding
 - Notes: app/docs/sessions/2026-02-20/1813_gym-plan-logs-onboarding-milestone.md
+
+## 2026-02-21 - Session data-gym-chat-wellness-tabs
+- Summary: Completed wellness IA refocus and Gym DB chat bridge milestone with edge-function/OpenAI context path and payload-debug visibility.
+- Changes: Reduced root wellness tabs to Gym/Food/Test; moved legacy Home + Sessions flows into Test as later tools; added Chat-first hub structure in Gym/Food; introduced `supabase/functions/chat_db` allowlisted DB action bridge with optional OpenAI contextual responses; added Gym chat payload panels for request/edge/OpenAI visibility.
+- Files: app/App.js, app/features/wellness/home/WellnessHomeScreen.js, app/features/wellness/test/TestHomeScreen.js, app/features/wellness/test/TestHomeLaterScreen.js, app/features/wellness/gym/GymHubScreen.js, app/features/wellness/gym/GymChatScreen.js, app/features/wellness/food/FoodHubScreen.js, app/features/wellness/food/FoodChatScreen.js, supabase/functions/chat_db/index.ts, supabase/functions/chat_db/config.toml, supabase/functions/deno.json, package.json, package-lock.json, tsconfig.json, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: User-visible navigation changes in wellness shell; Gym Chat now resolves DB-backed answers server-side and can generate OpenAI responses from structured DB context; debug payload inspection is available in Gym Chat UI.
+- Validation performed: `npx expo export --platform ios` passed.
+- Follow-ups / risks: Keep JWT mode disabled only for current testing; once auth path is stable, re-enable stricter function auth and pass real user tokens consistently.
+- Tag: nw-2026-02-21-1942-data-gym-chat (T1 + T3)
+- Notes: app/docs/sessions/2026-02-21/1942_data-gym-chat-wellness-tabs.md

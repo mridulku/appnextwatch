@@ -52,6 +52,20 @@ function TestHomeScreen({ navigation }) {
           icon="list-outline"
           onPress={() => navigation.navigate('TestFormOnboardingSandbox')}
         />
+
+        <ToolCard
+          title="Home (Later)"
+          subtitle="Moved from main wellness tabs"
+          icon="home-outline"
+          onPress={() => navigation.navigate('TestHomeLater')}
+        />
+
+        <ToolCard
+          title="Sessions (Later)"
+          subtitle="Moved from main wellness tabs"
+          icon="pulse-outline"
+          onPress={() => navigation.navigate('TestSessionsLater')}
+        />
       </View>
     </SafeAreaView>
   );

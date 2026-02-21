@@ -22,6 +22,7 @@
 | 1.7 | 2026-02-18 | Codex | Standardized Food/Gym list tabs with Inventory-style bottom action dock (`Voice Command` + `Add`) and removed top add buttons on Recipes, Utensils, Machines, and Exercises |
 | 1.8 | 2026-02-18 | Codex | Food Add Items now supports detail-first flow: catalog row tap opens item detail with add/remove state, while Add button still supports direct add |
 | 1.9 | 2026-02-20 | Codex | Gym IA and onboarding milestone: Plan/Logs/Library tab architecture, Training Program timeline + onboarding interview in Plan, Logs/Log Detail UX upgrades, shared full-width segmented controls, and Test-only Chat/Form onboarding sandboxes |
+| 2.0 | 2026-02-21 | Codex | Wellness IA checkpoint: root tabs reduced to Gym/Food/Test, Gym + Food now include first-class Chat tabs, Home/Sessions moved under Test (Later), and Gym Chat now uses Supabase Edge Function `chat_db` with OpenAI-backed DB-context responses + debug payload visibility |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -111,6 +112,13 @@
   - Added Test-only onboarding sandboxes under Test Tools:
     - `Chat Onboarding` (`TestOnboardingSandboxScreen`)
     - `Form Onboarding` (`TestFormOnboardingSandboxScreen`) with deterministic program-seed summary/export.
+- 2026-02-21: Wellness IA + Gym DB chat integration:
+  - Wellness root tabs now expose `Gym`, `Food`, and `Test` only.
+  - Main `Home` is now placeholder-only; previous rich Home and Sessions flows moved to Test tools as `Home (Later)` and `Sessions (Later)`.
+  - Gym top tabs now include `Chat` first (`Chat`, `Sessions`, `Plan`, `Library`).
+  - Food top tabs now include `Chat` first (`Chat`, `Sessions`, `Plan`, `Library`) with nested Library sub-tabs (`Inventory`, `Utensils`).
+  - Added server-side Supabase Edge Function `chat_db` to resolve allowlisted DB actions and optionally generate responses via OpenAI using structured DB context.
+  - Gym Chat now calls `chat_db` and surfaces request/response payload debugging, including edge context and OpenAI request/response payloads in dev mode.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.
@@ -128,7 +136,7 @@ Code references:
 ### 1.1 Product Shape Today
 - App launches to login (demo credentials flow), then routes by saved category (`movies`, `fitness`, `food`) or shows category selector.
 - Movies mode is a bottom-tab app with nested stacks for directory, lists, and profile.
-- Wellness mode is a bottom-tab app with `Home`, `Sessions`, `Gym`, `Food`, each with nested stack/hub behavior.
+- Wellness mode is a bottom-tab app with `Gym`, `Food`, and `Test`; legacy Home/Sessions experiences are now exposed as Test-only "Later" tools.
 
 Code references:
 - `appnextwatch/screens/LoginScreen.js`
@@ -252,6 +260,7 @@ Code references:
 ### 4.3 Rollout/Operational Constraints (inferred)
 - Feature changes must preserve both mode navigators (`MoviesApp` and `WellnessApp`) and category routing.
 - Backward compatibility with existing AsyncStorage keys is important to avoid data loss.
+- Secrets boundary is strict for DB chat: service-role keys must stay server-side (Edge Function only), while clients use anon/public key only.
 
 Code references:
 - `appnextwatch/App.js`
@@ -271,10 +280,10 @@ Code references:
 3. If no saved category, user chooses **Movies** or **Fitness / Food** in Category Selector.
 4. App enters selected navigator:
    - **Movies**: `Explore` / `Directory` / `Chat` / `Lists` / `Profile`.
-   - **Wellness**: `Home` / `Sessions` / `Gym` / `Food`.
+   - **Wellness**: `Gym` / `Food` / `Test`.
 5. User performs deep actions:
    - Movies: reel browse -> movie detail -> clips/rating/notes; directory -> actor/director/awards; chat with OpenAI.
-   - Wellness: start workout/cooking session -> run timer/chat/voice simulation -> session summary/history; gym and food hub operations.
+   - Wellness: Gym chat + sessions/program/library workflows, Food chat + sessions/plan/library workflows, and Test tools for moved legacy flows.
 6. Data updates persist locally (wellness inventories/history/profile) and/or fetch from Supabase (movies domain).
 
 Code references:
@@ -292,10 +301,11 @@ Code references:
 - `appnextwatch/screens/FoodHubScreen.js`
 
 ### 5.2 Key User Actions Mapped to Routes
-- Start workout session: `Home -> Sessions/WorkoutSessionSetup -> WorkoutSessionRun -> SessionSummary`
-- Start cooking session: `Sessions/CookingSessionSetup -> CookingSessionRun -> SessionSummary`
-- Manage food inventory: `FoodHub (Inventory) -> DB-backed grouped list -> catalog picker add/upsert -> stepper quantity updates`
-- Browse gym assets: `GymHub (Machines|Exercises) -> detail screens`
+- Gym DB chat: `GymHub (Chat) -> Edge Function chat_db -> allowlisted DB action -> OpenAI contextual answer`
+- Start workout session (current path): `Test -> Sessions (Later) -> WorkoutSessionSetup -> WorkoutSessionRun -> SessionSummary`
+- Start cooking session (current path): `Test -> Sessions (Later)/CookingSessionSetup -> CookingSessionRun -> SessionSummary`
+- Manage food inventory: `FoodHub (Library/Inventory) -> DB-backed grouped list -> catalog picker add/upsert -> stepper quantity updates`
+- Browse gym assets: `GymHub (Library/Muscles|Exercises|Machines) -> detail screens`
 
 Code references:
 - `appnextwatch/screens/WellnessHomeScreen.js`
@@ -317,7 +327,7 @@ Code references:
 | US-04 | Movie user | a full movie detail experience | I can rate, note, and browse clips/platform hints | P1 | Detail screen shows metadata, supports rating state and note sheet, supports clip/cinema interactions | `screens/MovieDetailScreen.js`, `data/streaming.js` |
 | US-05 | Directory user | curated entry points for movies/talent/awards | I can navigate quickly across content entities | P0 | Directory loads movies/actors/directors/award shows and deep-links into corresponding stacks | `screens/DirectoryScreen.js`, `core/supabaseApi.js`, `App.js` |
 | US-06 | Chat user | AI movie assistant responses constrained to catalog context | answers stay relevant to available titles | P1 | Chat builds movie context, calls OpenAI when key exists, and shows errors when missing key | `screens/ChatScreen.js`, `core/openai.js`, `core/env.js` |
-| US-07 | Wellness user | a dashboard for today’s meals/workout | I can start key actions from one screen | P1 | Home renders meal/workout cards and `Start` routes to workout session setup | `screens/WellnessHomeScreen.js`, `App.js` |
+| US-07 | Wellness user | a stable landing placeholder for Home while IA is being reworked | I can avoid stale production-facing home flows | P2 | Home renders placeholder copy only and does not expose previous meal/workout dashboard controls | `app/features/wellness/home/WellnessHomeScreen.js`, `app/App.js` |
 | US-08 | Session user | to start workout sessions from templates | I can run structured workouts | P0 | Setup screen passes template/session metadata into runner with generated session ID | `screens/WorkoutSessionSetupScreen.js`, `data/sessionSeeds.js`, `core/sessionHistoryStorage.js` |
 | US-09 | Session user | to start cooking sessions from meals or recipes | I can run guided cooking with minimal setup | P0 | Setup supports selecting meal or recipe and navigates to cooking runner in session mode | `screens/CookingSessionSetupScreen.js`, `data/sessionSeeds.js`, `data/foodRecipes.js` |
 | US-10 | Session user | workout progress logging with timer and set tracking | I can complete and review a session | P0 | Runner supports start/pause/log set/next/finish and writes session history record | `screens/ExerciseSessionScreen.js`, `core/sessionHistoryStorage.js` |
@@ -329,6 +339,7 @@ Code references:
 | US-16 | User/admin | settings and profile stats persistence | I can retain personal targets and preferences in wellness mode | P1 | Home settings loads/saves profile settings and can reset to defaults | `screens/HomeSettingsScreen.js`, `core/wellnessProfileStorage.js`, `screens/SettingsProfileScreen.js` |
 | US-17 | Gym user | save exercises from catalog into my own list | I can keep workout planning focused on relevant movements | P1 | Gym Exercises starts empty, add modal supports search/category filters from `catalog_exercises`, selected rows persist in `user_exercises`, and remove is supported | `app/features/wellness/gym/ExercisesHomeScreen.js`, `app/hooks/useCatalogSelection.js`, `supabase/migrations/20260218102000_add_user_exercises_and_user_recipes.sql` |
 | US-18 | Food user | save recipes from catalog into my own list | I can keep a personal short list for repeat cooking | P1 | Food Recipes starts empty, add modal supports meal-type category and search, selected rows persist in `user_recipes`, grouped list supports remove, and recipe detail opens when a local recipe mapping exists | `app/features/wellness/food/CookHomeScreen.js`, `app/hooks/useCatalogSelection.js`, `supabase/migrations/20260218102000_add_user_exercises_and_user_recipes.sql` |
+| US-19 | Gym user | query remote gym catalog data in chat with safe server-side controls | I can inspect available tables/rows without exposing privileged DB credentials in client | P1 | Gym Chat sends user message to Edge Function `chat_db`, server enforces allowlisted actions/tables, OpenAI response uses DB context, and dev payload panels expose request/edge/OpenAI payloads | `app/features/wellness/gym/GymChatScreen.js`, `supabase/functions/chat_db/index.ts`, `supabase/functions/chat_db/config.toml` |
 
 ### 6.1 QA Checklist (code-aligned)
 - [ ] Login failure/success paths return expected messages and auth transitions.
@@ -337,6 +348,7 @@ Code references:
 - [ ] Sessions create consistent history records for completed and abandoned runs.
 - [ ] Food voice commands parse verbs/units and clamp invalid removals safely.
 - [ ] Gym/Food hubs retain expected segment navigation and detail route integrity.
+- [ ] Gym DB chat function returns deterministic allowlisted results and never requires service-role key on client.
 
 > OPEN QUESTION:
 > Should there be a unified event model (analytics) for key actions such as session start/finish, inventory update, and movie detail engagement? No dedicated analytics module is present today.
