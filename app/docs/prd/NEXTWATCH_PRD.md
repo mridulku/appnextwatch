@@ -23,6 +23,7 @@
 | 1.8 | 2026-02-18 | Codex | Food Add Items now supports detail-first flow: catalog row tap opens item detail with add/remove state, while Add button still supports direct add |
 | 1.9 | 2026-02-20 | Codex | Gym IA and onboarding milestone: Plan/Logs/Library tab architecture, Training Program timeline + onboarding interview in Plan, Logs/Log Detail UX upgrades, shared full-width segmented controls, and Test-only Chat/Form onboarding sandboxes |
 | 2.0 | 2026-02-21 | Codex | Wellness IA checkpoint: root tabs reduced to Gym/Food/Test, Gym + Food now include first-class Chat tabs, Home/Sessions moved under Test (Later), and Gym Chat now uses Supabase Edge Function `chat_db` with OpenAI-backed DB-context responses + debug payload visibility |
+| 2.1 | 2026-02-24 | Codex | Gym delivery checkpoint: DB-backed Sessions + Templates flows, expanded/scored muscle-exercise-machine mapping surfaces, Gym Chat history UX, and server-side OpenAI Whisper voice-to-text via Edge Function `chat_transcribe` |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -119,6 +120,13 @@
   - Food top tabs now include `Chat` first (`Chat`, `Sessions`, `Plan`, `Library`) with nested Library sub-tabs (`Inventory`, `Utensils`).
   - Added server-side Supabase Edge Function `chat_db` to resolve allowlisted DB actions and optionally generate responses via OpenAI using structured DB context.
   - Gym Chat now calls `chat_db` and surfaces request/response payload debugging, including edge context and OpenAI request/response payloads in dev mode.
+- 2026-02-24: Gym sessions/templates/mappings and voice input checkpoint:
+  - Gym Sessions now persists to Supabase (`user_gym_sessions`, `user_gym_session_exercises`, `user_gym_session_sets`) with create/list/work/duplicate/delete behavior and session-status progression.
+  - Gym Templates are surfaced as first-class library entities and can instantiate sessions.
+  - Muscles/Exercises/Machines detail flows now read score-based mapping data for targeting and relevance.
+  - Gym Chat supports local chat history sessions (new/select/delete/rename) with empty-draft behavior.
+  - Added `chat_transcribe` Edge Function for server-side OpenAI Whisper transcription; Gym Chat mic captures audio and prefills transcript into input (no auto-send).
+  - iOS/Android microphone permissions were added for Gym Chat voice capture.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

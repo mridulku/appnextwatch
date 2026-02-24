@@ -21,26 +21,9 @@ import { fetchUserMachines } from '../../../core/api/gymMachinesDb';
 import { MODULE_KEYS } from '../../../core/api/userModuleStateDb';
 import ModuleReadyChip from '../../../ui/components/ModuleReadyChip';
 import COLORS from '../../../theme/colors';
+import { DAY_CATEGORY_ORDER, classifyMachineForDay } from './dayCategory';
 
-const MACHINE_GROUP_ORDER = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio', 'Other'];
-
-function normalizeMachineCategory(machine) {
-  const muscles = Array.isArray(machine?.primary_muscles)
-    ? machine.primary_muscles.map((m) => String(m).toLowerCase())
-    : [];
-
-  if (muscles.some((m) => m.includes('chest'))) return 'Chest';
-  if (muscles.some((m) => m.includes('back') || m.includes('lat'))) return 'Back';
-  if (muscles.some((m) => m.includes('quad') || m.includes('hamstring') || m.includes('glute') || m.includes('leg'))) return 'Legs';
-  if (muscles.some((m) => m.includes('shoulder') || m.includes('delt'))) return 'Shoulders';
-  if (muscles.some((m) => m.includes('bicep') || m.includes('tricep') || m.includes('arm'))) return 'Arms';
-  if (muscles.some((m) => m.includes('core') || m.includes('ab'))) return 'Core';
-
-  const zone = String(machine?.zone || '').toLowerCase();
-  if (zone.includes('cardio')) return 'Cardio';
-
-  return 'Other';
-}
+const MACHINE_GROUP_ORDER = DAY_CATEGORY_ORDER;
 
 function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const { user } = useAuth();
@@ -84,7 +67,7 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
     const grouped = userMachines.reduce((acc, row) => {
       const machine = row.catalog_machine;
       if (!machine) return acc;
-      const category = normalizeMachineCategory(machine);
+      const category = classifyMachineForDay(machine);
       if (!acc[category]) acc[category] = [];
       acc[category].push(row);
       return acc;
@@ -179,7 +162,7 @@ function GymHomeScreen({ navigation, embedded = false, showHeader = true }) {
             renderItem={({ item }) => (
               <SelectedCatalogItemCard
                 title={item.catalog_machine?.name || 'Machine'}
-                subtitle={`${normalizeMachineCategory(item.catalog_machine)} • ${item.catalog_machine?.zone || 'Gym Zone'}`}
+                subtitle={`${classifyMachineForDay(item.catalog_machine)} • ${item.catalog_machine?.zone || 'Gym Zone'}`}
                 onPress={() =>
                   navigation?.navigate('MachineDetail', {
                     itemId: item.machine_id,

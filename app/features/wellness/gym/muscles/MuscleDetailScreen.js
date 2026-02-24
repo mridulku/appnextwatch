@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -14,9 +14,8 @@ import CatalogItemCard from '../../../../ui/components/CatalogItemCard';
 import COLORS from '../../../../theme/colors';
 import UI_TOKENS from '../../../../ui/tokens';
 import { buildMuscleStats, sortMappingsByPriorityAndName } from './muscleMapping';
+import { formatScore, getScoreBand } from './scoreBand';
 import useMuscleExplorer from './useMuscleExplorer';
-
-const VIEW_TABS = ['Exercises', 'Machines'];
 
 function ChevronAction() {
   return (
@@ -27,7 +26,6 @@ function ChevronAction() {
 }
 
 function MuscleDetailScreen({ navigation, route }) {
-  const [activeTab, setActiveTab] = useState('Exercises');
   const groupKey = route.params?.groupKey;
   const subKey = route.params?.subKey;
 
@@ -37,7 +35,6 @@ function MuscleDetailScreen({ navigation, route }) {
     muscles,
     subgroups,
     exerciseMaps,
-    machineMaps,
     sessionHistory,
   } = useMuscleExplorer();
 
@@ -55,15 +52,27 @@ function MuscleDetailScreen({ navigation, route }) {
 
   const mappedExercises = useMemo(() => {
     if (!subgroup) return [];
-    const rows = exerciseMaps.filter((map) => map.muscle_subgroup_id === subgroup.id);
+    const bestSubgroupByExerciseId = exerciseMaps.reduce((acc, row) => {
+      const current = acc[row.exercise_id];
+      const score = Number.isFinite(Number(row?.target_score))
+        ? Number(row.target_score)
+        : (row?.is_primary ? 80 : 0);
+      if (!current || score > current.score) {
+        acc[row.exercise_id] = {
+          muscle_subgroup_id: row.muscle_subgroup_id,
+          score,
+        };
+      }
+      return acc;
+    }, {});
+
+    const rows = exerciseMaps.filter((map) => {
+      if (map.muscle_subgroup_id !== subgroup.id) return false;
+      const top = bestSubgroupByExerciseId[map.exercise_id];
+      return top?.muscle_subgroup_id === subgroup.id;
+    });
     return sortMappingsByPriorityAndName(rows, 'catalog_exercise');
   }, [exerciseMaps, subgroup]);
-
-  const mappedMachines = useMemo(() => {
-    if (!subgroup) return [];
-    const rows = machineMaps.filter((map) => map.muscle_subgroup_id === subgroup.id);
-    return sortMappingsByPriorityAndName(rows, 'catalog_machine');
-  }, [machineMaps, subgroup]);
 
   const stats = useMemo(
     () =>
@@ -73,8 +82,6 @@ function MuscleDetailScreen({ navigation, route }) {
       }),
     [mappedExercises, sessionHistory],
   );
-
-  const data = activeTab === 'Exercises' ? mappedExercises : mappedMachines;
 
   if (!group || !subgroup) {
     return (
@@ -103,7 +110,7 @@ function MuscleDetailScreen({ navigation, route }) {
   return (
     <View style={styles.safeArea}>
       <FlatList
-        data={data}
+        data={mappedExercises}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
@@ -112,25 +119,6 @@ function MuscleDetailScreen({ navigation, route }) {
             <View style={styles.heroCard}>
               <Text style={styles.heroTitle}>Target: {subgroup.name}</Text>
               <Text style={styles.heroSubtitle}>{group.name} muscle explorer</Text>
-
-              <View style={styles.segmentWrap}>
-                {VIEW_TABS.map((tab) => {
-                  const active = tab === activeTab;
-                  const count = tab === 'Exercises' ? mappedExercises.length : mappedMachines.length;
-                  return (
-                    <TouchableOpacity
-                      key={tab}
-                      style={[styles.segmentButton, active && styles.segmentButtonActive]}
-                      activeOpacity={0.9}
-                      onPress={() => setActiveTab(tab)}
-                    >
-                      <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
-                        {tab} · {count}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
             </View>
 
             <View style={styles.statsCard}>
@@ -163,55 +151,39 @@ function MuscleDetailScreen({ navigation, route }) {
           </>
         }
         renderItem={({ item }) => {
-          const mapped = activeTab === 'Exercises' ? item.catalog_exercise : item.catalog_machine;
-          const title = mapped?.name || (activeTab === 'Exercises' ? 'Exercise' : 'Machine');
-          const subtitle =
-            activeTab === 'Exercises'
-              ? `${mapped?.primary_muscle_group || group.name} • ${mapped?.type || 'exercise'} • ${mapped?.equipment || 'bodyweight'}`
-              : `${mapped?.zone || group.name} • ${Array.isArray(mapped?.primary_muscles) ? mapped.primary_muscles.join(', ') : 'machine'}`;
+          const mapped = item.catalog_exercise;
+          const title = mapped?.name || 'Exercise';
+          const score = Number.isFinite(Number(item?.target_score))
+            ? Number(item.target_score)
+            : (item?.is_primary ? 80 : 0);
+          const subtitle = `${mapped?.primary_muscle_group || group.name} • ${mapped?.type || 'exercise'} • ${mapped?.equipment || 'bodyweight'} • ${formatScore(score)}`;
 
           return (
             <CatalogItemCard
               title={title}
               subtitle={subtitle}
-              badges={
-                item.is_primary
-                  ? [{ label: 'Primary', tone: 'warn' }]
-                  : []
-              }
+              badges={[
+                { label: formatScore(score), tone: 'muted' },
+                { label: getScoreBand(score), tone: score >= 80 ? 'warn' : 'info' },
+              ]}
               actionLabel="View"
               actionVariant="muted"
-              onPress={() => {
-                if (activeTab === 'Exercises') {
-                  navigation.navigate('ExerciseDetail', {
-                    itemId: item.exercise_id,
-                    item: mapped,
-                    exerciseName: mapped?.name,
-                    fromCatalog: true,
-                    isAdded: false,
-                  });
-                  return;
-                }
-
-                navigation.navigate('MachineDetail', {
-                  itemId: item.machine_id,
+              onPress={() =>
+                navigation.navigate('ExerciseDetail', {
+                  itemId: item.exercise_id,
                   item: mapped,
-                  machineName: mapped?.name,
+                  exerciseName: mapped?.name,
                   fromCatalog: true,
                   isAdded: false,
-                });
-              }}
+                })
+              }
               rightAction={<ChevronAction />}
             />
           );
         }}
         ListEmptyComponent={
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyCardTitle}>
-              {activeTab === 'Exercises'
-                ? 'No exercises mapped yet for this muscle.'
-                : 'No machines mapped yet for this muscle.'}
-            </Text>
+            <Text style={styles.emptyCardTitle}>No exercises mapped yet for this muscle.</Text>
             <TouchableOpacity
               style={styles.emptyCardCta}
               activeOpacity={0.9}
@@ -259,36 +231,6 @@ const styles = StyleSheet.create({
     marginTop: 3,
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.subtitle,
-  },
-  segmentWrap: {
-    marginTop: UI_TOKENS.spacing.sm,
-    borderRadius: 999,
-    padding: 4,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.24)',
-    backgroundColor: COLORS.cardSoft,
-    flexDirection: 'row',
-    gap: UI_TOKENS.spacing.xs,
-  },
-  segmentButton: {
-    flex: 1,
-    borderRadius: 999,
-    minHeight: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  segmentButtonActive: {
-    backgroundColor: 'rgba(245,201,106,0.2)',
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(245,201,106,0.52)',
-  },
-  segmentText: {
-    color: COLORS.muted,
-    fontSize: UI_TOKENS.typography.meta,
-    fontWeight: '700',
-  },
-  segmentTextActive: {
-    color: COLORS.accent,
   },
   statsCard: {
     borderRadius: UI_TOKENS.radius.md,

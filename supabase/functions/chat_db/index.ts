@@ -6,6 +6,24 @@ type ChatRequest = {
   message?: string;
   user_id?: string;
   debug?: boolean;
+  attach_tables?: boolean;
+  history?: Array<{ role?: string; content?: string }>;
+};
+
+type ConversationTurn = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+type OpenAICostBreakdown = {
+  model: string;
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  input_cost_usd: number;
+  output_cost_usd: number;
+  total_cost_usd: number;
+  pricing_source: 'default_map' | 'env_override' | 'unknown';
 };
 
 type ActionPlan = {
@@ -27,6 +45,8 @@ const SERVICE_ROLE_KEY = Deno.env.get('SB_SERVICE_ROLE_KEY') || Deno.env.get('SU
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY') || Deno.env.get('SB_OPENAI_API_KEY') || '';
 const OPENAI_MODEL = Deno.env.get('OPENAI_MODEL') || 'gpt-4.1-mini';
 const OPENAI_ENDPOINT = Deno.env.get('OPENAI_ENDPOINT') || 'https://api.openai.com/v1/responses';
+const OPENAI_PRICE_INPUT_PER_1M = Deno.env.get('OPENAI_PRICE_INPUT_PER_1M');
+const OPENAI_PRICE_OUTPUT_PER_1M = Deno.env.get('OPENAI_PRICE_OUTPUT_PER_1M');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -64,6 +84,13 @@ const TABLE_SPECS: TableSpec[] = [
 
 const TABLE_BY_LOGICAL = new Map(TABLE_SPECS.map((spec) => [spec.logical, spec]));
 
+const MODEL_PRICING_PER_1M: Record<string, { input: number; output: number }> = {
+  'gpt-4.1-mini': { input: 0.4, output: 1.6 },
+  'gpt-4.1': { input: 2, output: 8 },
+  'gpt-4o-mini': { input: 0.15, output: 0.6 },
+  'gpt-4o': { input: 2.5, output: 10 },
+};
+
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     status,
@@ -78,6 +105,87 @@ function clampLimit(input: number | undefined, fallback = 10) {
   const parsed = Number(input);
   if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
   return Math.min(50, Math.max(1, Math.floor(parsed)));
+}
+
+function normalizeConversationHistory(raw: ChatRequest['history'], maxTurns = 10): ConversationTurn[] {
+  if (!Array.isArray(raw)) return [];
+
+  const normalized = raw
+    .map((item) => ({
+      role: item?.role === 'assistant' ? 'assistant' : item?.role === 'user' ? 'user' : null,
+      content: typeof item?.content === 'string' ? item.content.trim() : '',
+    }))
+    .filter((item) => item.role && item.content.length > 0) as ConversationTurn[];
+
+  if (normalized.length <= maxTurns) return normalized;
+  return normalized.slice(normalized.length - maxTurns);
+}
+
+function toOpenAIInputTurn(turn: ConversationTurn) {
+  const contentType = turn.role === 'assistant' ? 'output_text' : 'input_text';
+  return {
+    role: turn.role,
+    content: [{ type: contentType, text: turn.content }],
+  };
+}
+
+function roundUsd(value: number) {
+  return Number(value.toFixed(8));
+}
+
+function extractTokenUsage(parsed: any) {
+  const usage = parsed?.usage || {};
+  const inputTokens = Number(
+    usage?.input_tokens ??
+      usage?.prompt_tokens ??
+      usage?.input_token_count ??
+      0,
+  );
+  const outputTokens = Number(
+    usage?.output_tokens ??
+      usage?.completion_tokens ??
+      usage?.output_token_count ??
+      0,
+  );
+  const totalTokens = Number(usage?.total_tokens ?? inputTokens + outputTokens);
+
+  return {
+    input_tokens: Number.isFinite(inputTokens) ? inputTokens : 0,
+    output_tokens: Number.isFinite(outputTokens) ? outputTokens : 0,
+    total_tokens: Number.isFinite(totalTokens) ? totalTokens : 0,
+  };
+}
+
+function getModelPricing(model: string) {
+  const envInput = OPENAI_PRICE_INPUT_PER_1M ? Number(OPENAI_PRICE_INPUT_PER_1M) : NaN;
+  const envOutput = OPENAI_PRICE_OUTPUT_PER_1M ? Number(OPENAI_PRICE_OUTPUT_PER_1M) : NaN;
+
+  if (Number.isFinite(envInput) && Number.isFinite(envOutput) && envInput >= 0 && envOutput >= 0) {
+    return { input: envInput, output: envOutput, source: 'env_override' as const };
+  }
+
+  const mapped = MODEL_PRICING_PER_1M[model];
+  if (mapped) return { input: mapped.input, output: mapped.output, source: 'default_map' as const };
+
+  return { input: 0, output: 0, source: 'unknown' as const };
+}
+
+function buildCostBreakdown(model: string, parsed: any): OpenAICostBreakdown {
+  const usage = extractTokenUsage(parsed);
+  const pricing = getModelPricing(model);
+  const inputCost = (usage.input_tokens / 1_000_000) * pricing.input;
+  const outputCost = (usage.output_tokens / 1_000_000) * pricing.output;
+
+  return {
+    model,
+    input_tokens: usage.input_tokens,
+    output_tokens: usage.output_tokens,
+    total_tokens: usage.total_tokens,
+    input_cost_usd: roundUsd(inputCost),
+    output_cost_usd: roundUsd(outputCost),
+    total_cost_usd: roundUsd(inputCost + outputCost),
+    pricing_source: pricing.source,
+  };
 }
 
 function detectLogicalTable(message: string): string | null {
@@ -219,6 +327,7 @@ function fallbackHuman(action: AllowedAction, logicalTable: string | undefined, 
 
 async function callOpenAIWithContext(args: {
   message: string;
+  history: ConversationTurn[];
   action: AllowedAction;
   logicalTable?: string;
   tablesSummary: Array<{ table: string; rows: number }>;
@@ -248,6 +357,7 @@ async function callOpenAIWithContext(args: {
     model: OPENAI_MODEL,
     input: [
       { role: 'system', content: [{ type: 'input_text', text: systemPrompt }] },
+      ...args.history.map(toOpenAIInputTurn),
       { role: 'user', content: [{ type: 'input_text', text: userPrompt }] },
     ],
   };
@@ -272,6 +382,16 @@ async function callOpenAIWithContext(args: {
   } catch {
     return {
       human: raw || 'OpenAI returned non-JSON output.',
+      cost: {
+        model: OPENAI_MODEL,
+        input_tokens: 0,
+        output_tokens: 0,
+        total_tokens: 0,
+        input_cost_usd: 0,
+        output_cost_usd: 0,
+        total_cost_usd: 0,
+        pricing_source: 'unknown',
+      } as OpenAICostBreakdown,
       debug: args.debug
         ? {
             openai_request: requestPayload,
@@ -287,13 +407,93 @@ async function callOpenAIWithContext(args: {
     parsed?.output?.[0]?.content?.find((c: any) => c?.type === 'output_text')?.text ||
     '';
 
+  const cost = buildCostBreakdown(OPENAI_MODEL, parsed);
+
   return {
     human: outText || 'I could not generate a response from OpenAI.',
+    cost,
     debug: args.debug
       ? {
+          openai_cost: cost,
           openai_request: requestPayload,
           openai_response: parsed,
           context_payload: contextPayload,
+        }
+      : undefined,
+  };
+}
+
+async function callOpenAIDirect(args: { message: string; history: ConversationTurn[]; debug?: boolean }) {
+  const systemPrompt = [
+    'You are a concise helpful assistant.',
+    'Answer naturally and clearly.',
+  ].join(' ');
+
+  const requestPayload = {
+    model: OPENAI_MODEL,
+    input: [
+      { role: 'system', content: [{ type: 'input_text', text: systemPrompt }] },
+      ...args.history.map(toOpenAIInputTurn),
+      { role: 'user', content: [{ type: 'input_text', text: args.message }] },
+    ],
+  };
+
+  const res = await fetch(OPENAI_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestPayload),
+  });
+
+  const raw = await res.text();
+  if (!res.ok) {
+    throw new Error(`OPENAI_${res.status}: ${raw}`);
+  }
+
+  let parsed: any = null;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return {
+      human: raw || 'OpenAI returned non-JSON output.',
+      cost: {
+        model: OPENAI_MODEL,
+        input_tokens: 0,
+        output_tokens: 0,
+        total_tokens: 0,
+        input_cost_usd: 0,
+        output_cost_usd: 0,
+        total_cost_usd: 0,
+        pricing_source: 'unknown',
+      } as OpenAICostBreakdown,
+      debug: args.debug
+        ? {
+            openai_request: requestPayload,
+            openai_response_raw: raw,
+            openai_mode: 'direct',
+          }
+        : undefined,
+    };
+  }
+
+  const outText =
+    parsed?.output_text ||
+    parsed?.output?.[0]?.content?.find((c: any) => c?.type === 'output_text')?.text ||
+    '';
+
+  const cost = buildCostBreakdown(OPENAI_MODEL, parsed);
+
+  return {
+    human: outText || 'I could not generate a response from OpenAI.',
+    cost,
+    debug: args.debug
+      ? {
+          openai_cost: cost,
+          openai_request: requestPayload,
+          openai_response: parsed,
+          openai_mode: 'direct',
         }
       : undefined,
   };
@@ -318,6 +518,8 @@ Deno.serve(async (req) => {
     const body = (await req.json()) as ChatRequest;
     const message = String(body?.message || '').trim();
     const debugMode = Boolean(body?.debug);
+    const attachTables = body?.attach_tables !== false;
+    const history = normalizeConversationHistory(body?.history, 10);
 
     if (!message) {
       return json(400, {
@@ -349,6 +551,60 @@ Deno.serve(async (req) => {
         const { data: userData } = await admin.auth.getUser(token);
         if (userData?.user?.id) resolvedUserId = userData.user.id;
       }
+    }
+
+    if (!attachTables) {
+      if (!OPENAI_API_KEY) {
+        return json(500, {
+          ok: false,
+          action: 'openai_direct',
+          human: 'OpenAI is not configured on the server.',
+          error: 'MISSING_OPENAI_SERVER_ENV',
+          meta: { ms: Date.now() - startedAt, user_id: resolvedUserId },
+        });
+      }
+
+      let debugPayload: Record<string, unknown> | undefined;
+      let human = 'No response generated.';
+      let cost: OpenAICostBreakdown | null = null;
+      try {
+        const llm = await callOpenAIDirect({ message, history, debug: debugMode });
+        human = llm.human || human;
+        cost = (llm as { cost?: OpenAICostBreakdown }).cost || null;
+        if (debugMode && llm.debug) debugPayload = llm.debug as Record<string, unknown>;
+      } catch (e) {
+        console.error('[chat_db] openai_direct_error', e);
+        return json(500, {
+          ok: false,
+          action: 'openai_direct',
+          human: 'OpenAI direct request failed.',
+          error: e instanceof Error ? e.message : 'OPENAI_DIRECT_ERROR',
+          meta: { ms: Date.now() - startedAt, user_id: resolvedUserId },
+        });
+      }
+
+      const ms = Date.now() - startedAt;
+      return json(200, {
+        ok: true,
+        action: 'openai_direct',
+        data: null,
+        human,
+        meta: {
+          ms,
+          user_id: resolvedUserId,
+          cost,
+          ...(debugMode
+            ? {
+                debug: {
+                  attach_tables: false,
+                  history_turns: history.length,
+                  ...(debugPayload ? debugPayload : {}),
+                  openai_used: true,
+                },
+              }
+            : {}),
+        },
+      });
     }
 
     const plan = parsePlan(message);
@@ -452,11 +708,13 @@ Deno.serve(async (req) => {
 
     let human = fallbackHuman(plan.action, logicalTable, actionData, message);
     let debugPayload: Record<string, unknown> | undefined;
+    let cost: OpenAICostBreakdown | null = null;
 
     if (OPENAI_API_KEY) {
       try {
         const llm = await callOpenAIWithContext({
           message,
+          history,
           action: plan.action,
           logicalTable,
           tablesSummary,
@@ -464,6 +722,7 @@ Deno.serve(async (req) => {
           debug: debugMode,
         });
         human = llm.human || human;
+        cost = (llm as { cost?: OpenAICostBreakdown }).cost || null;
         if (debugMode && llm.debug) debugPayload = llm.debug as Record<string, unknown>;
       } catch (e) {
         console.error('[chat_db] openai_error', e);
@@ -486,10 +745,13 @@ Deno.serve(async (req) => {
       meta: {
         ms,
         user_id: resolvedUserId,
+        cost,
         ...(debugMode
           ? {
               debug: {
                 parsed_plan: plan,
+                attach_tables: true,
+                history_turns: history.length,
                 tables_summary: tablesSummary,
                 ...(debugPayload ? debugPayload : {}),
                 openai_used: Boolean(OPENAI_API_KEY),

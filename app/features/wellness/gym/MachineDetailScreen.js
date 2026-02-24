@@ -1,13 +1,15 @@
 import { ActivityIndicator, Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../../context/AuthContext';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
 import { addUserMachine, removeUserMachine } from '../../../core/api/gymMachinesDb';
+import { listMachineExerciseMappings } from '../../../core/api/musclesDb';
 import { ITEM_PLACEHOLDER_IMAGE } from '../../../core/placeholders';
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
+import { formatScore } from './muscles/scoreBand';
 
 function MachineDetailScreen({ route, navigation }) {
   const { user } = useAuth();
@@ -15,18 +17,47 @@ function MachineDetailScreen({ route, navigation }) {
   const [isMutating, setIsMutating] = useState(false);
   const [isAdded, setIsAdded] = useState(route.params?.isAdded ?? true);
   const [inlineError, setInlineError] = useState('');
+  const [loadingMappings, setLoadingMappings] = useState(true);
+  const [exerciseMatches, setExerciseMatches] = useState([]);
   const fromCatalog = Boolean(route.params?.fromCatalog);
 
   const machineName = item?.name || route.params?.machineName || 'Machine';
   const subtitle = `${item?.zone || 'Gym Zone'} • ${Array.isArray(item?.primary_muscles) && item.primary_muscles.length ? item.primary_muscles.join(', ') : 'Strength'}`;
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function hydrateMappings() {
+      if (!itemId) {
+        setLoadingMappings(false);
+        return;
+      }
+      try {
+        setLoadingMappings(true);
+        const exercises = await listMachineExerciseMappings(itemId);
+        if (!isActive) return;
+        setExerciseMatches(exercises || []);
+      } catch (error) {
+        if (!isActive) return;
+        setInlineError(error?.message || 'Could not load machine mappings');
+      } finally {
+        if (isActive) setLoadingMappings(false);
+      }
+    }
+
+    hydrateMappings();
+    return () => {
+      isActive = false;
+    };
+  }, [itemId]);
 
   const onToggleSaved = () => {
     if (!itemId || isMutating) return;
 
     const actionLabel = isAdded ? 'Remove' : 'Add';
     const actionMessage = isAdded
-      ? 'This machine will be removed from your selected list.'
-      : 'This machine will be added to your selected list.';
+      ? 'This machine will be removed from your liked list.'
+      : 'This machine will be marked as liked.';
 
     Alert.alert(`${actionLabel} machine?`, actionMessage, [
       { text: 'Cancel', style: 'cancel' },
@@ -70,9 +101,45 @@ function MachineDetailScreen({ route, navigation }) {
         </View>
 
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Details</Text>
-          <Text style={styles.sectionBody}>Description (placeholder)</Text>
-          <Text style={styles.sectionBody}>Metadata (placeholder)</Text>
+          <Text style={styles.sectionTitle}>Exercises you can do on this machine</Text>
+          {loadingMappings ? (
+            <View style={styles.loadingInline}>
+              <ActivityIndicator color={COLORS.accent} />
+              <Text style={styles.loadingInlineText}>Loading exercises...</Text>
+            </View>
+          ) : exerciseMatches.length ? (
+            exerciseMatches.map((row) => (
+              <TouchableOpacity
+                key={row.id}
+                style={styles.linkRow}
+                activeOpacity={0.9}
+                onPress={() =>
+                  navigation.navigate('ExerciseDetail', {
+                    itemId: row.exercise_id,
+                    item: row.catalog_exercise,
+                    exerciseName: row.catalog_exercise?.name,
+                    fromCatalog: true,
+                    isAdded: false,
+                  })
+                }
+              >
+                <View style={styles.metricTextWrap}>
+                  <Text style={styles.metricTitle}>{row.catalog_exercise?.name || 'Exercise'}</Text>
+                  <Text style={styles.metricMeta}>
+                    {row.catalog_exercise?.primary_muscle_group || 'Workout'} • {row.catalog_exercise?.equipment || 'Bodyweight'}
+                  </Text>
+                </View>
+                <View style={styles.linkRight}>
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{formatScore(row.relevance_score)}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={16} color={COLORS.muted} />
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.emptyText}>No exercise matches yet.</Text>
+          )}
         </View>
 
         {inlineError ? (
@@ -99,7 +166,7 @@ function MachineDetailScreen({ route, navigation }) {
                 color={isAdded ? '#FFB4A8' : COLORS.bg}
               />
               <Text style={[styles.removeText, !isAdded && styles.addText]}>
-                {isAdded ? 'Remove from Machines' : 'Add to Machines'}
+                {isAdded ? 'Remove thumbs-up' : '👍 Mark as liked'}
               </Text>
             </>
           )}
@@ -150,7 +217,88 @@ const styles = StyleSheet.create({
     gap: UI_TOKENS.spacing.xs,
   },
   sectionTitle: { color: COLORS.text, fontSize: UI_TOKENS.typography.subtitle + 1, fontWeight: '700' },
-  sectionBody: { color: COLORS.muted, fontSize: UI_TOKENS.typography.subtitle },
+  loadingInline: {
+    minHeight: 42,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: UI_TOKENS.spacing.sm,
+  },
+  loadingInlineText: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+  },
+  metricRow: {
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.2)',
+    backgroundColor: COLORS.cardSoft,
+    paddingHorizontal: UI_TOKENS.spacing.sm,
+    paddingVertical: UI_TOKENS.spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: UI_TOKENS.spacing.sm,
+  },
+  linkRow: {
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.2)',
+    backgroundColor: COLORS.cardSoft,
+    paddingHorizontal: UI_TOKENS.spacing.sm,
+    paddingVertical: UI_TOKENS.spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: UI_TOKENS.spacing.sm,
+  },
+  metricTextWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  metricTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.subtitle,
+    fontWeight: '700',
+  },
+  metricMeta: {
+    marginTop: 2,
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+  },
+  metricBadges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: UI_TOKENS.spacing.xs,
+  },
+  linkRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: UI_TOKENS.spacing.xs,
+  },
+  badge: {
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.3)',
+    backgroundColor: 'rgba(162,167,179,0.12)',
+    paddingHorizontal: UI_TOKENS.spacing.xs,
+    paddingVertical: 2,
+  },
+  badgeWarn: {
+    borderColor: 'rgba(255,164,116,0.45)',
+    backgroundColor: 'rgba(255,164,116,0.16)',
+  },
+  badgeText: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+  },
+  badgeWarnText: {
+    color: '#FFB98F',
+  },
+  emptyText: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+  },
   errorCard: {
     borderRadius: UI_TOKENS.radius.md,
     borderWidth: 1,

@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  FlatList,
   SafeAreaView,
+  SectionList,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,9 +11,18 @@ import {
 } from 'react-native';
 
 import CatalogItemCard from '../../../../ui/components/CatalogItemCard';
+import CollapsibleSection from '../../../../components/CollapsibleSection';
 import COLORS from '../../../../theme/colors';
 import UI_TOKENS from '../../../../ui/tokens';
 import useMuscleExplorer from './useMuscleExplorer';
+import { DAY_CATEGORY_ORDER, classifyMuscleForDay } from '../dayCategory';
+
+const GROUP_ICONS = {
+  Push: 'fitness-outline',
+  Pull: 'body-outline',
+  Legs: 'walk-outline',
+  General: 'albums-outline',
+};
 
 function ChevronAction() {
   return (
@@ -25,28 +34,51 @@ function ChevronAction() {
 
 function MusclesHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const { loading, error, muscles, subgroups, exerciseMaps, refresh } = useMuscleExplorer();
+  const [expandedGroups, setExpandedGroups] = useState({});
 
-  const groups = useMemo(
-    () => muscles.map((muscle) => {
-      const subgroupIds = subgroups
-        .filter((subgroup) => subgroup.muscle_id === muscle.id)
-        .map((subgroup) => subgroup.id);
-      const exerciseCount = new Set(
+  const subgroupRows = useMemo(() => {
+    const muscleById = Object.fromEntries(muscles.map((muscle) => [muscle.id, muscle]));
+    return subgroups.map((subgroup) => {
+      const parentMuscle = muscleById[subgroup.muscle_id];
+      const mappedExerciseIds = new Set(
         exerciseMaps
-          .filter((map) => subgroupIds.includes(map.muscle_subgroup_id))
+          .filter((map) => map.muscle_subgroup_id === subgroup.id)
           .map((map) => map.exercise_id),
-      ).size;
-
+      );
       return {
-        id: muscle.id,
-        key: muscle.name_key,
-        label: muscle.name,
-        subgroupCount: subgroupIds.length,
-        exerciseCount,
+        id: subgroup.id,
+        subgroupKey: subgroup.name_key,
+        subgroupLabel: subgroup.name,
+        groupKey: parentMuscle?.name_key || '',
+        groupLabel: parentMuscle?.name || 'Muscle',
+        category: classifyMuscleForDay(parentMuscle),
+        exerciseCount: mappedExerciseIds.size,
       };
-    }),
-    [muscles, subgroups, exerciseMaps],
-  );
+    });
+  }, [muscles, subgroups, exerciseMaps]);
+
+  const sections = useMemo(() => {
+    const grouped = subgroupRows.reduce((acc, row) => {
+      if (!acc[row.category]) acc[row.category] = [];
+      acc[row.category].push(row);
+      return acc;
+    }, {});
+
+    return DAY_CATEGORY_ORDER.filter((category) => grouped[category]?.length).map((category) => ({
+      title: category,
+      itemCount: grouped[category].length,
+      data: expandedGroups[category]
+        ? grouped[category].slice().sort((a, b) => a.subgroupLabel.localeCompare(b.subgroupLabel))
+        : [],
+    }));
+  }, [expandedGroups, subgroupRows]);
+
+  const toggleGroup = (title) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [title]: !prev[title],
+    }));
+  };
 
   const RootContainer = embedded ? View : SafeAreaView;
 
@@ -63,9 +95,9 @@ function MusclesHomeScreen({ navigation, embedded = false, showHeader = true }) 
 
   return (
     <RootContainer style={styles.safeArea}>
-      <FlatList
-        data={groups}
-        keyExtractor={(item) => item.key}
+      <SectionList
+        sections={sections}
+        keyExtractor={(item) => item.id || `${item.groupKey}_${item.subgroupKey}`}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
@@ -87,16 +119,30 @@ function MusclesHomeScreen({ navigation, embedded = false, showHeader = true }) 
             ) : null}
           </>
         }
+        stickySectionHeadersEnabled={false}
+        renderSectionHeader={({ section }) => (
+          <CollapsibleSection
+            title={section.title}
+            subtitle="Muscle groups"
+            icon={GROUP_ICONS[section.title] || 'barbell-outline'}
+            expanded={Boolean(expandedGroups[section.title])}
+            onToggle={() => toggleGroup(section.title)}
+            countLabel={`${section.itemCount}`}
+            style={styles.groupSection}
+          />
+        )}
         renderItem={({ item }) => (
           <CatalogItemCard
-            title={item.label}
-            subtitle={`${item.subgroupCount} sub-groups • ${item.exerciseCount} exercises`}
+            title={item.subgroupLabel}
+            subtitle={`${item.groupLabel} • ${item.exerciseCount} exercises`}
             actionLabel="View"
             actionVariant="muted"
             onPress={() =>
-              navigation.navigate('MuscleGroup', {
-                groupKey: item.key,
-                groupLabel: item.label,
+              navigation.navigate('MuscleDetail', {
+                groupKey: item.groupKey,
+                subKey: item.subgroupKey,
+                groupLabel: item.groupLabel,
+                subLabel: item.subgroupLabel,
               })
             }
             rightAction={<ChevronAction />}
@@ -117,6 +163,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: UI_TOKENS.spacing.md,
     paddingTop: UI_TOKENS.spacing.sm,
     paddingBottom: UI_TOKENS.spacing.xl + 10,
+  },
+  groupSection: {
+    marginTop: 4,
   },
   headerWrap: {
     marginBottom: UI_TOKENS.spacing.sm,

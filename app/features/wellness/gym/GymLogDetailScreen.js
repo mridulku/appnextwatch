@@ -15,6 +15,7 @@ import {
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
 import { findLogById } from './mockGymLogs';
+import { estimateExerciseDurationMin } from './sessionDuration';
 
 function toDateOnly(value) {
   const date = value instanceof Date ? new Date(value) : new Date(`${String(value).slice(0, 10)}T00:00:00`);
@@ -76,6 +77,7 @@ function normalizeSetRows(sets, fallbackExercise) {
 function normalizeExercises(exercises = []) {
   return exercises.map((exercise, index) => ({
     id: exercise?.id || `exercise_${index + 1}`,
+    exerciseCatalogId: exercise?.exerciseCatalogId || exercise?.exerciseId || null,
     name: exercise?.name || `Exercise ${index + 1}`,
     muscleGroup: exercise?.primaryGroup || exercise?.muscleGroup || 'Muscle',
     equipment: exercise?.equipment || 'Equipment',
@@ -87,6 +89,12 @@ function normalizeExercises(exercises = []) {
     actualSets: Array.isArray(exercise?.actual_sets || exercise?.actualSets) && (exercise?.actual_sets || exercise?.actualSets).length
       ? normalizeSetRows(exercise?.actual_sets || exercise?.actualSets, exercise)
       : null,
+    estimatedDurationMin:
+      Number(exercise?.estimatedDurationMin)
+      || estimateExerciseDurationMin({
+        name: exercise?.name,
+        sets: exercise?.planned_sets || exercise?.plannedSets || exercise?.planned || exercise?.sets,
+      }),
   }));
 }
 
@@ -139,6 +147,7 @@ function ExerciseAccordionCard({
   mode,
   dayIsFuture,
   onLogPress,
+  onOpenExercise,
 }) {
   const hasActual = Array.isArray(exercise.actualSets) && exercise.actualSets.length > 0;
 
@@ -153,7 +162,10 @@ function ExerciseAccordionCard({
 
         <View style={styles.exerciseMain}>
           <Text style={styles.exerciseTitle}>{exercise.name}</Text>
-          <Text style={styles.exerciseMeta}>{exercise.muscleGroup} • {exercise.equipment}</Text>
+          <Text style={styles.exerciseMeta}>
+            {exercise.muscleGroup} • {exercise.equipment}
+            {exercise.estimatedDurationMin ? ` • est ${exercise.estimatedDurationMin} min` : ''}
+          </Text>
 
           {mode === 'actual' && !hasActual ? (
             <Text style={styles.notLoggedText}>Not logged</Text>
@@ -161,6 +173,19 @@ function ExerciseAccordionCard({
         </View>
 
         <View style={styles.exerciseRight}>
+          {onOpenExercise ? (
+            <TouchableOpacity
+              style={styles.openDetailButton}
+              activeOpacity={0.9}
+              onPress={(event) => {
+                event?.stopPropagation?.();
+                onOpenExercise(exercise);
+              }}
+            >
+              <Ionicons name="open-outline" size={13} color={COLORS.accent2} />
+              <Text style={styles.openDetailText}>Details</Text>
+            </TouchableOpacity>
+          ) : null}
           {mode === 'planned' && hasActual ? (
             <View style={styles.loggedPill}>
               <Text style={styles.loggedPillText}>Logged</Text>
@@ -336,7 +361,15 @@ function LogSetsModal({ visible, exercise, dayIsFuture, onClose, onSave }) {
   );
 }
 
-function GymLogDetailScreen({ route, navigation }) {
+function GymLogDetailScreen({
+  route,
+  navigation,
+  onSessionStatusChange,
+  onLoggedCountChange,
+  onActualSetsSave,
+  onRequestDuplicate,
+  onRequestDelete,
+}) {
   const passedLog = route.params?.log || null;
   const logId = route.params?.logId;
   const sourceLog = passedLog || findLogById(logId);
@@ -397,6 +430,16 @@ function GymLogDetailScreen({ route, navigation }) {
   const actualSetCount = useMemo(() => sumSets(exercises, actualByExerciseId), [exercises, actualByExerciseId]);
   const actualVolume = useMemo(() => sumExerciseVolume(exercises, actualByExerciseId), [exercises, actualByExerciseId]);
 
+  useEffect(() => {
+    if (!onSessionStatusChange) return;
+    onSessionStatusChange(sessionStatus);
+  }, [onSessionStatusChange, sessionStatus]);
+
+  useEffect(() => {
+    if (!onLoggedCountChange) return;
+    onLoggedCountChange(loggedCount);
+  }, [loggedCount, onLoggedCountChange]);
+
   if (!sourceLog) {
     return (
       <View style={styles.safeArea}>
@@ -422,8 +465,31 @@ function GymLogDetailScreen({ route, navigation }) {
     setEditingExerciseId(exercise.id);
   };
 
+  const openExerciseDetail = (exercise) => {
+    if (!exercise) return;
+    const itemId = exercise.exerciseCatalogId;
+    if (!itemId) return;
+    navigation.navigate('ExerciseDetail', {
+      itemId,
+      exerciseName: exercise.name,
+      item: {
+        id: itemId,
+        name: exercise.name,
+        primary_muscle_group: exercise.muscleGroup,
+        equipment: exercise.equipment,
+      },
+      fromCatalog: true,
+      isAdded: false,
+    });
+  };
+
   const saveActualSets = (setRows) => {
     if (!editingExerciseId) return;
+
+    if (onActualSetsSave) {
+      Promise.resolve(onActualSetsSave({ exerciseId: editingExerciseId, sets: setRows })).catch(() => {});
+    }
+
     setActualByExerciseId((prev) => ({
       ...prev,
       [editingExerciseId]: setRows,
@@ -436,8 +502,24 @@ function GymLogDetailScreen({ route, navigation }) {
     <View style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.heroCard}>
-          <Text style={styles.heroTitle}>{sourceLog?.dayType || 'Workout Day'}</Text>
-          <Text style={styles.heroSubtitle}>{formatDateTitle(sourceLog?.dateISO)}</Text>
+          <View style={styles.heroTopRow}>
+            <View style={styles.heroTextWrap}>
+              <Text style={styles.heroTitle}>{sourceLog?.dayType || 'Workout Day'}</Text>
+              <Text style={styles.heroSubtitle}>{formatDateTitle(sourceLog?.dateISO)}</Text>
+            </View>
+            <View style={styles.heroActions}>
+              {onRequestDuplicate ? (
+                <TouchableOpacity style={styles.heroIconButton} activeOpacity={0.9} onPress={onRequestDuplicate}>
+                  <Ionicons name="copy-outline" size={15} color={COLORS.accent2} />
+                </TouchableOpacity>
+              ) : null}
+              {onRequestDelete ? (
+                <TouchableOpacity style={styles.heroIconButtonDanger} activeOpacity={0.9} onPress={onRequestDelete}>
+                  <Ionicons name="trash-outline" size={15} color="#FFB4A8" />
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          </View>
         </View>
 
         <View style={styles.summaryStrip}>
@@ -521,6 +603,7 @@ function GymLogDetailScreen({ route, navigation }) {
                   mode={activeTab}
                   dayIsFuture={isFutureDay}
                   onLogPress={openLogModal}
+                  onOpenExercise={openExerciseDetail}
                   onToggle={() => setExpandedMap((prev) => ({ ...prev, [exercise.id]: !prev[exercise.id] }))}
                 />
               );
@@ -584,6 +667,41 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(162,167,179,0.24)',
     backgroundColor: COLORS.card,
     padding: UI_TOKENS.spacing.md,
+  },
+  heroTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: UI_TOKENS.spacing.sm,
+  },
+  heroTextWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  heroActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: UI_TOKENS.spacing.xs,
+  },
+  heroIconButton: {
+    width: UI_TOKENS.control.iconButton,
+    height: UI_TOKENS.control.iconButton,
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(90,209,232,0.4)',
+    backgroundColor: 'rgba(90,209,232,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroIconButtonDanger: {
+    width: UI_TOKENS.control.iconButton,
+    height: UI_TOKENS.control.iconButton,
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(255,130,130,0.45)',
+    backgroundColor: 'rgba(255,130,130,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   heroTitle: {
     color: COLORS.text,
@@ -772,6 +890,22 @@ const styles = StyleSheet.create({
   exerciseRight: {
     alignItems: 'flex-end',
     gap: 4,
+  },
+  openDetailButton: {
+    borderRadius: 999,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(90,209,232,0.35)',
+    backgroundColor: 'rgba(90,209,232,0.12)',
+    paddingHorizontal: UI_TOKENS.spacing.xs + 2,
+    paddingVertical: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  openDetailText: {
+    color: COLORS.accent2,
+    fontSize: 10,
+    fontWeight: '700',
   },
   loggedPill: {
     borderRadius: 999,

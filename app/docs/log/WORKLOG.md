@@ -300,3 +300,19 @@
 - Follow-ups / risks: Keep JWT mode disabled only for current testing; once auth path is stable, re-enable stricter function auth and pass real user tokens consistently.
 - Tag: nw-2026-02-21-1942-data-gym-chat (T1 + T3)
 - Notes: app/docs/sessions/2026-02-21/1942_data-gym-chat-wellness-tabs.md
+
+## 2026-02-24 - Session gym-sessions-templates-chat-voice
+- Summary: Delivered Gym milestone covering persistent sessions/templates behavior, scored mapping-driven library details, and Gym chat voice input via Supabase Edge transcription.
+- Changes:
+  - Added/updated DB-backed Gym sessions flows (create/list/work/duplicate/delete + status progression) and integrated them into Gym Sessions UX.
+  - Added Gym template catalog/detail surfaces and template-to-session creation path.
+  - Expanded exercise-science mapping surfaces to use score-based mapping and richer muscles/exercises/machines detail rendering.
+  - Refined Gym Chat session UX (history/new/delete/rename/empty-draft behavior) and payload-debug presentation.
+  - Added `supabase/functions/chat_transcribe` for server-side OpenAI Whisper transcription and wired Gym Chat mic capture + transcript prefill.
+  - Added microphone permissions (`app.json`, `ios/AppNextwatch/Info.plist`) and installed `expo-av`.
+- Files: app/features/wellness/gym/*, app/core/api/{gymSessionsDb.js,gymTemplatesDb.js,musclesDb.js,dbTableCatalog.js}, app/hooks/useGymSessions.js, app/core/storage/gymChatStorage.js, app/App.js, app/features/wellness/test/TestHomeScreen.js, scripts/gym_mapping/*, supabase/migrations/20260224100000_add_user_gym_sessions.sql, supabase/migrations/20260224120000_add_catalog_gym_templates.sql, supabase/migrations/20260224143000_add_target_scores_to_muscle_maps.sql, supabase/migrations/20260224143100_add_machine_exercise_map.sql, supabase/functions/chat_db/index.ts, supabase/functions/chat_transcribe/*, app.json, ios/AppNextwatch/Info.plist, package.json, package-lock.json, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/*.
+- Behavior impact: Major user-visible Gym flow updates (Sessions/Templates/Library details/Chat), persistence behavior changes, and new voice-to-text input path through Edge + OpenAI.
+- Validation performed: `npx expo export --platform ios` passed; `npx supabase functions deploy chat_transcribe --project-ref ytkuqigyltxusbiuxuyn` succeeded.
+- Follow-ups / risks: `expo-av` deprecation warning remains (migrate to `expo-audio`); run manual iOS end-to-end pass for voice permission-denied/timeout/long-audio paths.
+- Tag: nw-2026-02-24-1758-data-gym-sessions (T1 + T2 + T3)
+- Notes: app/docs/sessions/2026-02-24/1758_data-gym-sessions-chat-voice.md

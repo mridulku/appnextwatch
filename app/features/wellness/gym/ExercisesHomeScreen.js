@@ -1,54 +1,32 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   SafeAreaView,
   SectionList,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
-import { MODULE_KEYS } from '../../../core/api/userModuleStateDb';
-import ModuleReadyChip from '../../../ui/components/ModuleReadyChip';
 import COLORS from '../../../theme/colors';
+import { DAY_CATEGORY_ORDER, classifyExerciseForDay } from './dayCategory';
 
-const GROUP_ORDER = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio', 'Mobility', 'Other'];
+const GROUP_ORDER = DAY_CATEGORY_ORDER;
 
 const GROUP_ICONS = {
-  Chest: 'fitness-outline',
-  Back: 'body-outline',
+  Push: 'fitness-outline',
+  Pull: 'body-outline',
   Legs: 'walk-outline',
-  Shoulders: 'barbell-outline',
-  Arms: 'barbell-outline',
-  Core: 'shield-outline',
-  Cardio: 'pulse-outline',
-  Mobility: 'body-outline',
-  Other: 'albums-outline',
+  General: 'albums-outline',
 };
-
-function normalizeExerciseCategory(row) {
-  const primary = String(row?.primary_muscle_group || '').trim();
-  if (primary) return primary;
-
-  const type = String(row?.type || '').toLowerCase();
-  if (type.includes('cardio')) return 'Cardio';
-  if (type.includes('mobility')) return 'Mobility';
-
-  return 'Other';
-}
 
 function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }) {
   const { user } = useAuth();
-  const insets = useSafeAreaInsets();
 
   const selection = useCatalogSelection({
     user,
@@ -60,7 +38,7 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
       userFkColumn: 'exercise_id',
       joinKey: 'catalog_exercise',
       categoryOrder: GROUP_ORDER,
-      getCatalogCategory: normalizeExerciseCategory,
+      getCatalogCategory: classifyExerciseForDay,
       getCatalogSearchText: (row) =>
         [row?.name, row?.type, row?.primary_muscle_group, row?.equipment]
           .filter(Boolean)
@@ -70,12 +48,23 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
   });
 
   const sections = useMemo(
-    () =>
-      selection.groupedUserSections.map((section) => ({
-        ...section,
-        data: selection.expandedCategories[section.title] ? section.data : [],
-      })),
-    [selection.groupedUserSections, selection.expandedCategories],
+    () => {
+      const grouped = selection.catalogRows.reduce((acc, row) => {
+        const category = classifyExerciseForDay(row);
+        if (!acc[category]) acc[category] = [];
+        acc[category].push(row);
+        return acc;
+      }, {});
+
+      return GROUP_ORDER.filter((category) => grouped[category]?.length).map((category) => ({
+        title: category,
+        itemCount: grouped[category].length,
+        data: selection.expandedCategories[category]
+          ? grouped[category].slice().sort((a, b) => (a?.name || '').localeCompare(b?.name || ''))
+          : [],
+      }));
+    },
+    [selection.catalogRows, selection.expandedCategories],
   );
 
   useFocusEffect(
@@ -85,9 +74,6 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
   );
 
   const RootContainer = embedded ? View : SafeAreaView;
-  const openAddScreen = () => navigation?.navigate('AddExercises');
-  const openVoiceCommand = () =>
-    Alert.alert('Voice Command', 'Exercise voice command is coming soon.');
 
   if (selection.loading) {
     return (
@@ -122,21 +108,17 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
           </View>
         ) : null}
 
-        {selection.groupedUserSections.length === 0 ? (
+        {selection.catalogRows.length === 0 ? (
           <View style={styles.emptyWrap}>
-            <Text style={styles.emptyTitle}>No exercises yet</Text>
-            <Text style={styles.emptySubtitle}>Add exercises from the catalog to shape your workout library.</Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={openAddScreen}>
-              <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
-              <Text style={styles.emptyCtaText}>Add exercises</Text>
-            </TouchableOpacity>
+            <Text style={styles.emptyTitle}>No exercises available</Text>
+            <Text style={styles.emptySubtitle}>Catalog is empty. Seed catalog data and retry.</Text>
           </View>
         ) : (
           <SectionList
             sections={sections}
             keyExtractor={(item) => item.id}
             stickySectionHeadersEnabled={false}
-            contentContainerStyle={[styles.listContent, { paddingBottom: 130 + insets.bottom }]}
+            contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
             renderSectionHeader={({ section }) => (
               <CollapsibleSection
@@ -150,26 +132,32 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
               />
             )}
             renderItem={({ item }) => {
-              const catalog = item.catalog_exercise;
+              const catalog = item;
+              const isAdded = selection.selectedCatalogIdSet.has(item.id);
 
               return (
                 <SelectedCatalogItemCard
                   title={catalog?.name || 'Exercise'}
-                  subtitle={`${normalizeExerciseCategory(catalog)} • ${catalog?.type || 'exercise'} • ${catalog?.equipment || 'bodyweight'}`}
+                  subtitle={`${classifyExerciseForDay(catalog)} • ${catalog?.type || 'exercise'} • ${catalog?.equipment || 'bodyweight'}`}
+                  badges={isAdded ? [{ label: '👍 Liked', tone: 'warn' }] : []}
                   onPress={() =>
                     navigation.navigate('ExerciseDetail', {
-                      itemId: item.exercise_id,
+                      itemId: item.id,
                       exerciseName: catalog?.name,
                       item: catalog,
+                      fromCatalog: true,
+                      isAdded,
                     })
                   }
                   topAction={{
                     iconName: 'create-outline',
                     onPress: () =>
                       navigation.navigate('ExerciseDetail', {
-                        itemId: item.exercise_id,
+                        itemId: item.id,
                         exerciseName: catalog?.name,
                         item: catalog,
+                        fromCatalog: true,
+                        isAdded,
                       }),
                   }}
                 />
@@ -177,18 +165,6 @@ function ExercisesHomeScreen({ navigation, embedded = false, showHeader = true }
             }}
           />
         )}
-      </View>
-      <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
-        <ModuleReadyChip moduleKey={MODULE_KEYS.GYM_EXERCISES} />
-
-        <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceCommand}>
-          <Ionicons name="mic" size={18} color={COLORS.bg} />
-          <Text style={styles.voiceButtonText}>Voice Command</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomAddButton} activeOpacity={0.9} onPress={openAddScreen}>
-          <Ionicons name="add-circle-outline" size={16} color={COLORS.text} />
-          <Text style={styles.bottomAddButtonText}>Add Exercise</Text>
-        </TouchableOpacity>
       </View>
     </RootContainer>
   );
@@ -277,135 +253,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     lineHeight: 29,
   },
-  emptyCta: {
-    marginTop: 16,
-    backgroundColor: COLORS.accent,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  emptyCtaText: {
-    color: COLORS.bg,
-    fontSize: 15,
-    fontWeight: '700',
-  },
   listContent: {
-    paddingBottom: 28,
+    paddingBottom: 20,
   },
   groupSection: {
     marginTop: 4,
-  },
-  itemRow: {
-    marginTop: 8,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.18)',
-    backgroundColor: COLORS.card,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  itemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    flex: 1,
-  },
-  itemIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(90,209,232,0.3)',
-    backgroundColor: 'rgba(90,209,232,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  itemTextWrap: {
-    flex: 1,
-  },
-  itemTitle: {
-    color: COLORS.text,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  itemMeta: {
-    color: COLORS.muted,
-    fontSize: 11,
-    marginTop: 2,
-    textTransform: 'capitalize',
-  },
-  bottomBar: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    backgroundColor: 'rgba(14,15,20,0.96)',
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.24)',
-    padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  voiceButton: {
-    flex: 1,
-    borderRadius: 14,
-    backgroundColor: COLORS.accent,
-    minHeight: 46,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  voiceButtonText: {
-    color: COLORS.bg,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  bottomAddButton: {
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.35)',
-    backgroundColor: COLORS.card,
-    minHeight: 46,
-    paddingHorizontal: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  bottomAddButtonText: {
-    color: COLORS.text,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  rowActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  chevron: {
-    marginRight: -2,
-  },
-  removeButton: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,124,123,0.45)',
-    backgroundColor: 'rgba(255,124,123,0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  removeButtonText: {
-    color: '#FF9C92',
-    fontSize: 12,
-    fontWeight: '700',
   },
 });
 

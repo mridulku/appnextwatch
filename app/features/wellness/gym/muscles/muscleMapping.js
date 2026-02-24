@@ -91,8 +91,9 @@ export function sortMappingsByPriorityAndName(rows, keyName) {
   return rows
     .slice()
     .sort((a, b) => {
-      const primaryDelta = Number(Boolean(b.is_primary)) - Number(Boolean(a.is_primary));
-      if (primaryDelta !== 0) return primaryDelta;
+      const scoreA = Number.isFinite(Number(a?.target_score)) ? Number(a.target_score) : (a?.is_primary ? 80 : 0);
+      const scoreB = Number.isFinite(Number(b?.target_score)) ? Number(b.target_score) : (b?.is_primary ? 80 : 0);
+      if (scoreB !== scoreA) return scoreB - scoreA;
       return String(a?.[keyName]?.name || '').localeCompare(String(b?.[keyName]?.name || ''));
     });
 }

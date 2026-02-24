@@ -144,6 +144,24 @@ export const DB_TABLE_GROUPS = [
         keyColumns: ['id', 'user_id', 'exercise_id', 'created_at'],
       },
       {
+        name: 'muscle_exercise_map',
+        description: 'Exercise-to-muscle subgroup mappings with targeting score.',
+        surfaces: ['Gym > Library > Muscles', 'Gym > Exercise detail'],
+        keyColumns: ['muscle_subgroup_id', 'exercise_id', 'target_score', 'mapping_source'],
+      },
+      {
+        name: 'muscle_machine_map',
+        description: 'Machine-to-muscle subgroup mappings with targeting score.',
+        surfaces: ['Gym > Library > Muscles', 'Gym > Machine detail'],
+        keyColumns: ['muscle_subgroup_id', 'machine_id', 'target_score', 'mapping_source'],
+      },
+      {
+        name: 'machine_exercise_map',
+        description: 'Derived machine-to-exercise relevance mappings.',
+        surfaces: ['Gym > Exercise detail', 'Gym > Machine detail'],
+        keyColumns: ['machine_id', 'exercise_id', 'relevance_score', 'mapping_source'],
+      },
+      {
         name: 'workout_sessions',
         description: 'Workout session logs per user.',
         surfaces: ['Sessions > Workout summary'],

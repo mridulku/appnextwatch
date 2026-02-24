@@ -50,6 +50,9 @@ import SessionSummaryScreen from './features/wellness/sessions/SessionSummaryScr
 import ExerciseSessionScreen from './features/wellness/sessions/ExerciseSessionScreen';
 import WellnessHomeScreen from './features/wellness/home/WellnessHomeScreen';
 import GymHubScreen from './features/wellness/gym/GymHubScreen';
+import GymSessionCreateScreen from './features/wellness/gym/GymSessionCreateScreen';
+import GymSessionWorkScreen from './features/wellness/gym/GymSessionWorkScreen';
+import GymTemplateDetailScreen from './features/wellness/gym/GymTemplateDetailScreen';
 import HomeSettingsScreen from './features/wellness/home/HomeSettingsScreen';
 import CategorySelectorScreen from './features/shared/category/CategorySelectorScreen';
 import TestHomeScreen from './features/wellness/test/TestHomeScreen';
@@ -58,6 +61,8 @@ import TestChatScreen from './features/wellness/test/TestChatScreen';
 import TestOnboardingSandboxScreen from './features/wellness/test/TestOnboardingSandboxScreen';
 import TestFormOnboardingSandboxScreen from './features/wellness/test/TestFormOnboardingSandboxScreen';
 import TestHomeLaterScreen from './features/wellness/test/TestHomeLaterScreen';
+import TestGymSessionsLaterScreen from './features/wellness/test/TestGymSessionsLaterScreen';
+import TestGymPlanLaterScreen from './features/wellness/test/TestGymPlanLaterScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PreferencesProvider } from './context/PreferencesContext';
 import { APP_CATEGORY, getSavedCategory } from './core/storage/categoryMode';
@@ -348,6 +353,21 @@ function GymStackScreens() {
         options={{ title: 'Log Detail' }}
       />
       <WellnessGymStack.Screen
+        name="GymSessionCreate"
+        component={GymSessionCreateScreen}
+        options={{ title: 'Create Session' }}
+      />
+      <WellnessGymStack.Screen
+        name="GymSessionWork"
+        component={GymSessionWorkScreen}
+        options={{ title: 'Work on Session' }}
+      />
+      <WellnessGymStack.Screen
+        name="GymTemplateDetail"
+        component={GymTemplateDetailScreen}
+        options={({ route }) => ({ title: route.params?.title ?? 'Template Detail' })}
+      />
+      <WellnessGymStack.Screen
         name="ProgramTimeline"
         component={ProgramTimelineScreen}
         options={{ title: 'Training Program' }}
@@ -455,6 +475,31 @@ function TestStackScreens() {
         name="TestSessionsLater"
         component={SessionStackScreens}
         options={{ title: 'Sessions (Later)', headerShown: false }}
+      />
+      <WellnessTestStack.Screen
+        name="TestGymSessionsLater"
+        component={TestGymSessionsLaterScreen}
+        options={{ title: 'Gym Sessions (Later)' }}
+      />
+      <WellnessTestStack.Screen
+        name="GymLogDetail"
+        component={GymLogDetailScreen}
+        options={{ title: 'Log Detail' }}
+      />
+      <WellnessTestStack.Screen
+        name="TestGymPlanLater"
+        component={TestGymPlanLaterScreen}
+        options={{ title: 'Gym Plan (Later)' }}
+      />
+      <WellnessTestStack.Screen
+        name="TestGymProgramTimeline"
+        component={ProgramTimelineScreen}
+        options={{ title: 'Training Program' }}
+      />
+      <WellnessTestStack.Screen
+        name="TestGymOnboardingInterview"
+        component={OnboardingInterviewScreen}
+        options={{ headerShown: false }}
       />
     </WellnessTestStack.Navigator>
   );
