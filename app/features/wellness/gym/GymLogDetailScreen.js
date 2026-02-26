@@ -1,6 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useMemo, useState } from 'react';
+import { Audio } from 'expo-av';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Modal,
   Platform,
   Pressable,
@@ -14,8 +17,24 @@ import {
 
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
+import { useAuth } from '../../../context/AuthContext';
+import {
+  createAudioClip,
+  deleteAudioClip,
+  finalizeAudioClip,
+  getOrCreateCurrentAppUserId,
+  listAudioClipSegments,
+  listAudioClips,
+  playableSignedUrlForSegment,
+  saveAudioClipTranscript,
+  transcribeAudioSegment,
+  uploadAudioClipSegment,
+} from '../../../core/api/audioRecorderDb';
 import { findLogById } from './mockGymLogs';
 import { estimateExerciseDurationMin } from './sessionDuration';
+
+const MIN_DURATION_MS = 500;
+const MIN_CLIP_SIZE_BYTES = 1500;
 
 function toDateOnly(value) {
   const date = value instanceof Date ? new Date(value) : new Date(`${String(value).slice(0, 10)}T00:00:00`);
@@ -35,6 +54,50 @@ function formatDateTitle(value) {
 function toNumber(value, fallback = 0) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function formatDuration(ms) {
+  const total = Math.max(0, Math.round((Number(ms) || 0) / 1000));
+  const min = Math.floor(total / 60);
+  const sec = total % 60;
+  return `${min}:${String(sec).padStart(2, '0')}`;
+}
+
+function formatRange(startIso, endIso) {
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 'Unknown range';
+  const timeFmt = { hour: 'numeric', minute: '2-digit', second: '2-digit' };
+  return `${start.toLocaleTimeString([], timeFmt)} - ${end.toLocaleTimeString([], timeFmt)}`;
+}
+
+function buildCombinedTranscript(segments) {
+  return (segments || [])
+    .map((segment) => {
+      const header = `Part ${segment.segment_index} (${formatRange(segment.started_at, segment.ended_at)})`;
+      const body = String(segment.transcript_text || '').trim() || '[No transcript]';
+      return `${header}\n${body}`;
+    })
+    .join('\n\n');
+}
+
+async function probeDurationFromUri(uri) {
+  if (!uri) return 0;
+  let sound = null;
+  try {
+    const created = await Audio.Sound.createAsync({ uri }, { shouldPlay: false });
+    sound = created?.sound || null;
+    const status = await sound?.getStatusAsync?.();
+    return Number(status?.durationMillis) || 0;
+  } catch {
+    return 0;
+  } finally {
+    if (sound) {
+      try {
+        await sound.unloadAsync();
+      } catch {}
+    }
+  }
 }
 
 function isLikelyIsolation(name = '') {
@@ -364,12 +427,17 @@ function LogSetsModal({ visible, exercise, dayIsFuture, onClose, onSave }) {
 function GymLogDetailScreen({
   route,
   navigation,
+  sessionRecordingSessionId = '',
   onSessionStatusChange,
   onLoggedCountChange,
   onActualSetsSave,
   onRequestDuplicate,
   onRequestDelete,
 }) {
+  const { user } = useAuth();
+  const recordingRef = useRef(null);
+  const playbackRef = useRef(null);
+
   const passedLog = route.params?.log || null;
   const logId = route.params?.logId;
   const sourceLog = passedLog || findLogById(logId);
@@ -402,6 +470,29 @@ function GymLogDetailScreen({
     })(),
   );
   const [editingExerciseId, setEditingExerciseId] = useState(null);
+  const [actualRecordingExpanded, setActualRecordingExpanded] = useState(true);
+  const [actualExercisesExpanded, setActualExercisesExpanded] = useState(true);
+  const [appUserId, setAppUserId] = useState('');
+  const [sessionClips, setSessionClips] = useState([]);
+  const [segmentsByClipId, setSegmentsByClipId] = useState({});
+  const [segmentsLoadingByClipId, setSegmentsLoadingByClipId] = useState({});
+  const [expandedClipId, setExpandedClipId] = useState('');
+  const [expandedCombinedTranscriptClipId, setExpandedCombinedTranscriptClipId] = useState('');
+  const [expandedSegmentTranscriptId, setExpandedSegmentTranscriptId] = useState('');
+  const [transcribingSegmentId, setTranscribingSegmentId] = useState('');
+  const [buildingCombinedClipId, setBuildingCombinedClipId] = useState('');
+
+  const [recorderState, setRecorderState] = useState('idle');
+  const [recorderStatusText, setRecorderStatusText] = useState('Ready');
+  const [recorderError, setRecorderError] = useState('');
+  const [transcribeStatus, setTranscribeStatus] = useState('');
+  const [transcribeError, setTranscribeError] = useState('');
+  const [activeClipId, setActiveClipId] = useState('');
+  const [pendingSegmentStartedAt, setPendingSegmentStartedAt] = useState('');
+  const [segmentIndexCounter, setSegmentIndexCounter] = useState(1);
+  const [failedSegments, setFailedSegments] = useState([]);
+  const [activePlayClipId, setActivePlayClipId] = useState('');
+  const [activePlaySegmentId, setActivePlaySegmentId] = useState('');
 
   const exercises = useMemo(
     () => initialExercises.map((exercise) => ({ ...exercise, actualSets: actualByExerciseId[exercise.id] || exercise.actualSets || null })),
@@ -439,6 +530,492 @@ function GymLogDetailScreen({
     if (!onLoggedCountChange) return;
     onLoggedCountChange(loggedCount);
   }, [loggedCount, onLoggedCountChange]);
+
+  const ensureAppUserId = useCallback(async () => {
+    if (appUserId) return appUserId;
+    const next = await getOrCreateCurrentAppUserId(user);
+    setAppUserId(next);
+    return next;
+  }, [appUserId, user]);
+
+  const refreshSessionClips = useCallback(async () => {
+    if (!sessionRecordingSessionId) return [];
+    const userId = await ensureAppUserId();
+    const rows = await listAudioClips({ userId, gymSessionId: sessionRecordingSessionId });
+    setSessionClips(rows);
+    return rows;
+  }, [ensureAppUserId, sessionRecordingSessionId]);
+
+  const loadSegmentsForClip = useCallback(
+    async (clipId, { force = false } = {}) => {
+      if (!clipId) return [];
+      if (!force && segmentsByClipId[clipId]) return segmentsByClipId[clipId];
+
+      setSegmentsLoadingByClipId((prev) => ({ ...prev, [clipId]: true }));
+      try {
+        const userId = await ensureAppUserId();
+        const rows = await listAudioClipSegments({ userId, clipId });
+        setSegmentsByClipId((prev) => ({ ...prev, [clipId]: rows }));
+        return rows;
+      } finally {
+        setSegmentsLoadingByClipId((prev) => ({ ...prev, [clipId]: false }));
+      }
+    },
+    [ensureAppUserId, segmentsByClipId],
+  );
+
+  useEffect(() => {
+    let active = true;
+
+    const boot = async () => {
+      if (!sessionRecordingSessionId) return;
+      try {
+        await refreshSessionClips();
+      } catch (error) {
+        if (!active) return;
+        setRecorderError(error?.message || 'Unable to load session recordings.');
+      }
+    };
+
+    boot();
+    return () => {
+      active = false;
+    };
+  }, [refreshSessionClips, sessionRecordingSessionId]);
+
+  useEffect(() => () => {
+    const recording = recordingRef.current;
+    const playback = playbackRef.current;
+    if (recording) recording.stopAndUnloadAsync().catch(() => {});
+    if (playback) playback.unloadAsync().catch(() => {});
+  }, []);
+
+  const stopPlayback = useCallback(async () => {
+    const activePlayback = playbackRef.current;
+    playbackRef.current = null;
+    setActivePlayClipId('');
+    setActivePlaySegmentId('');
+    if (activePlayback) {
+      try {
+        await activePlayback.stopAsync();
+      } catch {}
+      try {
+        await activePlayback.unloadAsync();
+      } catch {}
+    }
+  }, []);
+
+  const playUriOnce = useCallback(
+    async ({ uri, clipId = '', segmentId = '' }) => {
+      await stopPlayback();
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+      setRecorderState('playing');
+      setRecorderStatusText('Playing...');
+      setActivePlayClipId(clipId);
+      setActivePlaySegmentId(segmentId);
+
+      await new Promise(async (resolve, reject) => {
+        try {
+          const { sound } = await Audio.Sound.createAsync(
+            { uri },
+            { shouldPlay: true },
+            (status) => {
+              if (status?.didJustFinish) resolve();
+            },
+          );
+          playbackRef.current = sound;
+        } catch (error) {
+          reject(error);
+        }
+      });
+
+      await stopPlayback();
+      setRecorderState('ready');
+      setRecorderStatusText('Playback finished');
+    },
+    [stopPlayback],
+  );
+
+  const playSegment = useCallback(
+    async (segment, clipId) => {
+      try {
+        setRecorderError('');
+        const signedUrl = await playableSignedUrlForSegment({ storagePath: segment.storage_path, expiresIn: 3600 });
+        await playUriOnce({ uri: signedUrl, clipId, segmentId: segment.id });
+      } catch (error) {
+        setRecorderState('ready');
+        setRecorderStatusText('Playback failed');
+        setRecorderError(error?.message || 'Unable to play segment.');
+      }
+    },
+    [playUriOnce],
+  );
+
+  const playAllSegments = useCallback(
+    async (clipId) => {
+      try {
+        setRecorderError('');
+        const segments = await loadSegmentsForClip(clipId, { force: true });
+        if (!segments.length) {
+          setRecorderError('No recording parts available.');
+          return;
+        }
+
+        for (const segment of segments) {
+          const signedUrl = await playableSignedUrlForSegment({ storagePath: segment.storage_path, expiresIn: 3600 });
+          await playUriOnce({ uri: signedUrl, clipId, segmentId: segment.id });
+        }
+      } catch (error) {
+        setRecorderState('ready');
+        setRecorderStatusText('Playback failed');
+        setRecorderError(error?.message || 'Unable to play full recording.');
+      }
+    },
+    [loadSegmentsForClip, playUriOnce],
+  );
+
+  const startSegmentRecording = useCallback(async () => {
+    const permissions = await Audio.requestPermissionsAsync();
+    if (!permissions.granted) throw new Error('Microphone permission denied.');
+    await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+
+    const recording = new Audio.Recording();
+    await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+    await recording.startAsync();
+    recordingRef.current = recording;
+  }, []);
+
+  const closeActiveSegmentAndUpload = useCallback(
+    async () => {
+      const recording = recordingRef.current;
+      if (!recording || !activeClipId || !pendingSegmentStartedAt) return;
+      const userId = await ensureAppUserId();
+
+      await recording.stopAndUnloadAsync();
+      recordingRef.current = null;
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+
+      const status = await recording.getStatusAsync();
+      let durationMs = Number(status?.durationMillis) || 0;
+      const uri = recording.getURI();
+      if (!uri) throw new Error('Recording URI was not available.');
+
+      const resp = await fetch(uri);
+      const buffer = await resp.arrayBuffer();
+      const sizeBytes = buffer.byteLength || 0;
+      if (durationMs <= 0) durationMs = await probeDurationFromUri(uri);
+
+      const isClearlyTooShort = durationMs > 0 ? durationMs < MIN_DURATION_MS : sizeBytes < MIN_CLIP_SIZE_BYTES;
+      if (isClearlyTooShort) {
+        setPendingSegmentStartedAt('');
+        throw new Error('Recording segment is too short.');
+      }
+
+      const segmentPayload = {
+        userId,
+        clipId: activeClipId,
+        segmentIndex: segmentIndexCounter,
+        uri,
+        mimeType: 'audio/m4a',
+        durationMs,
+        sizeBytes,
+        startedAt: pendingSegmentStartedAt,
+        endedAt: new Date().toISOString(),
+        filename: `segment_${segmentIndexCounter}.m4a`,
+      };
+
+      try {
+        setRecorderState('uploading');
+        setRecorderStatusText(`Uploading part ${segmentIndexCounter}...`);
+        await uploadAudioClipSegment(segmentPayload);
+        setSegmentIndexCounter((prev) => prev + 1);
+        setFailedSegments((prev) => prev.filter((row) => row.segmentIndex !== segmentPayload.segmentIndex));
+        if (expandedClipId === activeClipId) await loadSegmentsForClip(activeClipId, { force: true });
+      } catch (error) {
+        setFailedSegments((prev) => {
+          const next = prev.filter((row) => row.segmentIndex !== segmentPayload.segmentIndex);
+          next.push({ ...segmentPayload, error: error?.message || 'Upload failed' });
+          return next;
+        });
+        throw error;
+      } finally {
+        setPendingSegmentStartedAt('');
+      }
+    },
+    [activeClipId, ensureAppUserId, expandedClipId, loadSegmentsForClip, pendingSegmentStartedAt, segmentIndexCounter],
+  );
+
+  const onPressRecordSession = useCallback(async () => {
+    if (!sessionRecordingSessionId) return;
+    if (['playing', 'uploading', 'stopping', 'finalizing'].includes(recorderState)) return;
+
+    try {
+      await stopPlayback();
+      setRecorderError('');
+      setTranscribeError('');
+      const userId = await ensureAppUserId();
+
+      let clipId = activeClipId;
+      if (!clipId) {
+        const startedAt = new Date().toISOString();
+        const created = await createAudioClip({
+          userId,
+          startedAt,
+          fileName: `session_${sessionRecordingSessionId.slice(0, 8)}_${Date.now()}`,
+          gymSessionId: sessionRecordingSessionId,
+        });
+        clipId = created.id;
+        setActiveClipId(clipId);
+        setSegmentIndexCounter(1);
+        setFailedSegments([]);
+        await refreshSessionClips();
+      }
+
+      const segmentStart = new Date().toISOString();
+      setPendingSegmentStartedAt(segmentStart);
+      await startSegmentRecording();
+      setRecorderState('recording');
+      setRecorderStatusText('Recording...');
+
+      if (!expandedClipId) setExpandedClipId(clipId);
+    } catch (error) {
+      setRecorderState('ready');
+      setRecorderStatusText('Record failed');
+      setRecorderError(error?.message || 'Unable to start recording.');
+    }
+  }, [
+    activeClipId,
+    ensureAppUserId,
+    expandedClipId,
+    recorderState,
+    refreshSessionClips,
+    sessionRecordingSessionId,
+    startSegmentRecording,
+    stopPlayback,
+  ]);
+
+  const onPressPauseSession = useCallback(async () => {
+    if (recorderState !== 'recording') return;
+    try {
+      setRecorderError('');
+      await closeActiveSegmentAndUpload();
+      setRecorderState('paused');
+      setRecorderStatusText('Paused');
+    } catch (error) {
+      setRecorderState('paused');
+      setRecorderStatusText('Paused with upload issue');
+      setRecorderError(error?.message || 'Unable to upload paused segment.');
+    }
+  }, [closeActiveSegmentAndUpload, recorderState]);
+
+  const onPressResumeSession = useCallback(async () => {
+    if (recorderState !== 'paused') return;
+    if (['playing', 'uploading', 'stopping', 'finalizing'].includes(recorderState)) return;
+    try {
+      setRecorderError('');
+      const segmentStart = new Date().toISOString();
+      setPendingSegmentStartedAt(segmentStart);
+      await startSegmentRecording();
+      setRecorderState('recording');
+      setRecorderStatusText('Recording...');
+    } catch (error) {
+      setRecorderState('paused');
+      setRecorderStatusText('Resume failed');
+      setRecorderError(error?.message || 'Unable to resume recording.');
+    }
+  }, [recorderState, startSegmentRecording]);
+
+  const onPressCompleteSessionRecording = useCallback(async () => {
+    if (!activeClipId || ['uploading', 'stopping', 'finalizing', 'playing'].includes(recorderState)) return;
+
+    try {
+      setRecorderError('');
+      setRecorderState('stopping');
+      setRecorderStatusText('Completing session...');
+
+      if (recorderState === 'recording') {
+        await closeActiveSegmentAndUpload();
+      }
+
+      if (failedSegments.length > 0) {
+        setRecorderState('paused');
+        setRecorderStatusText('Pending segment uploads');
+        setRecorderError('Some parts failed to upload. Retry pending uploads, then complete again.');
+        return;
+      }
+
+      setRecorderState('finalizing');
+      setRecorderStatusText('Finalizing session recording...');
+      const userId = await ensureAppUserId();
+      await finalizeAudioClip({ userId, clipId: activeClipId });
+      await refreshSessionClips();
+      if (expandedClipId === activeClipId) await loadSegmentsForClip(activeClipId, { force: true });
+
+      setRecorderState('ready');
+      setRecorderStatusText('Session recording saved');
+      setActiveClipId('');
+      setPendingSegmentStartedAt('');
+      setSegmentIndexCounter(1);
+      setFailedSegments([]);
+      setSessionStatus('completed');
+    } catch (error) {
+      setRecorderState('paused');
+      setRecorderStatusText('Complete failed');
+      setRecorderError(error?.message || 'Unable to complete session recording.');
+    }
+  }, [
+    activeClipId,
+    closeActiveSegmentAndUpload,
+    ensureAppUserId,
+    expandedClipId,
+    failedSegments.length,
+    loadSegmentsForClip,
+    recorderState,
+    refreshSessionClips,
+  ]);
+
+  const retryPendingSegmentUploads = useCallback(async () => {
+    if (!failedSegments.length || !appUserId) return;
+    try {
+      setRecorderError('');
+      setRecorderStatusText('Retrying pending uploads...');
+      const nextFailed = [];
+      for (const item of failedSegments) {
+        try {
+          await uploadAudioClipSegment(item);
+          setSegmentIndexCounter((prev) => Math.max(prev, Number(item.segmentIndex) + 1));
+        } catch (error) {
+          nextFailed.push({ ...item, error: error?.message || 'Upload failed' });
+        }
+      }
+      setFailedSegments(nextFailed);
+      if (expandedClipId) await loadSegmentsForClip(expandedClipId, { force: true });
+      if (nextFailed.length === 0) {
+        setRecorderStatusText('Pending uploads cleared. You can complete session now.');
+      } else {
+        setRecorderStatusText('Some uploads still pending.');
+      }
+    } catch (error) {
+      setRecorderError(error?.message || 'Retry failed.');
+    }
+  }, [appUserId, expandedClipId, failedSegments, loadSegmentsForClip]);
+
+  const toggleClipExpand = useCallback(
+    async (clip) => {
+      const clipId = clip?.id;
+      if (!clipId) return;
+      if (expandedClipId === clipId) {
+        setExpandedClipId('');
+        return;
+      }
+      setExpandedClipId(clipId);
+      setExpandedCombinedTranscriptClipId('');
+      setExpandedSegmentTranscriptId('');
+      setTranscribeError('');
+      setTranscribeStatus('');
+      if ((Number(clip.parts_count) || 0) > 0) await loadSegmentsForClip(clipId);
+    },
+    [expandedClipId, loadSegmentsForClip],
+  );
+
+  const onPressCombinedTranscript = useCallback(
+    async (clip) => {
+      if (!clip?.id) return;
+      if (expandedCombinedTranscriptClipId === clip.id && clip.transcript_text) {
+        setExpandedCombinedTranscriptClipId('');
+        return;
+      }
+
+      try {
+        setTranscribeError('');
+        setBuildingCombinedClipId(clip.id);
+        setTranscribeStatus(`Preparing transcript for ${clip.file_name}...`);
+        const userId = await ensureAppUserId();
+
+        let segments = await loadSegmentsForClip(clip.id, { force: true });
+        const missing = segments.filter((segment) => !String(segment?.transcript_text || '').trim());
+        for (const segment of missing) {
+          setTranscribingSegmentId(segment.id);
+          setTranscribeStatus(`Transcribing part ${segment.segment_index}...`);
+          await transcribeAudioSegment({ userId, segmentId: segment.id });
+        }
+
+        if (missing.length > 0) segments = await loadSegmentsForClip(clip.id, { force: true });
+        const combinedText = buildCombinedTranscript(segments);
+        await saveAudioClipTranscript({ userId, clipId: clip.id, transcriptText: combinedText });
+        await refreshSessionClips();
+        await loadSegmentsForClip(clip.id, { force: true });
+        setExpandedCombinedTranscriptClipId(clip.id);
+        setTranscribeStatus(`Transcript ready for ${clip.file_name}`);
+      } catch (error) {
+        setTranscribeStatus('Transcript failed');
+        setTranscribeError(error?.message || 'Unable to build transcript.');
+      } finally {
+        setBuildingCombinedClipId('');
+        setTranscribingSegmentId('');
+      }
+    },
+    [ensureAppUserId, expandedCombinedTranscriptClipId, loadSegmentsForClip, refreshSessionClips],
+  );
+
+  const onPressTranscribeSegment = useCallback(
+    async (clipId, segment) => {
+      if (!segment?.id || transcribingSegmentId) return;
+      if (segment.transcript_text) {
+        setExpandedSegmentTranscriptId((prev) => (prev === segment.id ? '' : segment.id));
+        return;
+      }
+
+      try {
+        setTranscribeError('');
+        setTranscribingSegmentId(segment.id);
+        setTranscribeStatus(`Transcribing part ${segment.segment_index}...`);
+        const userId = await ensureAppUserId();
+        await transcribeAudioSegment({ userId, segmentId: segment.id });
+        await loadSegmentsForClip(clipId, { force: true });
+        setExpandedSegmentTranscriptId(segment.id);
+        setTranscribeStatus(`Transcript ready for part ${segment.segment_index}`);
+      } catch (error) {
+        setTranscribeStatus('Transcription failed');
+        setTranscribeError(error?.message || 'Unable to transcribe segment.');
+      } finally {
+        setTranscribingSegmentId('');
+      }
+    },
+    [ensureAppUserId, loadSegmentsForClip, transcribingSegmentId],
+  );
+
+  const onPressDeleteClip = useCallback(
+    async (clip) => {
+      Alert.alert('Delete recording?', `Delete "${clip.file_name}" and all parts?`, [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const userId = await ensureAppUserId();
+              await deleteAudioClip({ userId, clipId: clip.id });
+              if (expandedClipId === clip.id) {
+                setExpandedClipId('');
+                setExpandedSegmentTranscriptId('');
+                setExpandedCombinedTranscriptClipId('');
+              }
+              setSegmentsByClipId((prev) => {
+                const next = { ...prev };
+                delete next[clip.id];
+                return next;
+              });
+              await refreshSessionClips();
+            } catch (error) {
+              setTranscribeError(error?.message || 'Unable to delete recording.');
+            }
+          },
+        },
+      ]);
+    },
+    [ensureAppUserId, expandedClipId, refreshSessionClips],
+  );
 
   if (!sourceLog) {
     return (
@@ -497,6 +1074,11 @@ function GymLogDetailScreen({
     setEditingExerciseId(null);
     setActiveTab('actual');
   };
+
+  const canRecord = recorderState === 'idle' || recorderState === 'ready';
+  const canPause = recorderState === 'recording';
+  const canResume = recorderState === 'paused';
+  const canComplete = Boolean(activeClipId) && (recorderState === 'recording' || recorderState === 'paused');
 
   return (
     <View style={styles.safeArea}>
@@ -592,7 +1174,253 @@ function GymLogDetailScreen({
           </View>
         ) : null}
 
-        {!isRestDay
+        {activeTab === 'actual' && !isRestDay && sessionRecordingSessionId ? (
+          <View style={styles.actualWidgetWrap}>
+            <View style={styles.actualWidgetCard}>
+              <TouchableOpacity style={styles.actualWidgetHeader} activeOpacity={0.9} onPress={() => setActualRecordingExpanded((prev) => !prev)}>
+                <Text style={styles.actualWidgetTitle}>Session Recording</Text>
+                <Ionicons name={actualRecordingExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={COLORS.muted} />
+              </TouchableOpacity>
+
+              {actualRecordingExpanded ? (
+                <View style={styles.actualWidgetBody}>
+                  <Text style={styles.statusText}>Status: {recorderStatusText}</Text>
+                  {recorderError ? <Text style={styles.errorText}>{recorderError}</Text> : null}
+                  {transcribeStatus ? <Text style={styles.statusText}>{transcribeStatus}</Text> : null}
+                  {transcribeError ? <Text style={styles.errorText}>{transcribeError}</Text> : null}
+                  {failedSegments.length > 0 ? <Text style={styles.errorText}>{failedSegments.length} pending upload(s)</Text> : null}
+
+                  <View style={styles.controlsRow}>
+                    <TouchableOpacity
+                      style={[styles.controlButton, !canRecord && styles.controlButtonDisabled]}
+                      onPress={onPressRecordSession}
+                      disabled={!canRecord}
+                      activeOpacity={0.9}
+                    >
+                      <Ionicons name="mic" size={14} color={COLORS.bg} />
+                      <Text style={styles.controlText}>Record</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.controlButtonAlt, !canPause && styles.controlButtonDisabled]}
+                      onPress={onPressPauseSession}
+                      disabled={!canPause}
+                      activeOpacity={0.9}
+                    >
+                      <Ionicons name="pause" size={14} color={COLORS.text} />
+                      <Text style={styles.controlTextAlt}>Pause</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.controlButtonAlt, !canResume && styles.controlButtonDisabled]}
+                      onPress={onPressResumeSession}
+                      disabled={!canResume}
+                      activeOpacity={0.9}
+                    >
+                      <Ionicons name="play" size={14} color={COLORS.text} />
+                      <Text style={styles.controlTextAlt}>Resume</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.completeSessionButton, !canComplete && styles.controlButtonDisabled]}
+                      onPress={onPressCompleteSessionRecording}
+                      disabled={!canComplete}
+                      activeOpacity={0.9}
+                    >
+                      {['stopping', 'uploading', 'finalizing'].includes(recorderState) ? (
+                        <ActivityIndicator color={COLORS.bg} size="small" />
+                      ) : (
+                        <Ionicons name="checkmark-done-outline" size={14} color={COLORS.bg} />
+                      )}
+                      <Text style={styles.completeSessionText}>Complete session</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {failedSegments.length > 0 ? (
+                    <TouchableOpacity style={styles.retryButton} activeOpacity={0.9} onPress={retryPendingSegmentUploads}>
+                      <Ionicons name="refresh" size={13} color={COLORS.text} />
+                      <Text style={styles.retryButtonText}>Retry pending uploads</Text>
+                    </TouchableOpacity>
+                  ) : null}
+
+                  <View style={styles.savedRecordingsWrap}>
+                    <Text style={styles.savedRecordingsTitle}>Saved session recordings ({sessionClips.length})</Text>
+                    {sessionClips.length === 0 ? (
+                      <Text style={styles.metaText}>No session recordings yet.</Text>
+                    ) : null}
+
+                    {sessionClips.map((clip) => {
+                      const expanded = expandedClipId === clip.id;
+                      const segments = segmentsByClipId[clip.id] || [];
+                      const segmentsLoading = Boolean(segmentsLoadingByClipId[clip.id]);
+                      const combinedExpanded = expandedCombinedTranscriptClipId === clip.id;
+                      const combinedReady = Boolean(String(clip.transcript_text || '').trim());
+                      return (
+                        <View key={clip.id} style={styles.clipRow}>
+                          <View style={styles.clipHeaderRow}>
+                            <View style={styles.clipMetaWrap}>
+                              <Text style={styles.clipName} numberOfLines={1}>{clip.file_name}</Text>
+                              <Text style={styles.metaText}>
+                                {formatDuration(clip.total_duration_ms || clip.duration_ms)} • {Number(clip.parts_count) || 0} parts
+                              </Text>
+                              {clip.started_at && clip.ended_at ? <Text style={styles.metaText}>{formatRange(clip.started_at, clip.ended_at)}</Text> : null}
+                            </View>
+                            <View style={styles.clipActionsWrap}>
+                              <TouchableOpacity style={styles.iconButton} activeOpacity={0.9} onPress={() => playAllSegments(clip.id)}>
+                                <Ionicons
+                                  name={activePlayClipId === clip.id ? 'radio' : 'play-forward'}
+                                  size={15}
+                                  color={activePlayClipId === clip.id ? COLORS.accent2 : COLORS.text}
+                                />
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                style={styles.iconButton}
+                                activeOpacity={0.9}
+                                onPress={() => onPressCombinedTranscript(clip)}
+                                disabled={Boolean(buildingCombinedClipId && buildingCombinedClipId !== clip.id)}
+                              >
+                                {buildingCombinedClipId === clip.id ? (
+                                  <ActivityIndicator color={COLORS.text} size="small" />
+                                ) : combinedReady ? (
+                                  <Ionicons
+                                    name={combinedExpanded ? 'document-text' : 'document-text-outline'}
+                                    size={15}
+                                    color={COLORS.accent2}
+                                  />
+                                ) : (
+                                  <Ionicons name="documents-outline" size={15} color={COLORS.text} />
+                                )}
+                              </TouchableOpacity>
+                              <TouchableOpacity style={styles.iconButton} activeOpacity={0.9} onPress={() => toggleClipExpand(clip)}>
+                                <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={15} color={COLORS.text} />
+                              </TouchableOpacity>
+                              <TouchableOpacity style={styles.iconButton} activeOpacity={0.9} onPress={() => onPressDeleteClip(clip)}>
+                                <Ionicons name="trash-outline" size={15} color="#ff8787" />
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+
+                          {expanded ? (
+                            <View style={styles.clipBody}>
+                              {segmentsLoading ? <ActivityIndicator color={COLORS.accent} /> : null}
+
+                              {!segmentsLoading && segments.length === 0 ? (
+                                <Text style={styles.metaText}>No parts found for this recording.</Text>
+                              ) : null}
+
+                              {!segmentsLoading ? segments.map((segment) => {
+                                const transcriptExpanded = expandedSegmentTranscriptId === segment.id;
+                                return (
+                                  <View key={segment.id} style={styles.segmentRow}>
+                                    <View style={styles.segmentHeaderRow}>
+                                      <View style={styles.segmentMetaWrap}>
+                                        <Text style={styles.segmentTitle}>Part {segment.segment_index}</Text>
+                                        <Text style={styles.metaText}>{formatRange(segment.started_at, segment.ended_at)}</Text>
+                                        <Text style={styles.metaText}>{formatDuration(segment.duration_ms)}</Text>
+                                      </View>
+                                      <View style={styles.segmentActionsWrap}>
+                                        <TouchableOpacity style={styles.iconButton} activeOpacity={0.9} onPress={() => playSegment(segment, clip.id)}>
+                                          <Ionicons
+                                            name={activePlaySegmentId === segment.id ? 'radio' : 'play'}
+                                            size={15}
+                                            color={activePlaySegmentId === segment.id ? COLORS.accent2 : COLORS.text}
+                                          />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                          style={styles.iconButton}
+                                          activeOpacity={0.9}
+                                          onPress={() => onPressTranscribeSegment(clip.id, segment)}
+                                          disabled={Boolean(transcribingSegmentId && transcribingSegmentId !== segment.id)}
+                                        >
+                                          {transcribingSegmentId === segment.id ? (
+                                            <ActivityIndicator color={COLORS.text} size="small" />
+                                          ) : segment.transcript_text ? (
+                                            <Ionicons
+                                              name={transcriptExpanded ? 'document-text' : 'document-text-outline'}
+                                              size={15}
+                                              color={COLORS.accent2}
+                                            />
+                                          ) : (
+                                            <Ionicons name="language-outline" size={15} color={COLORS.text} />
+                                          )}
+                                        </TouchableOpacity>
+                                      </View>
+                                    </View>
+
+                                    {transcriptExpanded && segment.transcript_text ? (
+                                      <View style={styles.transcriptWrap}>
+                                        <Text style={styles.transcriptTitle}>Transcript</Text>
+                                        <Text style={styles.transcriptText}>{segment.transcript_text}</Text>
+                                      </View>
+                                    ) : null}
+                                  </View>
+                                );
+                              }) : null}
+
+                              {combinedExpanded && combinedReady ? (
+                                <View style={styles.transcriptWrap}>
+                                  <Text style={styles.transcriptTitle}>Combined transcript</Text>
+                                  <Text style={styles.transcriptText}>{clip.transcript_text}</Text>
+                                </View>
+                              ) : null}
+                            </View>
+                          ) : null}
+                        </View>
+                      );
+                    })}
+                  </View>
+                </View>
+              ) : null}
+            </View>
+
+            <View style={styles.actualWidgetCard}>
+              <TouchableOpacity style={styles.actualWidgetHeader} activeOpacity={0.9} onPress={() => setActualExercisesExpanded((prev) => !prev)}>
+                <Text style={styles.actualWidgetTitle}>Session Exercises</Text>
+                <Ionicons name={actualExercisesExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={COLORS.muted} />
+              </TouchableOpacity>
+
+              {actualExercisesExpanded ? (
+                <View style={styles.actualWidgetBody}>
+                  {exercises.map((exercise) => {
+                    const expanded = Boolean(expandedMap[exercise.id]);
+                    return (
+                      <ExerciseAccordionCard
+                        key={exercise.id}
+                        exercise={exercise}
+                        expanded={expanded}
+                        mode={activeTab}
+                        dayIsFuture={isFutureDay}
+                        onLogPress={openLogModal}
+                        onOpenExercise={openExerciseDetail}
+                        onToggle={() => setExpandedMap((prev) => ({ ...prev, [exercise.id]: !prev[exercise.id] }))}
+                      />
+                    );
+                  })}
+                </View>
+              ) : null}
+            </View>
+          </View>
+        ) : null}
+
+        {!isRestDay && activeTab !== 'actual'
+          ? exercises.map((exercise) => {
+              const expanded = Boolean(expandedMap[exercise.id]);
+              return (
+                <ExerciseAccordionCard
+                  key={exercise.id}
+                  exercise={exercise}
+                  expanded={expanded}
+                  mode={activeTab}
+                  dayIsFuture={isFutureDay}
+                  onLogPress={openLogModal}
+                  onOpenExercise={openExerciseDetail}
+                  onToggle={() => setExpandedMap((prev) => ({ ...prev, [exercise.id]: !prev[exercise.id] }))}
+                />
+              );
+            })
+          : null}
+
+        {!isRestDay && activeTab === 'actual' && !sessionRecordingSessionId
           ? exercises.map((exercise) => {
               const expanded = Boolean(expandedMap[exercise.id]);
               return (
@@ -1082,6 +1910,221 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.meta,
     textAlign: 'center',
+  },
+  actualWidgetWrap: {
+    marginTop: UI_TOKENS.spacing.sm,
+    gap: UI_TOKENS.spacing.sm,
+  },
+  actualWidgetCard: {
+    borderRadius: UI_TOKENS.radius.md,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.24)',
+    backgroundColor: COLORS.card,
+    overflow: 'hidden',
+  },
+  actualWidgetHeader: {
+    minHeight: 44,
+    paddingHorizontal: UI_TOKENS.spacing.sm,
+    paddingVertical: UI_TOKENS.spacing.xs + 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: UI_TOKENS.border.hairline,
+    borderBottomColor: 'rgba(162,167,179,0.2)',
+  },
+  actualWidgetTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta + 1,
+    fontWeight: '700',
+  },
+  actualWidgetBody: {
+    padding: UI_TOKENS.spacing.sm,
+  },
+  statusText: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+    marginBottom: 4,
+  },
+  errorText: {
+    color: '#ff8787',
+    fontSize: UI_TOKENS.typography.meta,
+    marginBottom: 4,
+  },
+  metaText: {
+    color: COLORS.muted,
+    fontSize: 11,
+  },
+  controlsRow: {
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  controlButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    borderRadius: 10,
+    minHeight: 34,
+    backgroundColor: COLORS.accent,
+    paddingHorizontal: 11,
+  },
+  controlButtonAlt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    borderRadius: 10,
+    minHeight: 34,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.28)',
+    backgroundColor: 'rgba(31,36,49,0.75)',
+    paddingHorizontal: 11,
+  },
+  completeSessionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    borderRadius: 10,
+    minHeight: 34,
+    backgroundColor: COLORS.accent,
+    paddingHorizontal: 11,
+  },
+  completeSessionText: {
+    color: COLORS.bg,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  controlButtonDisabled: {
+    opacity: 0.45,
+  },
+  controlText: {
+    color: COLORS.bg,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  controlTextAlt: {
+    color: COLORS.text,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  retryButton: {
+    marginTop: 8,
+    borderRadius: 10,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.28)',
+    backgroundColor: 'rgba(31,36,49,0.75)',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+  },
+  retryButtonText: {
+    color: COLORS.text,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  savedRecordingsWrap: {
+    marginTop: UI_TOKENS.spacing.sm,
+    gap: UI_TOKENS.spacing.xs,
+  },
+  savedRecordingsTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta + 1,
+    fontWeight: '700',
+  },
+  clipRow: {
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.2)',
+    backgroundColor: 'rgba(31,36,49,0.65)',
+    paddingHorizontal: UI_TOKENS.spacing.sm,
+    paddingVertical: UI_TOKENS.spacing.sm,
+  },
+  clipHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  clipMetaWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  clipName: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta + 1,
+    fontWeight: '700',
+  },
+  clipActionsWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  clipBody: {
+    marginTop: UI_TOKENS.spacing.xs,
+    gap: UI_TOKENS.spacing.xs,
+  },
+  segmentRow: {
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.2)',
+    backgroundColor: 'rgba(24,27,36,0.6)',
+    paddingHorizontal: UI_TOKENS.spacing.xs + 2,
+    paddingVertical: UI_TOKENS.spacing.xs + 2,
+  },
+  segmentHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  segmentMetaWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  segmentActionsWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  segmentTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+  },
+  iconButton: {
+    width: 30,
+    height: 30,
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.24)',
+    backgroundColor: COLORS.cardSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  transcriptWrap: {
+    marginTop: UI_TOKENS.spacing.xs,
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.2)',
+    backgroundColor: 'rgba(24,27,36,0.6)',
+    paddingHorizontal: UI_TOKENS.spacing.xs + 2,
+    paddingVertical: UI_TOKENS.spacing.xs + 2,
+  },
+  transcriptTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  transcriptText: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+    lineHeight: 18,
   },
   modalOverlay: {
     flex: 1,

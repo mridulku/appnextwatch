@@ -59,6 +59,13 @@ function TestHomeScreen({ navigation }) {
           onPress={() => navigation.navigate('TestChat')}
         />
 
+        <ToolCard
+          title="Audio Recorder"
+          subtitle="Record, pause, stop, play, and upload to Supabase"
+          icon="mic-outline"
+          onPress={() => navigation.navigate('TestAudioRecorder')}
+        />
+
         <CollapsibleGroup
           title="Onboarding interfaces"
           subtitle="Sandbox onboarding variants"

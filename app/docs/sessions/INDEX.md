@@ -2,6 +2,8 @@
 
 | Date | Time | Tag | Commit | Title (1 line) | Notes link |
 |---|---|---|---|---|---|
+| 2026-02-26 | 11:57 | TBD | TBD | gym session actual tab recording + transcript integration | [1157_data-gym-session-audio-actual.md](2026-02-26/1157_data-gym-session-audio-actual.md) |
+| 2026-02-25 | 10:20 | TBD | TBD | gym chat lab unstructured text to session-action parser (v1) | [1020_chat-lab-session-actions.md](2026-02-25/1020_chat-lab-session-actions.md) |
 | 2026-02-24 | 17:58 | nw-2026-02-24-1758-data-gym-sessions | TBD | gym sessions+templates+mapping checkpoint and chat voice transcription | [1758_data-gym-sessions-chat-voice.md](2026-02-24/1758_data-gym-sessions-chat-voice.md) |
 | 2026-02-21 | 19:42 | nw-2026-02-21-1942-data-gym-chat | TBD | wellness tabs refocus + gym edge-function DB chat bridge | [1942_data-gym-chat-wellness-tabs.md](2026-02-21/1942_data-gym-chat-wellness-tabs.md) |
 | 2026-02-20 | 18:13 | nw-2026-02-20-1813-navigation-gym-onboarding | TBD | gym plan/logs IA + onboarding milestone checkpoint | [1813_gym-plan-logs-onboarding-milestone.md](2026-02-20/1813_gym-plan-logs-onboarding-milestone.md) |

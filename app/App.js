@@ -52,12 +52,14 @@ import WellnessHomeScreen from './features/wellness/home/WellnessHomeScreen';
 import GymHubScreen from './features/wellness/gym/GymHubScreen';
 import GymSessionCreateScreen from './features/wellness/gym/GymSessionCreateScreen';
 import GymSessionWorkScreen from './features/wellness/gym/GymSessionWorkScreen';
+import GymChatLabCatalogScreen from './features/wellness/gym/GymChatLabCatalogScreen';
 import GymTemplateDetailScreen from './features/wellness/gym/GymTemplateDetailScreen';
 import HomeSettingsScreen from './features/wellness/home/HomeSettingsScreen';
 import CategorySelectorScreen from './features/shared/category/CategorySelectorScreen';
 import TestHomeScreen from './features/wellness/test/TestHomeScreen';
 import TestTablesScreen from './features/wellness/test/TestTablesScreen';
 import TestChatScreen from './features/wellness/test/TestChatScreen';
+import TestAudioRecorderScreen from './features/wellness/test/TestAudioRecorderScreen';
 import TestOnboardingSandboxScreen from './features/wellness/test/TestOnboardingSandboxScreen';
 import TestFormOnboardingSandboxScreen from './features/wellness/test/TestFormOnboardingSandboxScreen';
 import TestHomeLaterScreen from './features/wellness/test/TestHomeLaterScreen';
@@ -363,6 +365,11 @@ function GymStackScreens() {
         options={{ title: 'Work on Session' }}
       />
       <WellnessGymStack.Screen
+        name="GymChatLabCatalog"
+        component={GymChatLabCatalogScreen}
+        options={{ title: 'Exercise Catalog' }}
+      />
+      <WellnessGymStack.Screen
         name="GymTemplateDetail"
         component={GymTemplateDetailScreen}
         options={({ route }) => ({ title: route.params?.title ?? 'Template Detail' })}
@@ -455,6 +462,11 @@ function TestStackScreens() {
         name="TestChat"
         component={TestChatScreen}
         options={{ title: 'Chat' }}
+      />
+      <WellnessTestStack.Screen
+        name="TestAudioRecorder"
+        component={TestAudioRecorderScreen}
+        options={{ title: 'Audio Recorder' }}
       />
       <WellnessTestStack.Screen
         name="TestOnboardingSandbox"

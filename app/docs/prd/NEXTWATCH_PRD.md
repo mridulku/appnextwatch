@@ -24,6 +24,7 @@
 | 1.9 | 2026-02-20 | Codex | Gym IA and onboarding milestone: Plan/Logs/Library tab architecture, Training Program timeline + onboarding interview in Plan, Logs/Log Detail UX upgrades, shared full-width segmented controls, and Test-only Chat/Form onboarding sandboxes |
 | 2.0 | 2026-02-21 | Codex | Wellness IA checkpoint: root tabs reduced to Gym/Food/Test, Gym + Food now include first-class Chat tabs, Home/Sessions moved under Test (Later), and Gym Chat now uses Supabase Edge Function `chat_db` with OpenAI-backed DB-context responses + debug payload visibility |
 | 2.1 | 2026-02-24 | Codex | Gym delivery checkpoint: DB-backed Sessions + Templates flows, expanded/scored muscle-exercise-machine mapping surfaces, Gym Chat history UX, and server-side OpenAI Whisper voice-to-text via Edge Function `chat_transcribe` |
+| 2.2 | 2026-02-25 | Codex | Added experimental Gym `Chat Lab` tab for unstructured text → structured `create_session` parsing via dedicated Edge Function `chat_session_lab_parse`, with client-side confirmation before DB session creation |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -127,6 +128,22 @@
   - Gym Chat supports local chat history sessions (new/select/delete/rename) with empty-draft behavior.
   - Added `chat_transcribe` Edge Function for server-side OpenAI Whisper transcription; Gym Chat mic captures audio and prefills transcript into input (no auto-send).
   - iOS/Android microphone permissions were added for Gym Chat voice capture.
+- 2026-02-25: Gym Chat Lab experimental action parsing:
+  - Added a 4th Gym primary tab `Chat Lab` after `Chat`, `Sessions`, and `Library`.
+  - Added `GymChatLabScreen` for free-text action input and parse-result rendering.
+  - Added new Edge Function `chat_session_lab_parse` that:
+    - loads `catalog_exercises`,
+    - calls OpenAI with strict JSON instructions for `create_session`,
+    - normalizes and validates parsed output,
+    - resolves exercises against catalog (exact + fuzzy),
+    - returns structured action + issues (partial unresolved behavior supported).
+  - Chat Lab now requires explicit confirmation (`Create session`) before writing to DB via existing `useGymSessions().create(...)`.
+- 2026-02-26: Gym Session Actual tab recording/transcript integration:
+  - Added session-scoped segmented recording inside Gym session `Actual` view with controls: `Record`, `Pause`, `Resume`, and `Complete session`.
+  - Added collapsible widgets in Actual mode: `Session Recording` and `Session Exercises`.
+  - `Complete session` finalizes the active recording and persists it as session-linked audio log.
+  - Added session-level saved recordings UI with per-part playback/transcription and combined transcript generation.
+  - Added DB linkage field `user_audio_clips.gym_session_id` for deterministic session-audio retrieval.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.

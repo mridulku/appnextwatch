@@ -10,11 +10,13 @@ import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
 import GymChatScreen from './GymChatScreen';
 import GymSessionsScreen from './GymSessionsScreen';
+import GymChatLabScreen from './GymChatLabScreen';
 
 const PRIMARY_TABS = [
   { key: 'chat', label: 'Chat', icon: '💬' },
   { key: 'logs', label: 'Sessions', icon: '🗒️' },
   { key: 'library', label: 'Library', icon: '📚' },
+  { key: 'chat_lab', label: 'Chat Lab', icon: '🧪' },
 ];
 
 const LIBRARY_TABS = [
@@ -26,6 +28,7 @@ const LIBRARY_TABS = [
 
 function normalizePrimarySegment(value) {
   if (value === 'Chat' || value === 'chat') return 'chat';
+  if (value === 'Chat Lab' || value === 'chat_lab' || value === 'chatlab') return 'chat_lab';
   if (value === 'Logs' || value === 'logs') return 'logs';
   if (value === 'Library' || value === 'library') return 'library';
   if (value === 'Plan' || value === 'plan' || value === 'My Stats' || value === 'my_stats') return 'logs';
@@ -69,6 +72,9 @@ function GymHubScreen({ navigation, route }) {
     }
     if (segment === 'logs') {
       return <GymSessionsScreen />;
+    }
+    if (segment === 'chat_lab') {
+      return <GymChatLabScreen navigation={navigation} />;
     }
     return (
       <View style={styles.libraryWrap}>

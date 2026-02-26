@@ -316,3 +316,34 @@
 - Follow-ups / risks: `expo-av` deprecation warning remains (migrate to `expo-audio`); run manual iOS end-to-end pass for voice permission-denied/timeout/long-audio paths.
 - Tag: nw-2026-02-24-1758-data-gym-sessions (T1 + T2 + T3)
 - Notes: app/docs/sessions/2026-02-24/1758_data-gym-sessions-chat-voice.md
+
+## 2026-02-25 - Session gym-chat-lab-v1
+- Summary: Added experimental Gym `Chat Lab` tab that parses unstructured text into structured session creation actions via a dedicated Supabase Edge Function.
+- Changes:
+  - Added 4th Gym top tab `Chat Lab` and new `GymChatLabScreen`.
+  - Added `app/core/api/gymChatLabDb.js` for `chat_session_lab_parse` calls.
+  - Added local `chatLab/types.js` contract docs/constants.
+  - Added new edge function `supabase/functions/chat_session_lab_parse` with strict JSON parse pipeline and catalog exercise resolution (exact+fuzzy) plus partial unresolved handling.
+  - Wired confirm-then-create behavior to existing `useGymSessions().create(...)` path.
+- Files: app/features/wellness/gym/GymHubScreen.js, app/features/wellness/gym/GymChatLabScreen.js, app/core/api/gymChatLabDb.js, app/features/wellness/gym/chatLab/types.js, supabase/functions/chat_session_lab_parse/*, app/docs/prd/NEXTWATCH_PRD.md, app/docs/log/WORKLOG.md, app/docs/sessions/*.
+- Behavior impact: New user-facing experimental flow in Gym for text-command based session creation; existing Chat/Sessions/Library flows unchanged.
+- Validation performed: `npx expo export --platform ios` passed; `npx supabase functions deploy chat_session_lab_parse --project-ref ytkuqigyltxusbiuxuyn` succeeded.
+- Follow-ups / risks: unresolved exercises currently require message retry (no in-card correction controls); fuzzy resolution may need additional guardrails for close-name exercises.
+- Tag: TBD (recommended once this milestone is accepted)
+- Notes: app/docs/sessions/2026-02-25/1020_chat-lab-session-actions.md
+
+## 2026-02-26 - Session data-gym-session-audio-actual
+- Summary: Integrated session-scoped audio recording/transcription into Gym Session `Actual` flow with collapsible recording/exercise widgets.
+- Changes:
+  - Added DB linkage from audio clips to gym sessions (`user_audio_clips.gym_session_id`).
+  - Extended audio DB API to create/list clips scoped by gym session.
+  - Wired Gym session detail to pass active `sessionId` into log-detail surface.
+  - Added `Session Recording` widget in Actual tab with `Record/Pause/Resume/Complete session` controls.
+  - Added session-level saved recordings UI with per-part play/transcribe and combined transcript generation.
+  - Added `Session Exercises` collapsible widget so exercises remain available below recording controls.
+- Files: app/features/wellness/gym/GymLogDetailScreen.js, app/features/wellness/gym/GymSessionWorkScreen.js, app/core/api/audioRecorderDb.js, supabase/migrations/20260226143000_link_audio_clips_to_gym_sessions.sql, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/INDEX.md, app/docs/sessions/2026-02-26/1157_data-gym-session-audio-actual.md.
+- Behavior impact: User-visible Gym session behavior change (Actual tab now supports in-flow session recording/transcript logs tied to that session).
+- Validation performed: `node --check` on edited JS files; `supabase db push` applied migration `20260226143000_link_audio_clips_to_gym_sessions.sql`.
+- Follow-ups / risks: Manual iOS smoke pass recommended for long recordings, interruptions, and network-failure retries.
+- Tag: TBD (recommended)
+- Notes: app/docs/sessions/2026-02-26/1157_data-gym-session-audio-actual.md

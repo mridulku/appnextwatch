@@ -203,6 +203,7 @@ function GymSessionWorkScreen({ route, navigation }) {
     <GymLogDetailScreen
       navigation={navigation}
       route={{ params: { logId: session.id, log: logPayload } }}
+      sessionRecordingSessionId={session.id}
       onSessionStatusChange={handleSessionStatusChange}
       onLoggedCountChange={handleLoggedCountChange}
       onActualSetsSave={handleActualSetsSave}
