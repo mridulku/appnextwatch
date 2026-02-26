@@ -345,5 +345,5 @@
 - Behavior impact: User-visible Gym session behavior change (Actual tab now supports in-flow session recording/transcript logs tied to that session).
 - Validation performed: `node --check` on edited JS files; `supabase db push` applied migration `20260226143000_link_audio_clips_to_gym_sessions.sql`.
 - Follow-ups / risks: Manual iOS smoke pass recommended for long recordings, interruptions, and network-failure retries.
-- Tag: TBD (recommended)
+- Tag: nw-2026-02-26-1200-data-gym-audio (T1 + T2 + T3)
 - Notes: app/docs/sessions/2026-02-26/1157_data-gym-session-audio-actual.md
