@@ -154,8 +154,8 @@ function DirectoryScreen({ navigation }) {
   const resolveImage = (type, item) =>
     item?.wiki_image_url || imageCache[`${type}:${item.id}`];
 
-  const renderMediaCard = ({ title, subtitle, imageUrl, gradient, onPress }) => (
-    <TouchableOpacity style={styles.mediaCard} onPress={onPress} activeOpacity={0.9}>
+  const renderMediaCard = ({ keyValue, title, subtitle, imageUrl, gradient, onPress }) => (
+    <TouchableOpacity key={keyValue} style={styles.mediaCard} onPress={onPress} activeOpacity={0.9}>
       {imageUrl ? (
         <ImageBackground source={{ uri: imageUrl }} style={styles.mediaImage}>
           <LinearGradient
@@ -224,6 +224,7 @@ function DirectoryScreen({ navigation }) {
         >
           {movies.map((movie) =>
             renderMediaCard({
+              keyValue: movie.id,
               title: movie.title,
               subtitle: `${movie.year} • ${movie.genre}`,
               imageUrl: resolveImage('movie', movie),
@@ -254,6 +255,7 @@ function DirectoryScreen({ navigation }) {
         >
           {actors.map((person) =>
             renderMediaCard({
+              keyValue: person.id,
               title: person.name,
               subtitle: 'Actor',
               imageUrl: resolveImage('actor', person),
@@ -284,6 +286,7 @@ function DirectoryScreen({ navigation }) {
         >
           {actresses.map((person) =>
             renderMediaCard({
+              keyValue: person.id,
               title: person.name,
               subtitle: 'Actress',
               imageUrl: resolveImage('actor', person),
@@ -310,6 +313,7 @@ function DirectoryScreen({ navigation }) {
         >
           {directors.map((person) =>
             renderMediaCard({
+              keyValue: person.id,
               title: person.name,
               subtitle: 'Director',
               imageUrl: resolveImage('director', person),

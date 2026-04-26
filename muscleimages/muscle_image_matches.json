@@ -1,0 +1,817 @@
+{
+  "generated_at": "2026-03-08T01:38:38.130Z",
+  "count": 21,
+  "min_confidence": 75,
+  "items": [
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.25.13 PM.png",
+      "match": {
+        "detected_subgroup_name": "Lower Abs",
+        "best_match_name": "Lower Abs",
+        "best_match_id": "138aefa3-f280-4b1b-9c20-ec16d69db976",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Abs",
+            "id": "e7a609ad-8693-491d-b15b-59a69274602a",
+            "parent": "Core",
+            "confidence": 70
+          },
+          {
+            "name": "Obliques",
+            "id": "2fded183-66f2-48ed-a08c-6b0bed559db3",
+            "parent": "Core",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The image specifically highlights the lower abdominal area with a blue overlay and a yellow arrow pointing to it. Additionally, the visible text 'LOWER ABS' confirms the muscle subgroup focus. The visual and textual cues clearly indicate the Lower Abs subgroup.",
+        "visible_text": "LOWER ABS",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Core"
+      },
+      "meta": {
+        "ms": 6034,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "138aefa3-f280-4b1b-9c20-ec16d69db976",
+      "final_match_name": "Lower Abs",
+      "final_match_parent": "Core",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.25.43 PM.png",
+      "match": {
+        "detected_subgroup_name": "Lats",
+        "best_match_name": "Lats",
+        "best_match_id": "268bc73c-bb0d-49b5-8cd7-ae3288799b05",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Mid Back",
+            "id": "ec590137-1fb0-4506-951b-6ec6ce3dda6c",
+            "parent": "Back",
+            "confidence": 40
+          },
+          {
+            "name": "Upper Back",
+            "id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+            "parent": "Back",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The highlighted muscle area on the back corresponds to the large, fan-shaped latissimus dorsi muscles, located on the mid to lower sides of the back. The shape, location, and size match the Lats exactly.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Back"
+      },
+      "meta": {
+        "ms": 4705,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "268bc73c-bb0d-49b5-8cd7-ae3288799b05",
+      "final_match_name": "Lats",
+      "final_match_parent": "Back",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.25.57 PM.png",
+      "match": {
+        "detected_subgroup_name": "Abs",
+        "best_match_name": "Abs",
+        "best_match_id": "e7a609ad-8693-491d-b15b-59a69274602a",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Lower Abs",
+            "id": "138aefa3-f280-4b1b-9c20-ec16d69db976",
+            "parent": "Core",
+            "confidence": 80
+          },
+          {
+            "name": "Obliques",
+            "id": "2fded183-66f2-48ed-a08c-6b0bed559db3",
+            "parent": "Core",
+            "confidence": 20
+          }
+        ],
+        "reasoning": "The image highlights the rectus abdominis muscles, commonly referred to as abs, clearly visible in the front of the torso. The muscle group colored red corresponds to the general abs area, including upper and lower parts but primarily the entirety of the abs. No other muscle group matches this exact location and coverage as well as 'Abs'.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Core"
+      },
+      "meta": {
+        "ms": 4164,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "e7a609ad-8693-491d-b15b-59a69274602a",
+      "final_match_name": "Abs",
+      "final_match_parent": "Core",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.26.09 PM.png",
+      "match": {
+        "detected_subgroup_name": "Biceps",
+        "best_match_name": "Biceps",
+        "best_match_id": "f21c6c70-5254-49e5-ad90-d36aa7c965b7",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Triceps",
+            "id": "af2cb743-788c-433a-92e8-0fa3f52d9270",
+            "parent": "Arms",
+            "confidence": 60
+          },
+          {
+            "name": "Forearms",
+            "id": "deee70ef-e2e8-4b40-a595-90eee188151c",
+            "parent": "Arms",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The muscles highlighted in red are located on the front-upper arm, matching the anatomical location of the biceps. The shape and position are consistent with the biceps muscle subgroup rather than triceps or forearms.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Arms"
+      },
+      "meta": {
+        "ms": 5149,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "f21c6c70-5254-49e5-ad90-d36aa7c965b7",
+      "final_match_name": "Biceps",
+      "final_match_parent": "Arms",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.26.25 PM.png",
+      "match": {
+        "detected_subgroup_name": "Calves",
+        "best_match_name": "Calves",
+        "best_match_id": "6a948839-f668-4794-8947-2486daaf497d",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Hamstrings",
+            "id": "92895b10-439c-4740-83a7-8d8feaeab0a0",
+            "parent": "Legs",
+            "confidence": 40
+          },
+          {
+            "name": "Glutes",
+            "id": "7554e80d-0eba-4716-94b3-efd208ad639a",
+            "parent": "Legs",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The image shows muscles located in the lower back part of the leg, around the ankle and heel area, with the gastrocnemius muscle clearly visible, which is characteristic of the calf muscles group.",
+        "visible_text": "us muscle\ndle\nion",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Legs"
+      },
+      "meta": {
+        "ms": 5383,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "6a948839-f668-4794-8947-2486daaf497d",
+      "final_match_name": "Calves",
+      "final_match_parent": "Legs",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.26.41 PM.png",
+      "match": {
+        "detected_subgroup_name": "Forearms",
+        "best_match_name": "Forearms",
+        "best_match_id": "deee70ef-e2e8-4b40-a595-90eee188151c",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Biceps",
+            "id": "f21c6c70-5254-49e5-ad90-d36aa7c965b7",
+            "parent": "Arms",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The image clearly shows muscles of the forearm, including pronator teres, brachioradialis, extensor carpi radialis longus, and other forearm muscles. These muscles correspond exactly to the Forearms subgroup in the catalog.",
+        "visible_text": "Flexor retinaculum\nPronator quadratus\nExtensor carpi radialis longus\nBrachioradialis\nPronator tere\nTendon of biceps brachii\nBiceps brachii",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Arms"
+      },
+      "meta": {
+        "ms": 4614,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "deee70ef-e2e8-4b40-a595-90eee188151c",
+      "final_match_name": "Forearms",
+      "final_match_parent": "Arms",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.26.58 PM.png",
+      "match": {
+        "detected_subgroup_name": "Front Delts",
+        "best_match_name": "Front Delts",
+        "best_match_id": "6306a6bd-43fb-4e09-9f37-9ac55b1415a5",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Side Delts",
+            "id": "d0688ffd-005e-49ee-92dd-5685903eae06",
+            "parent": "Shoulders",
+            "confidence": 30
+          },
+          {
+            "name": "Upper Chest",
+            "id": "1882e70e-1cd4-4e19-b257-342b56b1b198",
+            "parent": "Chest",
+            "confidence": 20
+          }
+        ],
+        "reasoning": "The image highlights and labels the anterior (front) deltoid muscle, making it clear that the muscle group depicted and labeled is the Front Delts, which is a precise match in the catalog. The highlighted area corresponds to the front shoulder muscle.",
+        "visible_text": "YOURHOUSEFITNESS.COM Anterior Deltoid",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Shoulders"
+      },
+      "meta": {
+        "ms": 4449,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "6306a6bd-43fb-4e09-9f37-9ac55b1415a5",
+      "final_match_name": "Front Delts",
+      "final_match_parent": "Shoulders",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.27.15 PM.png",
+      "match": {
+        "detected_subgroup_name": "Glutes",
+        "best_match_name": "Glutes",
+        "best_match_id": "7554e80d-0eba-4716-94b3-efd208ad639a",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Hamstrings",
+            "id": "92895b10-439c-4740-83a7-8d8feaeab0a0",
+            "parent": "Legs",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The image highlights the large muscle group of the buttocks in red, matching the location and shape of the glutes exactly. Hamstrings are located below this area on the back of the thighs, but the highlighted area does not extend down to the proper hamstring location.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Legs"
+      },
+      "meta": {
+        "ms": 3317,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "7554e80d-0eba-4716-94b3-efd208ad639a",
+      "final_match_name": "Glutes",
+      "final_match_parent": "Legs",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.27.36 PM.png",
+      "match": {
+        "detected_subgroup_name": "Hamstrings",
+        "best_match_name": "Hamstrings",
+        "best_match_id": "92895b10-439c-4740-83a7-8d8feaeab0a0",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Glutes",
+            "id": "7554e80d-0eba-4716-94b3-efd208ad639a",
+            "parent": "Legs",
+            "confidence": 50
+          },
+          {
+            "name": "Quads",
+            "id": "42f88849-5969-4249-8855-47423473155b",
+            "parent": "Legs",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The image highlights the muscles at the back of the thigh in red, which matches the anatomical location and shape of the hamstrings muscle group.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Legs"
+      },
+      "meta": {
+        "ms": 4606,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "92895b10-439c-4740-83a7-8d8feaeab0a0",
+      "final_match_name": "Hamstrings",
+      "final_match_parent": "Legs",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.28.03 PM.png",
+      "match": {
+        "detected_subgroup_name": "Lower Back",
+        "best_match_name": "Lower Back",
+        "best_match_id": "8dee91ff-66e3-476f-a8e0-8e146b577c6f",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Mid Back",
+            "id": "ec590137-1fb0-4506-951b-6ec6ce3dda6c",
+            "parent": "Back",
+            "confidence": 30
+          },
+          {
+            "name": "Upper Back",
+            "id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+            "parent": "Back",
+            "confidence": 20
+          }
+        ],
+        "reasoning": "The image shows the muscular anatomy of the back with a red highlight and label specifically indicating the 'Lower Back' region, matching the 'Lower Back' muscle subgroup in the catalog.",
+        "visible_text": "LOWER BACK",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Back"
+      },
+      "meta": {
+        "ms": 5878,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "8dee91ff-66e3-476f-a8e0-8e146b577c6f",
+      "final_match_name": "Lower Back",
+      "final_match_parent": "Back",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.28.32 PM.png",
+      "match": {
+        "detected_subgroup_name": "Mid Chest",
+        "best_match_name": "Lower Chest",
+        "best_match_id": "b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Upper Chest",
+            "id": "1882e70e-1cd4-4e19-b257-342b56b1b198",
+            "parent": "Chest",
+            "confidence": 60
+          },
+          {
+            "name": "Mid Chest",
+            "id": "b1447577-1492-43c2-bdf4-6927a7fcec05",
+            "parent": "Chest",
+            "confidence": 50
+          }
+        ],
+        "reasoning": "The highlighted area corresponds to the central region of the chest muscles just below the clavicle, consistent with the Mid Chest subgroup. The image focuses on the upper torso and pectoral muscles area, making Mid Chest the best match.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Chest"
+      },
+      "meta": {
+        "ms": 7062,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2",
+      "final_match_name": "Lower Chest",
+      "final_match_parent": "Chest",
+      "final_confidence": 90,
+      "refined_match": {
+        "detected_subgroup_name": "Lower Chest",
+        "best_match_name": "Mid Chest",
+        "best_match_id": "b1447577-1492-43c2-bdf4-6927a7fcec05",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Lower Chest",
+            "id": "b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2",
+            "parent": "Chest",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The green curved lines appear to highlight the lower part of the chest muscles (pectoral region) just above the upper abdominals, which corresponds best to the 'Lower Chest' subgroup.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Chest"
+      },
+      "refine_meta": {
+        "ms": 5454,
+        "model": "gpt-4.1-mini"
+      },
+      "manual_refinement": {
+        "source": "chest_set_classification",
+        "applied_at": "2026-03-08T01:40:42.934Z"
+      }
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.28.52 PM.png",
+      "match": {
+        "detected_subgroup_name": "Lower Back",
+        "best_match_name": "Lower Back",
+        "best_match_id": "8dee91ff-66e3-476f-a8e0-8e146b577c6f",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Mid Back",
+            "id": "ec590137-1fb0-4506-951b-6ec6ce3dda6c",
+            "parent": "Back",
+            "confidence": 60
+          },
+          {
+            "name": "Upper Back",
+            "id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+            "parent": "Back",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The highlighted area is located in the lower part of the back, below the scapulae and above the waist, which corresponds to the Lower Back muscle subgroup.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Back"
+      },
+      "meta": {
+        "ms": 4450,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "ec590137-1fb0-4506-951b-6ec6ce3dda6c",
+      "final_match_name": "Mid Back",
+      "final_match_parent": "Back",
+      "final_confidence": 90,
+      "refined_match": {
+        "detected_subgroup_name": "Mid Back",
+        "best_match_name": "Mid Back",
+        "best_match_id": "ec590137-1fb0-4506-951b-6ec6ce3dda6c",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Upper Back",
+            "id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+            "parent": "Back",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The highlighted region is mid-lower portion of the back, corresponding to the mid back muscle area. It is not high enough to be upper back and not in the chest area.",
+        "visible_text": "CK",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Back"
+      },
+      "refine_meta": {
+        "ms": 3245,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.29.12 PM.png",
+      "match": {
+        "detected_subgroup_name": "Upper Chest",
+        "best_match_name": "Upper Chest",
+        "best_match_id": "1882e70e-1cd4-4e19-b257-342b56b1b198",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Lower Chest",
+            "id": "b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2",
+            "parent": "Chest",
+            "confidence": 60
+          },
+          {
+            "name": "Mid Chest",
+            "id": "b1447577-1492-43c2-bdf4-6927a7fcec05",
+            "parent": "Chest",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The image highlights the upper part of the chest muscles (pectoralis major), which corresponds to the Upper Chest subgroup. The highlighted muscle location and shape match the upper portion of the pectoral muscles.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Chest"
+      },
+      "meta": {
+        "ms": 4555,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "b1447577-1492-43c2-bdf4-6927a7fcec05",
+      "final_match_name": "Mid Chest",
+      "final_match_parent": "Chest",
+      "final_confidence": 80,
+      "manual_refinement": {
+        "source": "chest_set_classification",
+        "applied_at": "2026-03-08T01:40:42.934Z"
+      }
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.29.35 PM.png",
+      "match": {
+        "detected_subgroup_name": "Obliques",
+        "best_match_name": "Obliques",
+        "best_match_id": "2fded183-66f2-48ed-a08c-6b0bed559db3",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Abs",
+            "id": "e7a609ad-8693-491d-b15b-59a69274602a",
+            "parent": "Core",
+            "confidence": 60
+          },
+          {
+            "name": "Lower Abs",
+            "id": "138aefa3-f280-4b1b-9c20-ec16d69db976",
+            "parent": "Core",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The highlighted muscle area is on the side of the abdomen, consistent with the obliques muscle group, which runs along the lateral torso. Other abdominal muscles like Abs and Lower Abs are more central or lower, while the highlight is clearly on the side sides of the core.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Core"
+      },
+      "meta": {
+        "ms": 5515,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "2fded183-66f2-48ed-a08c-6b0bed559db3",
+      "final_match_name": "Obliques",
+      "final_match_parent": "Core",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.29.53 PM.png",
+      "match": {
+        "detected_subgroup_name": "Hamstrings",
+        "best_match_name": "Hamstrings",
+        "best_match_id": "92895b10-439c-4740-83a7-8d8feaeab0a0",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Quads",
+            "id": "42f88849-5969-4249-8855-47423473155b",
+            "parent": "Legs",
+            "confidence": 80
+          }
+        ],
+        "reasoning": "The image highlights the muscle on the back of the thigh labeled as 'Hamstring,' which corresponds exactly to the Hamstrings subgroup. The front thigh muscle labeled 'Quad' corresponds to the Quads subgroup but is less prominently highlighted.",
+        "visible_text": "QUAD\nHAMSTRING",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Legs"
+      },
+      "meta": {
+        "ms": 4061,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "42f88849-5969-4249-8855-47423473155b",
+      "final_match_name": "Quads",
+      "final_match_parent": "Legs",
+      "final_confidence": 80
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.30.10 PM.png",
+      "match": {
+        "detected_subgroup_name": "Rear Delts",
+        "best_match_name": "Rear Delts",
+        "best_match_id": "806fa58e-6737-4a1f-b1a4-7b6e824cbd82",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Side Delts",
+            "id": "d0688ffd-005e-49ee-92dd-5685903eae06",
+            "parent": "Shoulders",
+            "confidence": 70
+          },
+          {
+            "name": "Traps",
+            "id": "b3adaca7-2ad4-4cf3-a2b8-3e7998811149",
+            "parent": "Back",
+            "confidence": 50
+          }
+        ],
+        "reasoning": "The highlighted muscles are located on the back side of the shoulders, specifically the posterior deltoid area, which corresponds to the Rear Delts subgroup in the catalog.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Shoulders"
+      },
+      "meta": {
+        "ms": 4036,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "806fa58e-6737-4a1f-b1a4-7b6e824cbd82",
+      "final_match_name": "Rear Delts",
+      "final_match_parent": "Shoulders",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.30.32 PM.png",
+      "match": {
+        "detected_subgroup_name": "Side Delts",
+        "best_match_name": "Side Delts",
+        "best_match_id": "d0688ffd-005e-49ee-92dd-5685903eae06",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Front Delts",
+            "id": "6306a6bd-43fb-4e09-9f37-9ac55b1415a5",
+            "parent": "Shoulders",
+            "confidence": 60
+          },
+          {
+            "name": "Rear Delts",
+            "id": "806fa58e-6737-4a1f-b1a4-7b6e824cbd82",
+            "parent": "Shoulders",
+            "confidence": 60
+          }
+        ],
+        "reasoning": "The image clearly labels and highlights the deltoid muscle areas on the shoulder, specifically pointing out the Front Delts, Side Delts, and Rear Delts. The annotation 'Side D' matches 'Side Delts' from the catalog, and the red highlighted muscle area corresponds to the side shoulder deltoid.",
+        "visible_text": "Front Delts Overhead Press Bench Press Push-Up Side D Overhead Upright R Lateral R Weird La Rear De Pulling Exer Reverse Flys Face Pulls",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Shoulders"
+      },
+      "meta": {
+        "ms": 4626,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "d0688ffd-005e-49ee-92dd-5685903eae06",
+      "final_match_name": "Side Delts",
+      "final_match_parent": "Shoulders",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.30.45 PM.png",
+      "match": {
+        "detected_subgroup_name": "Traps",
+        "best_match_name": "Traps",
+        "best_match_id": "b3adaca7-2ad4-4cf3-a2b8-3e7998811149",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Rear Delts",
+            "id": "806fa58e-6737-4a1f-b1a4-7b6e824cbd82",
+            "parent": "Shoulders",
+            "confidence": 40
+          },
+          {
+            "name": "Upper Back",
+            "id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+            "parent": "Back",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The highlighted muscle in the image covers the area of the upper back and neck, corresponding to the trapezius muscle anatomy. The shape and position match the Traps subgroup exactly.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Back"
+      },
+      "meta": {
+        "ms": 5815,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "b3adaca7-2ad4-4cf3-a2b8-3e7998811149",
+      "final_match_name": "Traps",
+      "final_match_parent": "Back",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.31.06 PM.png",
+      "match": {
+        "detected_subgroup_name": "Triceps",
+        "best_match_name": "Triceps",
+        "best_match_id": "af2cb743-788c-433a-92e8-0fa3f52d9270",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Biceps",
+            "id": "f21c6c70-5254-49e5-ad90-d36aa7c965b7",
+            "parent": "Arms",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The highlighted muscle group is located on the back of the upper arm, which corresponds to the triceps muscle group as per the anatomical position and structure. The biceps are on the front of the arm, so this image best matches the triceps subgroup.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Arms"
+      },
+      "meta": {
+        "ms": 4098,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "af2cb743-788c-433a-92e8-0fa3f52d9270",
+      "final_match_name": "Triceps",
+      "final_match_parent": "Arms",
+      "final_confidence": 95
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.31.29 PM.png",
+      "match": {
+        "detected_subgroup_name": "Rear Delts",
+        "best_match_name": "Rear Delts",
+        "best_match_id": "806fa58e-6737-4a1f-b1a4-7b6e824cbd82",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Side Delts",
+            "id": "d0688ffd-005e-49ee-92dd-5685903eae06",
+            "parent": "Shoulders",
+            "confidence": 60
+          },
+          {
+            "name": "Upper Back",
+            "id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+            "parent": "Back",
+            "confidence": 40
+          },
+          {
+            "name": "Traps",
+            "id": "b3adaca7-2ad4-4cf3-a2b8-3e7998811149",
+            "parent": "Back",
+            "confidence": 20
+          }
+        ],
+        "reasoning": "The highlighted muscles are located on the rear part of the shoulder, consistent with the anatomy of the Rear Deltoids (Rear Delts). The muscle area is clearly behind the upper arm and above the upper back, which matches the Rear Delts subgroup.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Shoulders"
+      },
+      "meta": {
+        "ms": 4587,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+      "final_match_name": "Upper Back",
+      "final_match_parent": "Back",
+      "final_confidence": 95,
+      "refined_match": {
+        "detected_subgroup_name": "Upper Back",
+        "best_match_name": "Upper Back",
+        "best_match_id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Lower Chest",
+            "id": "b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2",
+            "parent": "Chest",
+            "confidence": 5
+          }
+        ],
+        "reasoning": "The image shows the back view of a human figure with the shoulder blade area muscles highlighted in red. These muscles correspond to the upper back muscle subgroup. The mid chest subgroup relates to the front chest muscles, which are not displayed or highlighted in this image.",
+        "visible_text": null,
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Back"
+      },
+      "refine_meta": {
+        "ms": 4709,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "file_name": "Screenshot 2026-03-07 at 8.31.59 PM.png",
+      "match": {
+        "detected_subgroup_name": "Upper Chest",
+        "best_match_name": "Upper Chest",
+        "best_match_id": "1882e70e-1cd4-4e19-b257-342b56b1b198",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Lower Chest",
+            "id": "b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2",
+            "parent": "Chest",
+            "confidence": 30
+          },
+          {
+            "name": "Front Delts",
+            "id": "6306a6bd-43fb-4e09-9f37-9ac55b1415a5",
+            "parent": "Shoulders",
+            "confidence": 20
+          }
+        ],
+        "reasoning": "The image highlights the clavicular head of the pectoralis major muscle, which is commonly referred to as the 'Upper Chest'. The text directly labels the area as 'Upper Chest'. The muscle group highlighted corresponds with the upper part of the pectoral muscles, making 'Upper Chest' the best exact match from the catalog.",
+        "visible_text": "CLAVICULAR HEAD ('Upper Chest')",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Chest"
+      },
+      "meta": {
+        "ms": 4314,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "1882e70e-1cd4-4e19-b257-342b56b1b198",
+      "final_match_name": "Upper Chest",
+      "final_match_parent": "Chest",
+      "final_confidence": 100,
+      "refined_match": {
+        "detected_subgroup_name": "Mid Chest",
+        "best_match_name": "Lower Chest",
+        "best_match_id": "b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2",
+        "confidence": 50,
+        "alternates": [],
+        "reasoning": "The image highlights the upper chest area labeled as 'CLAVICULAR HEAD (Upper Chest)', which is a part of the chest muscles. The closest match from the catalog is 'Mid Chest' as it relates to the chest muscle subgroup, even though this is specifically the upper chest portion.",
+        "visible_text": "CLAVICULAR HEAD (\"Upper Chest\")",
+        "is_muscle_reference_image": true,
+        "best_match_parent": "Chest"
+      },
+      "refine_meta": {
+        "ms": 2836,
+        "model": "gpt-4.1-mini"
+      },
+      "manual_refinement": {
+        "source": "chest_set_classification",
+        "applied_at": "2026-03-08T01:40:42.934Z"
+      }
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "generated_at": "2026-03-07T14:23:46.294Z",
+  "min_confidence": 85,
+  "count": 17,
+  "items": [
+    {
+      "machine_id": "b4a71ccd-3b3a-4662-a439-2c18835df137",
+      "machine_name": "Pec Deck",
+      "confidence": 90,
+      "source_file": "IMG_6632.HEIC",
+      "converted_path": "machineimages/converted/01_IMG_6632.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/b4a71ccd-3b3a-4662-a439-2c18835df137.jpg"
+    },
+    {
+      "machine_id": "de80976f-a037-45fa-acf8-2159c1161dd7",
+      "machine_name": "Shoulder Press Machine",
+      "confidence": 90,
+      "source_file": "IMG_6633.HEIC",
+      "converted_path": "machineimages/converted/02_IMG_6633.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/de80976f-a037-45fa-acf8-2159c1161dd7.jpg"
+    },
+    {
+      "machine_id": "cf9c117b-0840-44f5-b42c-84a75240be52",
+      "machine_name": "Treadmill",
+      "confidence": 95,
+      "source_file": "IMG_6635.HEIC",
+      "converted_path": "machineimages/converted/04_IMG_6635.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/cf9c117b-0840-44f5-b42c-84a75240be52.jpg"
+    },
+    {
+      "machine_id": "ac034e61-b4f0-4cc4-ac65-4f24a0a7644f",
+      "machine_name": "Cable Tower",
+      "confidence": 90,
+      "source_file": "IMG_6636.HEIC",
+      "converted_path": "machineimages/converted/05_IMG_6636.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/ac034e61-b4f0-4cc4-ac65-4f24a0a7644f.jpg"
+    },
+    {
+      "machine_id": "8bf6bdd9-40d3-43a8-b9a4-069f97c8330e",
+      "machine_name": "Rowing Machine",
+      "confidence": 90,
+      "source_file": "IMG_6638.HEIC",
+      "converted_path": "machineimages/converted/07_IMG_6638.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/8bf6bdd9-40d3-43a8-b9a4-069f97c8330e.jpg"
+    },
+    {
+      "machine_id": "45a7e0ea-116c-46f1-ac34-c8ae915a59e3",
+      "machine_name": "Air Bike",
+      "confidence": 85,
+      "source_file": "IMG_6640.HEIC",
+      "converted_path": "machineimages/converted/09_IMG_6640.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/45a7e0ea-116c-46f1-ac34-c8ae915a59e3.jpg"
+    },
+    {
+      "machine_id": "bf43bda0-cd08-40ac-a833-4a759d7f6980",
+      "machine_name": "Lat Pulldown Machine",
+      "confidence": 90,
+      "source_file": "IMG_6641.HEIC",
+      "converted_path": "machineimages/converted/10_IMG_6641.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/bf43bda0-cd08-40ac-a833-4a759d7f6980.jpg"
+    },
+    {
+      "machine_id": "e93f04b6-f2e2-4f51-b127-96d1b6fc5c9c",
+      "machine_name": "Leg Extension Machine",
+      "confidence": 95,
+      "source_file": "IMG_6642.HEIC",
+      "converted_path": "machineimages/converted/11_IMG_6642.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/e93f04b6-f2e2-4f51-b127-96d1b6fc5c9c.jpg"
+    },
+    {
+      "machine_id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+      "machine_name": "Bench Press Station",
+      "confidence": 90,
+      "source_file": "IMG_6644.HEIC",
+      "converted_path": "machineimages/converted/13_IMG_6644.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/bff771ff-c971-4bbf-bda2-238c12fa512f.jpg"
+    },
+    {
+      "machine_id": "aa8f3bbd-3105-40de-9e85-956fbfbbe7b7",
+      "machine_name": "Assisted Pull-up Machine",
+      "confidence": 95,
+      "source_file": "IMG_6645.HEIC",
+      "converted_path": "machineimages/converted/14_IMG_6645.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/aa8f3bbd-3105-40de-9e85-956fbfbbe7b7.jpg"
+    },
+    {
+      "machine_id": "c2c9e70a-3e75-4ec6-b9ad-bbb1c2bc10f5",
+      "machine_name": "Back Extension Bench",
+      "confidence": 90,
+      "source_file": "IMG_6646.HEIC",
+      "converted_path": "machineimages/converted/15_IMG_6646.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/c2c9e70a-3e75-4ec6-b9ad-bbb1c2bc10f5.jpg"
+    },
+    {
+      "machine_id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+      "machine_name": "Incline Bench",
+      "confidence": 90,
+      "source_file": "IMG_6648.HEIC",
+      "converted_path": "machineimages/converted/17_IMG_6648.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/0f45fd9b-9c71-4432-b1d2-f87fb76a1283.jpg"
+    },
+    {
+      "machine_id": "617d1f38-136b-4896-9733-9c321d8a0fe2",
+      "machine_name": "Incline Chest Press Machine",
+      "confidence": 85,
+      "source_file": "IMG_6651.HEIC",
+      "converted_path": "machineimages/converted/20_IMG_6651.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/617d1f38-136b-4896-9733-9c321d8a0fe2.jpg"
+    },
+    {
+      "machine_id": "a1d12e71-cd17-4db9-b75e-df746a4e8c4c",
+      "machine_name": "Preacher Curl Machine",
+      "confidence": 90,
+      "source_file": "IMG_6652.HEIC",
+      "converted_path": "machineimages/converted/21_IMG_6652.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/a1d12e71-cd17-4db9-b75e-df746a4e8c4c.jpg"
+    },
+    {
+      "machine_id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+      "machine_name": "Smith Machine",
+      "confidence": 95,
+      "source_file": "IMG_6653.HEIC",
+      "converted_path": "machineimages/converted/22_IMG_6653.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/efacd40d-c4d6-4479-b295-3819b1f1c21b.jpg"
+    },
+    {
+      "machine_id": "7e2c9841-6cfd-470b-8705-3188f9148814",
+      "machine_name": "Leg Press Machine",
+      "confidence": 95,
+      "source_file": "IMG_6654.HEIC",
+      "converted_path": "machineimages/converted/23_IMG_6654.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/7e2c9841-6cfd-470b-8705-3188f9148814.jpg"
+    },
+    {
+      "machine_id": "c1b2a68f-7145-4d8b-99c9-80b9510e7c75",
+      "machine_name": "Glute Drive Machine",
+      "confidence": 90,
+      "source_file": "IMG_6655.HEIC",
+      "converted_path": "machineimages/converted/24_IMG_6655.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/c1b2a68f-7145-4d8b-99c9-80b9510e7c75.jpg"
+    }
+  ]
+}

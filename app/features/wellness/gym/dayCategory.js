@@ -95,8 +95,62 @@ export function classifyMachineForDay(machine) {
 }
 
 export function classifyMuscleForDay(muscle) {
+  const key = normalize(muscle?.subgroupKey || muscle?.name_key || '');
+
+  if (
+    [
+      'upper_chest',
+      'mid_chest',
+      'lower_chest',
+      'rear_delts',
+      'front_delts',
+      'side_delts',
+      'triceps',
+    ].includes(key)
+  ) {
+    return 'Push';
+  }
+
+  if (
+    [
+      'lats',
+      'mid_back',
+      'traps',
+      'upper_back',
+      'lower_back',
+      'biceps',
+    ].includes(key)
+  ) {
+    return 'Pull';
+  }
+
+  if (
+    [
+      'quads',
+      'glutes',
+      'hamstrings',
+      'adductors',
+      'abductors',
+      'calves',
+    ].includes(key)
+  ) {
+    return 'Legs';
+  }
+
+  if (
+    [
+      'forearms',
+      'abs',
+      'lower_abs',
+      'obliques',
+    ].includes(key)
+  ) {
+    return 'General';
+  }
+
   return resolveDayCategory([
     muscle?.name,
     muscle?.name_key,
+    muscle?.group,
   ]);
 }

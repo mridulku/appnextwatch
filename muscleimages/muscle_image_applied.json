@@ -1,0 +1,195 @@
+{
+  "generated_at": "2026-03-08T01:41:13.638Z",
+  "count": 21,
+  "items": [
+    {
+      "order_index": 1,
+      "source_file": "Screenshot 2026-03-07 at 8.25.13 PM.png",
+      "muscle_name": "Core",
+      "subgroup_id": "138aefa3-f280-4b1b-9c20-ec16d69db976",
+      "subgroup_name": "Lower Abs",
+      "storage_path": "catalog/subgroups/138aefa3-f280-4b1b-9c20-ec16d69db976.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/138aefa3-f280-4b1b-9c20-ec16d69db976.png"
+    },
+    {
+      "order_index": 2,
+      "source_file": "Screenshot 2026-03-07 at 8.25.43 PM.png",
+      "muscle_name": "Back",
+      "subgroup_id": "268bc73c-bb0d-49b5-8cd7-ae3288799b05",
+      "subgroup_name": "Lats",
+      "storage_path": "catalog/subgroups/268bc73c-bb0d-49b5-8cd7-ae3288799b05.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/268bc73c-bb0d-49b5-8cd7-ae3288799b05.png"
+    },
+    {
+      "order_index": 3,
+      "source_file": "Screenshot 2026-03-07 at 8.25.57 PM.png",
+      "muscle_name": "Core",
+      "subgroup_id": "e7a609ad-8693-491d-b15b-59a69274602a",
+      "subgroup_name": "Abs",
+      "storage_path": "catalog/subgroups/e7a609ad-8693-491d-b15b-59a69274602a.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/e7a609ad-8693-491d-b15b-59a69274602a.png"
+    },
+    {
+      "order_index": 4,
+      "source_file": "Screenshot 2026-03-07 at 8.26.09 PM.png",
+      "muscle_name": "Arms",
+      "subgroup_id": "f21c6c70-5254-49e5-ad90-d36aa7c965b7",
+      "subgroup_name": "Biceps",
+      "storage_path": "catalog/subgroups/f21c6c70-5254-49e5-ad90-d36aa7c965b7.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/f21c6c70-5254-49e5-ad90-d36aa7c965b7.png"
+    },
+    {
+      "order_index": 5,
+      "source_file": "Screenshot 2026-03-07 at 8.26.25 PM.png",
+      "muscle_name": "Legs",
+      "subgroup_id": "6a948839-f668-4794-8947-2486daaf497d",
+      "subgroup_name": "Calves",
+      "storage_path": "catalog/subgroups/6a948839-f668-4794-8947-2486daaf497d.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/6a948839-f668-4794-8947-2486daaf497d.png"
+    },
+    {
+      "order_index": 6,
+      "source_file": "Screenshot 2026-03-07 at 8.26.41 PM.png",
+      "muscle_name": "Arms",
+      "subgroup_id": "deee70ef-e2e8-4b40-a595-90eee188151c",
+      "subgroup_name": "Forearms",
+      "storage_path": "catalog/subgroups/deee70ef-e2e8-4b40-a595-90eee188151c.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/deee70ef-e2e8-4b40-a595-90eee188151c.png"
+    },
+    {
+      "order_index": 7,
+      "source_file": "Screenshot 2026-03-07 at 8.26.58 PM.png",
+      "muscle_name": "Shoulders",
+      "subgroup_id": "6306a6bd-43fb-4e09-9f37-9ac55b1415a5",
+      "subgroup_name": "Front Delts",
+      "storage_path": "catalog/subgroups/6306a6bd-43fb-4e09-9f37-9ac55b1415a5.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/6306a6bd-43fb-4e09-9f37-9ac55b1415a5.png"
+    },
+    {
+      "order_index": 8,
+      "source_file": "Screenshot 2026-03-07 at 8.27.15 PM.png",
+      "muscle_name": "Legs",
+      "subgroup_id": "7554e80d-0eba-4716-94b3-efd208ad639a",
+      "subgroup_name": "Glutes",
+      "storage_path": "catalog/subgroups/7554e80d-0eba-4716-94b3-efd208ad639a.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/7554e80d-0eba-4716-94b3-efd208ad639a.png"
+    },
+    {
+      "order_index": 9,
+      "source_file": "Screenshot 2026-03-07 at 8.27.36 PM.png",
+      "muscle_name": "Legs",
+      "subgroup_id": "92895b10-439c-4740-83a7-8d8feaeab0a0",
+      "subgroup_name": "Hamstrings",
+      "storage_path": "catalog/subgroups/92895b10-439c-4740-83a7-8d8feaeab0a0.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/92895b10-439c-4740-83a7-8d8feaeab0a0.png"
+    },
+    {
+      "order_index": 10,
+      "source_file": "Screenshot 2026-03-07 at 8.28.03 PM.png",
+      "muscle_name": "Back",
+      "subgroup_id": "8dee91ff-66e3-476f-a8e0-8e146b577c6f",
+      "subgroup_name": "Lower Back",
+      "storage_path": "catalog/subgroups/8dee91ff-66e3-476f-a8e0-8e146b577c6f.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/8dee91ff-66e3-476f-a8e0-8e146b577c6f.png"
+    },
+    {
+      "order_index": 11,
+      "source_file": "Screenshot 2026-03-07 at 8.28.32 PM.png",
+      "muscle_name": "Chest",
+      "subgroup_id": "b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2",
+      "subgroup_name": "Lower Chest",
+      "storage_path": "catalog/subgroups/b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2.png"
+    },
+    {
+      "order_index": 12,
+      "source_file": "Screenshot 2026-03-07 at 8.28.52 PM.png",
+      "muscle_name": "Back",
+      "subgroup_id": "ec590137-1fb0-4506-951b-6ec6ce3dda6c",
+      "subgroup_name": "Mid Back",
+      "storage_path": "catalog/subgroups/ec590137-1fb0-4506-951b-6ec6ce3dda6c.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/ec590137-1fb0-4506-951b-6ec6ce3dda6c.png"
+    },
+    {
+      "order_index": 13,
+      "source_file": "Screenshot 2026-03-07 at 8.29.12 PM.png",
+      "muscle_name": "Chest",
+      "subgroup_id": "b1447577-1492-43c2-bdf4-6927a7fcec05",
+      "subgroup_name": "Mid Chest",
+      "storage_path": "catalog/subgroups/b1447577-1492-43c2-bdf4-6927a7fcec05.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/b1447577-1492-43c2-bdf4-6927a7fcec05.png"
+    },
+    {
+      "order_index": 14,
+      "source_file": "Screenshot 2026-03-07 at 8.29.35 PM.png",
+      "muscle_name": "Core",
+      "subgroup_id": "2fded183-66f2-48ed-a08c-6b0bed559db3",
+      "subgroup_name": "Obliques",
+      "storage_path": "catalog/subgroups/2fded183-66f2-48ed-a08c-6b0bed559db3.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/2fded183-66f2-48ed-a08c-6b0bed559db3.png"
+    },
+    {
+      "order_index": 15,
+      "source_file": "Screenshot 2026-03-07 at 8.29.53 PM.png",
+      "muscle_name": "Legs",
+      "subgroup_id": "42f88849-5969-4249-8855-47423473155b",
+      "subgroup_name": "Quads",
+      "storage_path": "catalog/subgroups/42f88849-5969-4249-8855-47423473155b.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/42f88849-5969-4249-8855-47423473155b.png"
+    },
+    {
+      "order_index": 16,
+      "source_file": "Screenshot 2026-03-07 at 8.30.10 PM.png",
+      "muscle_name": "Shoulders",
+      "subgroup_id": "806fa58e-6737-4a1f-b1a4-7b6e824cbd82",
+      "subgroup_name": "Rear Delts",
+      "storage_path": "catalog/subgroups/806fa58e-6737-4a1f-b1a4-7b6e824cbd82.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/806fa58e-6737-4a1f-b1a4-7b6e824cbd82.png"
+    },
+    {
+      "order_index": 17,
+      "source_file": "Screenshot 2026-03-07 at 8.30.32 PM.png",
+      "muscle_name": "Shoulders",
+      "subgroup_id": "d0688ffd-005e-49ee-92dd-5685903eae06",
+      "subgroup_name": "Side Delts",
+      "storage_path": "catalog/subgroups/d0688ffd-005e-49ee-92dd-5685903eae06.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/d0688ffd-005e-49ee-92dd-5685903eae06.png"
+    },
+    {
+      "order_index": 18,
+      "source_file": "Screenshot 2026-03-07 at 8.30.45 PM.png",
+      "muscle_name": "Back",
+      "subgroup_id": "b3adaca7-2ad4-4cf3-a2b8-3e7998811149",
+      "subgroup_name": "Traps",
+      "storage_path": "catalog/subgroups/b3adaca7-2ad4-4cf3-a2b8-3e7998811149.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/b3adaca7-2ad4-4cf3-a2b8-3e7998811149.png"
+    },
+    {
+      "order_index": 19,
+      "source_file": "Screenshot 2026-03-07 at 8.31.06 PM.png",
+      "muscle_name": "Arms",
+      "subgroup_id": "af2cb743-788c-433a-92e8-0fa3f52d9270",
+      "subgroup_name": "Triceps",
+      "storage_path": "catalog/subgroups/af2cb743-788c-433a-92e8-0fa3f52d9270.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/af2cb743-788c-433a-92e8-0fa3f52d9270.png"
+    },
+    {
+      "order_index": 20,
+      "source_file": "Screenshot 2026-03-07 at 8.31.29 PM.png",
+      "muscle_name": "Back",
+      "subgroup_id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+      "subgroup_name": "Upper Back",
+      "storage_path": "catalog/subgroups/d73c4436-e882-45f6-ae29-6923a81a063b.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/d73c4436-e882-45f6-ae29-6923a81a063b.png"
+    },
+    {
+      "order_index": 21,
+      "source_file": "Screenshot 2026-03-07 at 8.31.59 PM.png",
+      "muscle_name": "Chest",
+      "subgroup_id": "1882e70e-1cd4-4e19-b257-342b56b1b198",
+      "subgroup_name": "Upper Chest",
+      "storage_path": "catalog/subgroups/1882e70e-1cd4-4e19-b257-342b56b1b198.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/1882e70e-1cd4-4e19-b257-342b56b1b198.png"
+    }
+  ]
+}

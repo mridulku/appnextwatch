@@ -15,10 +15,10 @@ export const MUSCLE_GROUPS = [
     icon: 'body-outline',
     subgroups: [
       { key: 'lats', label: 'Lats', muscleKeys: ['lats'] },
-      { key: 'upper_back', label: 'Upper Back', muscleKeys: ['upper_back', 'traps'] },
       { key: 'mid_back', label: 'Mid Back', muscleKeys: ['mid_back'] },
-      { key: 'lower_back', label: 'Lower Back', muscleKeys: ['lower_back'] },
       { key: 'traps', label: 'Traps', muscleKeys: ['traps', 'upper_back'] },
+      { key: 'upper_back', label: 'Upper Back', muscleKeys: ['upper_back', 'traps'] },
+      { key: 'lower_back', label: 'Lower Back', muscleKeys: ['lower_back'] },
     ],
   },
   {
@@ -27,8 +27,10 @@ export const MUSCLE_GROUPS = [
     icon: 'walk-outline',
     subgroups: [
       { key: 'quads', label: 'Quads', muscleKeys: ['quads'] },
-      { key: 'hamstrings', label: 'Hamstrings', muscleKeys: ['hamstrings'] },
       { key: 'glutes', label: 'Glutes', muscleKeys: ['glutes'] },
+      { key: 'hamstrings', label: 'Hamstrings', muscleKeys: ['hamstrings'] },
+      { key: 'adductors', label: 'Adductors', muscleKeys: ['adductors'] },
+      { key: 'abductors', label: 'Abductors', muscleKeys: ['abductors'] },
       { key: 'calves', label: 'Calves', muscleKeys: ['calves'] },
     ],
   },
@@ -37,9 +39,9 @@ export const MUSCLE_GROUPS = [
     label: 'Shoulders',
     icon: 'barbell-outline',
     subgroups: [
+      { key: 'rear_delts', label: 'Rear Delts', muscleKeys: ['rear_delts'] },
       { key: 'front_delts', label: 'Front Delts', muscleKeys: ['front_delts'] },
       { key: 'side_delts', label: 'Side Delts', muscleKeys: ['side_delts'] },
-      { key: 'rear_delts', label: 'Rear Delts', muscleKeys: ['rear_delts'] },
     ],
   },
   {
@@ -57,7 +59,7 @@ export const MUSCLE_GROUPS = [
     label: 'Core',
     icon: 'shield-outline',
     subgroups: [
-      { key: 'abs', label: 'Abs', muscleKeys: ['abs'] },
+      { key: 'abs', label: 'Upper Abs', muscleKeys: ['abs', 'upper_abs'] },
       { key: 'obliques', label: 'Obliques', muscleKeys: ['obliques'] },
       { key: 'lower_abs', label: 'Lower Abs', muscleKeys: ['lower_abs'] },
     ],

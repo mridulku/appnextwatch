@@ -37,6 +37,7 @@ export default function useCatalogSelection({
     getCatalogSearchText = defaultSearchText,
     defaultCategory = 'All',
     insertPayload = {},
+    buildInsertPayload,
   } = config;
 
   const [loading, setLoading] = useState(true);
@@ -195,7 +196,14 @@ export default function useCatalogSelection({
         userId: appUserId,
         fkColumn: userFkColumn,
         fkValue: catalogId,
-        payload: insertPayload,
+        payload:
+          typeof buildInsertPayload === 'function'
+            ? await buildInsertPayload({
+              catalogId,
+              appUserId,
+              currentUserRows: userRows,
+            })
+            : insertPayload,
       });
 
       const nextRows = await listUserSelections({
@@ -259,6 +267,7 @@ export default function useCatalogSelection({
     toggleCategory,
     addCatalogItem,
     removeCatalogItem,
+    setUserRows,
     hydrate,
   };
 }

@@ -10,7 +10,7 @@ export async function fetchCatalogMachines() {
   const client = getClientOrThrow();
   const response = await client
     .from('catalog_machines')
-    .select('id,name,zone,primary_muscles')
+    .select('id,name,zone,primary_muscles,image_url,image_source,image_status')
     .order('name', { ascending: true });
 
   if (response.error) throw response.error;
@@ -21,7 +21,7 @@ export async function fetchUserMachines(userId) {
   const client = getClientOrThrow();
   const response = await client
     .from('user_machines')
-    .select('id,user_id,machine_id,is_active,notes,catalog_machine:catalog_machines(id,name,zone,primary_muscles)')
+    .select('id,user_id,machine_id,is_active,notes,catalog_machine:catalog_machines(id,name,zone,primary_muscles,image_url,image_source,image_status)')
     .eq('user_id', userId)
     .order('created_at', { ascending: true });
 

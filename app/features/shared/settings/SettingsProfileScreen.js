@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { CommonActions } from '@react-navigation/native';
 import { Alert, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 import COLORS from '../../../theme/colors';
@@ -49,20 +48,6 @@ function ToggleRow({ title, description, value, onChange }) {
 }
 
 function SettingsProfileScreen({ navigation, settings, onUpdateSettings, onResetData }) {
-  const goToCategorySelector = () => {
-    let rootNavigation = navigation;
-    while (rootNavigation?.getParent?.()) {
-      rootNavigation = rootNavigation.getParent();
-    }
-
-    rootNavigation?.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: 'CategorySelector' }],
-      }),
-    );
-  };
-
   const exportData = () => {
     Alert.alert('Export ready', 'Profile export is a placeholder in v0.');
   };
@@ -142,13 +127,6 @@ function SettingsProfileScreen({ navigation, settings, onUpdateSettings, onReset
             <Ionicons name="chevron-forward" size={16} color={COLORS.muted} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionRow} activeOpacity={0.9} onPress={goToCategorySelector}>
-            <View style={styles.actionLeft}>
-              <Ionicons name="grid-outline" size={16} color={COLORS.accent2} />
-              <Text style={styles.actionText}>Switch app mode</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color={COLORS.muted} />
-          </TouchableOpacity>
         </View>
 
         <View style={styles.card}>

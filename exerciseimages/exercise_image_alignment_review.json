@@ -1,0 +1,43 @@
+{
+  "summary": {
+    "generated_at": "2026-03-08T03:00:27.948Z",
+    "expected_count": 72,
+    "image_count": 71,
+    "alignment_total_score": 12551.666666666666,
+    "missing_exercises": [
+      {
+        "order_index": 23,
+        "exercise_id": "32598229-d69b-4be2-ae4e-99cd00769a92",
+        "exercise_name": "Decline Press"
+      },
+      {
+        "order_index": 51,
+        "exercise_id": "ff2138d0-d62d-468f-a473-728f7c19f529",
+        "exercise_name": "Reverse Pec Deck"
+      },
+      {
+        "order_index": 72,
+        "exercise_id": "660fdce6-4f13-42c1-ad8b-c91ff87e79b8",
+        "exercise_name": "Wrist Curl"
+      }
+    ],
+    "unused_images": [
+      {
+        "file_name": "Screenshot 2026-03-08 at 7.35.26 AM.png",
+        "classifier_best_name": "Chest Supported Row",
+        "classifier_detected_name": "Chest Supported Row",
+        "classifier_confidence": 95
+      },
+      {
+        "file_name": "Screenshot 2026-03-08 at 7.59.57 AM.png",
+        "classifier_best_name": "Preacher Curl",
+        "classifier_detected_name": "Preacher Curl",
+        "classifier_confidence": 95
+      }
+    ],
+    "suspicious_count": 3,
+    "confirmed_count": 69,
+    "review_required_count": 0
+  },
+  "items": []
+}

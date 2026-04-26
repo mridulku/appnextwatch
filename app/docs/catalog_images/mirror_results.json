@@ -1,0 +1,1122 @@
+{
+  "mirrored_at": "2026-02-27T07:07:03.693Z",
+  "started_at": "2026-02-27T06:58:26.596Z",
+  "include_pending": true,
+  "bucket": "gym-catalog-images",
+  "item_count": 135,
+  "items": [
+    {
+      "entity": "exercises",
+      "id": "251920ae-4b93-4da4-b873-5adf0657d489",
+      "name": "Triceps Pushdown",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "d6c3cb23-3638-4e46-a746-463ab76fb8b2",
+      "name": "Back Squat",
+      "status": "pending",
+      "confidence": 49,
+      "storage_path": "catalog/exercises/d6c3cb23-3638-4e46-a746-463ab76fb8b2.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/d6c3cb23-3638-4e46-a746-463ab76fb8b2.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Nenad Stojkovic",
+      "image_license": "CC BY 2.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 17195641,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Woman_doing_squat_workout_in_gym_with_barbell%2C_back_view.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "f90a1f8b-c3d6-4c74-8dbc-be06acbc4804",
+      "name": "Incline Dumbbell Press",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "32598229-d69b-4be2-ae4e-99cd00769a92",
+      "name": "Decline Press",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "3d1c39e2-8bcd-4fa7-9e85-a8b5613cf302",
+      "name": "Pull-up",
+      "status": "pending",
+      "confidence": 55,
+      "storage_path": "catalog/exercises/3d1c39e2-8bcd-4fa7-9e85-a8b5613cf302.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/3d1c39e2-8bcd-4fa7-9e85-a8b5613cf302.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "U.S. Army photo by Spc. Ryan Lucas",
+      "image_license": "Public domain",
+      "mime_type": "image/jpeg",
+      "size_bytes": 11726428,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Pull-ups_%286142095%29.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "5885ba9b-c859-41b2-8dbb-21517d071896",
+      "name": "Face Pull",
+      "status": "pending",
+      "confidence": 49,
+      "storage_path": "catalog/exercises/5885ba9b-c859-41b2-8dbb-21517d071896.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/5885ba9b-c859-41b2-8dbb-21517d071896.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Library Company of Philadelphia",
+      "image_license": "No restrictions",
+      "mime_type": "image/jpeg",
+      "size_bytes": 1104716,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Roper%27s_Gymnasium._274_Market_Street%2C_Philadelphia%2C_%28ca._1831%29_%284700703204%29.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "4ca0c50d-28a4-4d3e-9e8c-eb76e665052b",
+      "name": "Shrugs",
+      "status": "pending",
+      "confidence": 37,
+      "storage_path": "catalog/exercises/4ca0c50d-28a4-4d3e-9e8c-eb76e665052b.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/4ca0c50d-28a4-4d3e-9e8c-eb76e665052b.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Cpl. Alexander Mitchell",
+      "image_license": "Public domain",
+      "mime_type": "image/jpeg",
+      "size_bytes": 12093605,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Chef_Robert_Irvine_spends_time_with_Marines_in_Italy_160728-M-ML847-066.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "0bd52984-ef5a-4adc-9fd4-3e3363fc1414",
+      "name": "Leg Curl",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "6b5e6ef3-d5a1-49ce-a740-6a2f89b4d7f7",
+      "name": "Calf Raise",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "77d46ca8-a14c-4b89-a87a-95bc7832ecae",
+      "name": "Rear Delt Fly",
+      "status": "pending",
+      "confidence": 45,
+      "storage_path": "catalog/exercises/77d46ca8-a14c-4b89-a87a-95bc7832ecae.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/77d46ca8-a14c-4b89-a87a-95bc7832ecae.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Sam's Fitness - Gym Equipment",
+      "image_license": "CC BY 3.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 209615,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Lee_Priest_Sam%27s_Fitness_Pec_Fly.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+      "name": "Hammer Curl",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8",
+      "name": "Plank",
+      "status": "pending",
+      "confidence": 51,
+      "storage_path": "catalog/exercises/1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Tyler  Read",
+      "image_license": "CC BY 2.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 10095672,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/2/20/Girl_exercising_side_plank.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "c40bd626-4879-4eb3-a284-2c5254e3503a",
+      "name": "Russian Twist",
+      "status": "pending",
+      "confidence": 41,
+      "storage_path": "catalog/exercises/c40bd626-4879-4eb3-a284-2c5254e3503a.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/c40bd626-4879-4eb3-a284-2c5254e3503a.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "U.S. Army photo by Sgt. Agustin Montanez",
+      "image_license": "Public domain",
+      "mime_type": "image/jpeg",
+      "size_bytes": 23976182,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Functional_Fitness_for_Senior_Leaders_%287032782%29.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "47f5090a-cff4-443c-babd-ddd89e674689",
+      "name": "Decline Bench Press",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "050a9080-9da8-4708-b524-17280aa04301",
+      "name": "Pec Deck Fly",
+      "status": "pending",
+      "confidence": 45,
+      "storage_path": "catalog/exercises/050a9080-9da8-4708-b524-17280aa04301.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/050a9080-9da8-4708-b524-17280aa04301.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Sam's Fitness - Gym Equipment",
+      "image_license": "CC BY 3.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 209615,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Lee_Priest_Sam%27s_Fitness_Pec_Fly.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "1cc535b2-4a27-4ecf-bd86-16594b756164",
+      "name": "Push-up",
+      "status": "pending",
+      "confidence": 55,
+      "storage_path": "catalog/exercises/1cc535b2-4a27-4ecf-bd86-16594b756164.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/1cc535b2-4a27-4ecf-bd86-16594b756164.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Tpikonen",
+      "image_license": "CC BY-SA 4.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 1849262,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Push-up_bars.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "97e389e7-498e-4df5-8225-a0e0121189c7",
+      "name": "Dips (Chest Bias)",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "c4e1ac6b-85b5-4b6f-b2d6-62c5def90446",
+      "name": "Wide Grip Lat Pulldown",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "43b0676c-deda-452c-aee5-34f4e2e90fad",
+      "name": "Close Grip Lat Pulldown",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+      "name": "Single Arm Dumbbell Row",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "33ce5ff2-224a-4587-a932-fee6d0a3b51c",
+      "name": "Chest Supported Row",
+      "status": "rejected",
+      "error": "download_failed_all_candidates"
+    },
+    {
+      "entity": "exercises",
+      "id": "e1c94c08-7eb3-4f81-9324-217dd90bdb98",
+      "name": "Chin-up",
+      "status": "pending",
+      "confidence": 41,
+      "storage_path": "catalog/exercises/e1c94c08-7eb3-4f81-9324-217dd90bdb98.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/e1c94c08-7eb3-4f81-9324-217dd90bdb98.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Tdorante10",
+      "image_license": "CC BY-SA 4.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 7595666,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Macombs_Dam_Pk_td_%282019-01-24%29_134_-_Outdoor_Fitness_Area.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+      "name": "Shrug",
+      "status": "pending",
+      "confidence": 37,
+      "storage_path": "catalog/exercises/38e427f3-b9e2-4537-a442-876fed4ed1a9.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/38e427f3-b9e2-4537-a442-876fed4ed1a9.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Cpl. Alexander Mitchell",
+      "image_license": "Public domain",
+      "mime_type": "image/jpeg",
+      "size_bytes": 12093605,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Chef_Robert_Irvine_spends_time_with_Marines_in_Italy_160728-M-ML847-066.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "2e0d149c-1700-49a0-9e92-0e170d6bcff2",
+      "name": "Back Extension",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/1/19/A_history_of_the_Harriet_Hollond_Memorial_Presbyterian_Church_of_Philadelphia%2C_Pa._%281899%29_%2814760894686%29.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "f27a2e10-af45-41e7-9b0e-e04b9169ffac",
+      "name": "Front Squat",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/a/ac/SwissBallSquat.JPG"
+    },
+    {
+      "entity": "exercises",
+      "id": "d795a455-16d6-4312-a86c-b097df9e1bd7",
+      "name": "Goblet Squat",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "f603c63e-2b00-4561-8579-3e113d98ad3e",
+      "name": "Hip Thrust",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "92914d0a-1120-4496-86b4-ce1cb61c6634",
+      "name": "Walking Lunge",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "3066fbf7-0fdf-419f-b414-fcbf1df0b3f2",
+      "name": "Bulgarian Split Squat",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "e419037e-04fb-43d9-86af-92c1fe8b350a",
+      "name": "Lying Leg Curl",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "4d3f2601-78a3-4ccd-8fc1-630235658161",
+      "name": "Standing Calf Raise",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "cfa3a5ab-a85d-4a2c-a374-2127f7e41491",
+      "name": "Seated Calf Raise",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "86c586db-8e3f-4cd8-9c48-a6002ca4c8ac",
+      "name": "Overhead Press",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/d/d6/Always_ready_to_take_on_the_challenge-_Master_Sgt_Sneed_%288653309%29.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "7a51d583-b26a-466d-aec0-0d0c8ee711cf",
+      "name": "Arnold Press",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "ff2138d0-d62d-468f-a473-728f7c19f529",
+      "name": "Reverse Pec Deck",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+      "name": "Upright Row",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "187395e4-7568-4a88-adf8-42dc9fcecd3f",
+      "name": "Barbell Curl",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "f47cc1a3-1510-4667-9416-77332df2a107",
+      "name": "Preacher Curl",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "0a7f6eff-7c79-4b81-af98-1c09ad85cef0",
+      "name": "Skull Crusher",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "a1c50802-bc72-4dd4-88a2-82ea422ed874",
+      "name": "Close Grip Bench Press",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "2d264680-33d2-438c-898c-21b0ef986050",
+      "name": "Cable Rope Overhead Extension",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "660fdce6-4f13-42c1-ad8b-c91ff87e79b8",
+      "name": "Wrist Curl",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/4/4e/John_Joseph_Quinlan_Gym_Training_2017.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "8dd7abda-9dbc-4060-b7cd-663002991c85",
+      "name": "Reverse Wrist Curl",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "283f705a-9a71-424b-b581-0719a46c4079",
+      "name": "Cable Crunch",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "7015a839-6da8-415c-8725-0415d9ca65da",
+      "name": "Ab Wheel Rollout",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+      "name": "Seated Cable Row",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "f6e14b77-111b-4c4a-8c45-9d5cac861a7c",
+      "name": "Leg Press",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/5/59/Laura_S._Walker_State_Park_Fitness_Zone_exercise_equipment.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+      "name": "Shoulder Press",
+      "status": "pending",
+      "confidence": 41,
+      "storage_path": "catalog/exercises/2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Cpl. Monica C. Erickson",
+      "image_license": "Public domain",
+      "mime_type": "image/jpeg",
+      "size_bytes": 275405,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/USMC-100417-M-5728E-141.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "36336e54-6d1a-46a2-9b47-420cb834bf5b",
+      "name": "Thoracic Rotation Mobility",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+      "name": "Cable Curl",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/0/0c/Multi_grip_bar.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "22da0254-d5d7-48f9-839b-9235a8135926",
+      "name": "Bench Press",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/a/a0/Working_out_at_a_local_gym.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "8a737165-7b00-4deb-a2b4-4aabd3ddd9c5",
+      "name": "Lateral Raise",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/c/c7/Girl_doing_shoulder_workout.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "5c504c6c-7ba4-4de8-aa7c-964de4027a89",
+      "name": "Chest Fly",
+      "status": "pending",
+      "confidence": 41,
+      "storage_path": "catalog/exercises/5c504c6c-7ba4-4de8-aa7c-964de4027a89.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/5c504c6c-7ba4-4de8-aa7c-964de4027a89.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Sam's Fitness - Gym Equipment",
+      "image_license": "CC BY 3.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 209615,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Lee_Priest_Sam%27s_Fitness_Pec_Fly.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "3bada2cd-0533-4069-848c-7b6aa2ead4b1",
+      "name": "Romanian Deadlift",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "05d75ac0-59c9-40ac-89e9-af5d459269ef",
+      "name": "Hanging Leg Raise",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "2b5dd334-f40c-4c91-a0b3-a3bf93414134",
+      "name": "Incline Cable Fly",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "3e84990c-9e7e-40ef-a5d7-ccaad308d8fe",
+      "name": "Bent Over Barbell Row",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "9a48c433-989b-4051-a02a-cb5813292789",
+      "name": "Hack Squat",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/c/c5/David_Jobson_%26_Ziggy_Chima%3B_machine_hack_squat.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "cd4d6a20-0732-4cde-91e1-8197587ef506",
+      "name": "Seated Leg Curl",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "71ed4418-9960-427d-8066-dec3101eb47b",
+      "name": "Cable Lateral Raise",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "a73875f8-fcab-41b9-85a7-172050f347e5",
+      "name": "Overhead Triceps Extension",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "7d4a3510-b1ea-41f0-8ee7-374da2520291",
+      "name": "Dead Bug",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "76eda93c-586b-48bf-a299-edb88d60b9a8",
+      "name": "Pallof Press",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "e2da5aef-d786-4076-91fc-0b0092f86355",
+      "name": "Side Plank",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/2/20/Girl_exercising_side_plank.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "df285b83-9b1e-47fa-9c01-5cd55c6391cf",
+      "name": "Rowing Sprint",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "63c1b131-e499-4a2f-947f-8eee2461560e",
+      "name": "Treadmill Run",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/1/19/US_Navy_071204-N-4133B-091_Sailors_run_on_treadmills_in_the_main_gym_aboard_the_Nimitz-class_nuclear-powered_aircraft_carrier_USS_Ronald_Reagan_%28CVN_76%29_as_part_of_maintain_a_healthy_lifestyle_month.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "d83fb115-643e-4eaf-acfc-efb5dc20dd6a",
+      "name": "Bike Sprint",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "66e4d133-718a-49a8-9759-f495e33d9342",
+      "name": "Jump Rope",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/5/5d/Welts_%283342750581%29.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "712405c7-7d8c-4b90-95ba-dc4294ac4c9a",
+      "name": "Dynamic Hip Mobility",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "exercises",
+      "id": "09e94363-2def-4b2d-b35c-2a2a280dfba4",
+      "name": "Lat Pulldown",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/f/f2/Marian-Lats-Pull-Down.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "68a08b31-7829-42a8-aae7-bd0bdc499fdc",
+      "name": "Biceps Curl",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/0/0c/Multi_grip_bar.jpg"
+    },
+    {
+      "entity": "exercises",
+      "id": "999d051b-1a85-46c9-a6c8-4d09e09a7207",
+      "name": "Leg Extension",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/b/bd/Jack_LaLanne_1961_portrait.JPG"
+    },
+    {
+      "entity": "machines",
+      "id": "510be77b-f315-4783-bee8-c7579fe7cab2",
+      "name": "Captain Chair",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/f/f7/Marine_Park_td_%282019-01-16%29_49_-_Outdoor_Fitness_Equipment.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "984ac682-ecd4-4af7-95fd-45dd2034729a",
+      "name": "Decline Chest Press Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "92f615a5-c5ea-47f2-8243-11bb1f724416",
+      "name": "Dual Adjustable Pulley",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "a86cc3b0-0f91-441f-b310-a6fec3e70e87",
+      "name": "Flat Chest Press Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "a330e332-4134-405a-9494-4c232def19e0",
+      "name": "Functional Trainer",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/e/eb/Functional_Trainer_Exercise_Machine_at_Gym.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "c1b2a68f-7145-4d8b-99c9-80b9510e7c75",
+      "name": "Glute Drive Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "b490478b-9ab1-4288-ad7d-0a762de5380a",
+      "name": "Hack Squat Machine",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/c/c5/David_Jobson_%26_Ziggy_Chima%3B_machine_hack_squat.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "617d1f38-136b-4896-9733-9c321d8a0fe2",
+      "name": "Incline Chest Press Machine",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/e/e5/Chest_Incline.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "bf43bda0-cd08-40ac-a833-4a759d7f6980",
+      "name": "Lat Pulldown Machine",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/b/b1/Lat_Pull_down_Machine.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "538db655-c7de-4c83-8dbc-e464ac523725",
+      "name": "Lateral Raise Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "415e8c59-29c7-4b9a-89c4-3707144f7b2b",
+      "name": "Leg Curl Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "e93f04b6-f2e2-4f51-b127-96d1b6fc5c9c",
+      "name": "Leg Extension Machine",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/0/04/374_FSS_fitness_center_refresh_%288993216%29.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "7e2c9841-6cfd-470b-8705-3188f9148814",
+      "name": "Leg Press Machine",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/5/59/Laura_S._Walker_State_Park_Fitness_Zone_exercise_equipment.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "b99f6ab5-24da-4e5f-bbf0-b08d2af00756",
+      "name": "Lying Leg Curl Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "b4a71ccd-3b3a-4662-a439-2c18835df137",
+      "name": "Pec Deck",
+      "status": "pending",
+      "confidence": 41,
+      "storage_path": "catalog/machines/b4a71ccd-3b3a-4662-a439-2c18835df137.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/b4a71ccd-3b3a-4662-a439-2c18835df137.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Sam's Fitness - Gym Equipment",
+      "image_license": "CC BY 3.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 209615,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Lee_Priest_Sam%27s_Fitness_Pec_Fly.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "a1d12e71-cd17-4db9-b75e-df746a4e8c4c",
+      "name": "Preacher Curl Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "9d30e7fd-5764-463b-886d-35f9ced6a3f1",
+      "name": "Rear Delt Machine",
+      "status": "pending",
+      "confidence": 45,
+      "storage_path": "catalog/machines/9d30e7fd-5764-463b-886d-35f9ced6a3f1.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/9d30e7fd-5764-463b-886d-35f9ced6a3f1.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Sam's Fitness - Gym Equipment",
+      "image_license": "CC BY 3.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 209615,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Lee_Priest_Sam%27s_Fitness_Pec_Fly.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "2d7746c0-ff1c-4cb1-b424-b8f2eb787b1d",
+      "name": "Roman Chair",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "8bf6bdd9-40d3-43a8-b9a4-069f97c8330e",
+      "name": "Rowing Machine",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/8/81/James_A._Shanley%2C_D._of_New_Haven%2C_Conn._%28...%29_rowing_machine_at_the_House_gym_LCCN2016872002.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "c52b4494-3f88-4548-939c-47feafbd7e39",
+      "name": "Seated Leg Curl Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "5543c7f2-1f72-4f4a-8bed-9ff4eda92255",
+      "name": "Seated Row Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+      "name": "Smith Machine",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/7/7c/Smith-machine-shrugs-2.png"
+    },
+    {
+      "entity": "machines",
+      "id": "1751092c-94fb-45c9-b037-2a267aa94722",
+      "name": "T-Bar Row Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "cf9c117b-0840-44f5-b42c-84a75240be52",
+      "name": "Treadmill",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/0/0f/Treadmills_at_gym.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "97abfa26-2d53-4647-a5d1-944cfe38df35",
+      "name": "Ab Crunch Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "45a7e0ea-116c-46f1-ac34-c8ae915a59e3",
+      "name": "Air Bike",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/f/f5/Ramstein%E2%80%99s_Southside_Fitness_Center_to_reopen_for_active_duty_personnel_%286235329%29.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "aa8f3bbd-3105-40de-9e85-956fbfbbe7b7",
+      "name": "Assisted Pull-up Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "c2c9e70a-3e75-4ec6-b9ad-bbb1c2bc10f5",
+      "name": "Back Extension Bench",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/0/0c/Hunters_Point_South_Pk_td_%282019-06-10%29_033_-_Outdoor_Fitness_Equipment.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+      "name": "Bench Press Station",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/e/ef/Join_the_club%2C_Cherry_Point_weight_lifters_have_goals_to_achieve_in_the_gym_130306-M-EY704-005.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "f310b13f-f9a4-4903-a6bf-631e66ec7ef6",
+      "name": "Cable Crossover",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "ac034e61-b4f0-4cc4-ac65-4f24a0a7644f",
+      "name": "Cable Tower",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "3eb1a230-32d4-4b02-9b9c-c5b3a40568f6",
+      "name": "Calf Raise Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "40caa3aa-353f-439a-bd3b-66eff1dbc807",
+      "name": "Dip Assist Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "e8aed90f-a95f-43d8-84f3-0e4b2f5c7f86",
+      "name": "High Row Machine",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "machines",
+      "id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+      "name": "Incline Bench",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/a/ad/Gainey_Cup_Competition_130303-D-FW736-014.jpg"
+    },
+    {
+      "entity": "machines",
+      "id": "de80976f-a037-45fa-acf8-2159c1161dd7",
+      "name": "Shoulder Press Machine",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/1/11/Bench_press_Machine.jpg"
+    },
+    {
+      "entity": "muscles",
+      "id": "5287440c-eef6-4e66-a685-a202ed478fba",
+      "name": "Chest",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/5/52/Muscles-_chest%28%3F%29_Wellcome_L0006625.jpg"
+    },
+    {
+      "entity": "muscles",
+      "id": "6c622717-7315-4b4d-b5f2-19fb7f43bca1",
+      "name": "Back",
+      "status": "pending",
+      "confidence": 67,
+      "storage_path": "catalog/muscles/6c622717-7315-4b4d-b5f2-19fb7f43bca1.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/muscles/6c622717-7315-4b4d-b5f2-19fb7f43bca1.png",
+      "image_source": "wikimedia",
+      "image_credit": "Anatomography",
+      "image_license": "CC BY-SA 2.1 jp",
+      "mime_type": "image/png",
+      "size_bytes": 248723,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Sternomastoid_muscle_back.png"
+    },
+    {
+      "entity": "muscles",
+      "id": "9c5fd1c5-9cbe-4784-9e3f-3d8619450345",
+      "name": "Legs",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/4/47/1123_Muscles_of_the_Leg_that_Move_the_Foot_and_Toes.jpg"
+    },
+    {
+      "entity": "muscles",
+      "id": "a5f78fd1-06cb-431f-8ed1-aaf0b6f5b223",
+      "name": "Shoulders",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/8/84/Pectoralis_minor_muscle_frontal.png"
+    },
+    {
+      "entity": "muscles",
+      "id": "080a7581-87e5-4ce3-9959-384c49ad254c",
+      "name": "Arms",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/2/20/Deltoid_muscle_frontal.png"
+    },
+    {
+      "entity": "muscles",
+      "id": "4285b1dc-6b36-4824-b1d6-3adb3464cf3a",
+      "name": "Core",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/2/21/Volume_rendering_of_abdominal_muscles.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "1882e70e-1cd4-4e19-b257-342b56b1b198",
+      "name": "Upper Chest",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/e/e8/Diseases_of_the_chest_and_the_principles_of_physical_diagnosis_%281920%29_%2814592935550%29.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "b1447577-1492-43c2-bdf4-6927a7fcec05",
+      "name": "Mid Chest",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "subgroups",
+      "id": "b5cfe4e0-7ca0-48d5-8dc0-9478356ce5a2",
+      "name": "Lower Chest",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/b/ba/Anatomy%2C_physiology_and_hygiene_%281890%29_%2814577957577%29.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "268bc73c-bb0d-49b5-8cd7-ae3288799b05",
+      "name": "Lats",
+      "status": "pending",
+      "confidence": 57,
+      "storage_path": "catalog/subgroups/268bc73c-bb0d-49b5-8cd7-ae3288799b05.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/268bc73c-bb0d-49b5-8cd7-ae3288799b05.png",
+      "image_source": "wikimedia",
+      "image_credit": "Anatomography",
+      "image_license": "CC BY-SA 2.1 jp",
+      "mime_type": "image/png",
+      "size_bytes": 294297,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Latissimus_dorsi_muscle_lateral.png"
+    },
+    {
+      "entity": "subgroups",
+      "id": "d73c4436-e882-45f6-ae29-6923a81a063b",
+      "name": "Upper Back",
+      "status": "pending",
+      "confidence": 71,
+      "storage_path": "catalog/subgroups/d73c4436-e882-45f6-ae29-6923a81a063b.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/d73c4436-e882-45f6-ae29-6923a81a063b.png",
+      "image_source": "wikimedia",
+      "image_credit": "OpenStax College",
+      "image_license": "CC BY 3.0",
+      "mime_type": "image/png",
+      "size_bytes": 524365,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/6/64/1117_Muscles_of_the_Neck_Upper_Back.png"
+    },
+    {
+      "entity": "subgroups",
+      "id": "ec590137-1fb0-4506-951b-6ec6ce3dda6c",
+      "name": "Mid Back",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/5/53/Serratus_posterior_inferior_muscle_lateral.png"
+    },
+    {
+      "entity": "subgroups",
+      "id": "8dee91ff-66e3-476f-a8e0-8e146b577c6f",
+      "name": "Lower Back",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/1/10/Lower_limb%3B_%C3%A9corch%C3%A9_leg_showing_the_sartorial_muscle%2C_and_a_Wellcome_V0008456.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "b3adaca7-2ad4-4cf3-a2b8-3e7998811149",
+      "name": "Traps",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/4/42/Hunting_and_trapping_stories%3B_a_book_for_boys_%281903%29_%2814782090752%29.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "42f88849-5969-4249-8855-47423473155b",
+      "name": "Quads",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/4/42/Quad_Flandria.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "92895b10-439c-4740-83a7-8d8feaeab0a0",
+      "name": "Hamstrings",
+      "status": "pending",
+      "confidence": 41,
+      "storage_path": "catalog/subgroups/92895b10-439c-4740-83a7-8d8feaeab0a0.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/92895b10-439c-4740-83a7-8d8feaeab0a0.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "Daniel.Cardenas",
+      "image_license": "CC BY 3.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 542733,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/7/76/2010-10-02_pulled_hamstring.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "7554e80d-0eba-4716-94b3-efd208ad639a",
+      "name": "Glutes",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/4/40/Cunningham%27s_Text-book_of_anatomy_%281914%29_%2820789827456%29.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "6a948839-f668-4794-8947-2486daaf497d",
+      "name": "Calves",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/2/23/Large_Calf.png"
+    },
+    {
+      "entity": "subgroups",
+      "id": "6306a6bd-43fb-4e09-9f37-9ac55b1415a5",
+      "name": "Front Delts",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "subgroups",
+      "id": "d0688ffd-005e-49ee-92dd-5685903eae06",
+      "name": "Side Delts",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "subgroups",
+      "id": "806fa58e-6737-4a1f-b1a4-7b6e824cbd82",
+      "name": "Rear Delts",
+      "status": "missing",
+      "error": "no_candidate"
+    },
+    {
+      "entity": "subgroups",
+      "id": "f21c6c70-5254-49e5-ad90-d36aa7c965b7",
+      "name": "Biceps",
+      "status": "pending",
+      "confidence": 71,
+      "storage_path": "catalog/subgroups/f21c6c70-5254-49e5-ad90-d36aa7c965b7.jpg",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/f21c6c70-5254-49e5-ad90-d36aa7c965b7.jpg",
+      "image_source": "wikimedia",
+      "image_credit": "OpenStax College",
+      "image_license": "CC BY 4.0",
+      "mime_type": "image/jpeg",
+      "size_bytes": 554485,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Biceps_Muscle_CNX.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "af2cb743-788c-433a-92e8-0fa3f52d9270",
+      "name": "Triceps",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/6/6e/Crest-for-lateral-head-of-triceps-brachii.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "deee70ef-e2e8-4b40-a595-90eee188151c",
+      "name": "Forearms",
+      "status": "pending",
+      "confidence": 57,
+      "storage_path": "catalog/subgroups/deee70ef-e2e8-4b40-a595-90eee188151c.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/subgroups/deee70ef-e2e8-4b40-a595-90eee188151c.png",
+      "image_source": "wikimedia",
+      "image_credit": "Henry Vandyke Carter",
+      "image_license": "Public domain",
+      "mime_type": "image/png",
+      "size_bytes": 85143,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Forearm_muscles_back_deep.png"
+    },
+    {
+      "entity": "subgroups",
+      "id": "e7a609ad-8693-491d-b15b-59a69274602a",
+      "name": "Abs",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/2/21/Volume_rendering_of_abdominal_muscles.jpg"
+    },
+    {
+      "entity": "subgroups",
+      "id": "2fded183-66f2-48ed-a08c-6b0bed559db3",
+      "name": "Obliques",
+      "status": "rejected",
+      "error": "HTTP 429 for https://upload.wikimedia.org/wikipedia/commons/d/da/Testut%27s_Treatise_on_Human_Anatomy_%281911%29_-_Vol_1_-_Fig_403.png"
+    },
+    {
+      "entity": "subgroups",
+      "id": "138aefa3-f280-4b1b-9c20-ec16d69db976",
+      "name": "Lower Abs",
+      "status": "missing",
+      "error": "no_candidate"
+    }
+  ]
+}

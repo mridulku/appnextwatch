@@ -107,7 +107,8 @@ function CookRecipeScreen({ route, navigation }) {
   const { user } = useAuth();
   const isSessionMode = Boolean(route.params?.sessionMode);
   const savedRecipeId = route.params?.savedRecipeId;
-  const canManageSaved = !isSessionMode && Boolean(savedRecipeId);
+  const readOnlyCatalog = Boolean(route.params?.readOnlyCatalog);
+  const canManageSaved = !readOnlyCatalog && !isSessionMode && Boolean(savedRecipeId);
   const recipe = useMemo(() => {
     const sessionRecipe = normalizeSessionRecipe(route.params?.sessionRecipe);
     if (sessionRecipe) return sessionRecipe;

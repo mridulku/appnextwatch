@@ -12,6 +12,7 @@ import UI_TOKENS from '../../../ui/tokens';
 function UtensilDetailScreen({ route, navigation }) {
   const { user } = useAuth();
   const { itemId, item } = route.params || {};
+  const readOnly = Boolean(route.params?.readOnly);
   const [isMutating, setIsMutating] = useState(false);
   const [isAdded, setIsAdded] = useState(route.params?.isAdded ?? true);
   const [inlineError, setInlineError] = useState('');
@@ -89,27 +90,29 @@ function UtensilDetailScreen({ route, navigation }) {
       </ScrollView>
 
       <View style={styles.bottomActions}>
-        <TouchableOpacity
-          style={[styles.removeButton, !isAdded && styles.addButton, isMutating && styles.buttonDisabled]}
-          activeOpacity={0.9}
-          onPress={onToggleSaved}
-          disabled={isMutating}
-        >
-          {isMutating ? (
-            <ActivityIndicator size="small" color={isAdded ? '#FFB4A8' : COLORS.bg} />
-          ) : (
-            <>
-              <Ionicons
-                name={isAdded ? 'trash-outline' : 'add-circle-outline'}
-                size={16}
-                color={isAdded ? '#FFB4A8' : COLORS.bg}
-              />
-              <Text style={[styles.removeText, !isAdded && styles.addText]}>
-                {isAdded ? 'Remove from Utensils' : 'Add to Utensils'}
-              </Text>
-            </>
-          )}
-        </TouchableOpacity>
+        {readOnly ? null : (
+          <TouchableOpacity
+            style={[styles.removeButton, !isAdded && styles.addButton, isMutating && styles.buttonDisabled]}
+            activeOpacity={0.9}
+            onPress={onToggleSaved}
+            disabled={isMutating}
+          >
+            {isMutating ? (
+              <ActivityIndicator size="small" color={isAdded ? '#FFB4A8' : COLORS.bg} />
+            ) : (
+              <>
+                <Ionicons
+                  name={isAdded ? 'trash-outline' : 'add-circle-outline'}
+                  size={16}
+                  color={isAdded ? '#FFB4A8' : COLORS.bg}
+                />
+                <Text style={[styles.removeText, !isAdded && styles.addText]}>
+                  {isAdded ? 'Remove from Utensils' : 'Add to Utensils'}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        )}
         {fromCatalog ? (
           <TouchableOpacity style={styles.backButton} activeOpacity={0.9} onPress={() => navigation.goBack()}>
             <Text style={styles.backText}>Back to Catalog</Text>

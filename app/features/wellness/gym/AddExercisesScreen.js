@@ -46,7 +46,8 @@ function AddExercisesScreen({ navigation }) {
       catalogSelect: 'id,name,type,primary_muscle_group,equipment',
       userTable: 'user_exercises',
       userSelect:
-        'id,user_id,exercise_id,catalog_exercise:catalog_exercises(id,name,type,primary_muscle_group,equipment)',
+        'id,user_id,exercise_id,sort_order,catalog_exercise:catalog_exercises(id,name,type,primary_muscle_group,equipment)',
+      userOrderBy: 'sort_order',
       userFkColumn: 'exercise_id',
       joinKey: 'catalog_exercise',
       categoryOrder: GROUP_ORDER,
@@ -56,6 +57,9 @@ function AddExercisesScreen({ navigation }) {
           .filter(Boolean)
           .join(' ')
           .toLowerCase(),
+      buildInsertPayload: ({ currentUserRows }) => ({
+        sort_order: (currentUserRows || []).reduce((max, row) => Math.max(max, Number(row?.sort_order || 0)), 0) + 1,
+      }),
     },
   });
 

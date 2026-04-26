@@ -9,6 +9,7 @@ function CatalogItemCard({
   title,
   subtitle,
   imageUrl,
+  imageSource,
   selected = false,
   actionLabel = 'ADD',
   actionVariant = 'accent',
@@ -49,7 +50,7 @@ function CatalogItemCard({
     >
       <View style={styles.left}>
         <Image
-          source={imageUrl ? { uri: imageUrl } : ITEM_PLACEHOLDER_IMAGE}
+          source={imageSource || (imageUrl ? { uri: imageUrl } : ITEM_PLACEHOLDER_IMAGE)}
           style={styles.image}
           resizeMode="cover"
         />

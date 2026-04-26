@@ -1,0 +1,2277 @@
+{
+  "summary": {
+    "generated_at": "2026-03-08T03:00:27.948Z",
+    "expected_count": 72,
+    "image_count": 71,
+    "alignment_total_score": 12551.666666666666,
+    "missing_exercises": [],
+    "unused_images": [
+      {
+        "file_name": "Screenshot 2026-03-08 at 7.35.26 AM.png",
+        "classifier_best_name": "Chest Supported Row",
+        "classifier_detected_name": "Chest Supported Row",
+        "classifier_confidence": 95
+      },
+      {
+        "file_name": "Screenshot 2026-03-08 at 7.59.57 AM.png",
+        "classifier_best_name": "Preacher Curl",
+        "classifier_detected_name": "Preacher Curl",
+        "classifier_confidence": 95
+      }
+    ],
+    "suspicious_count": 3,
+    "confirmed_count": 69,
+    "review_required_count": 0,
+    "completed_with_manual_additions": [
+      {
+        "exercise_name": "Decline Press",
+        "source_file": "Screenshot 2026-03-08 at 8.37.18 AM.png"
+      },
+      {
+        "exercise_name": "Reverse Pec Deck",
+        "source_file": "Screenshot 2026-03-08 at 8.37.38 AM.png"
+      },
+      {
+        "exercise_name": "Wrist Curl",
+        "source_file": "Screenshot 2026-03-08 at 8.37.49 AM.png"
+      }
+    ]
+  },
+  "items": [
+    {
+      "image_index": 1,
+      "source_file": "Screenshot 2026-03-08 at 7.18.24 AM.png",
+      "expected_order_index": 1,
+      "exercise_id": "7015a839-6da8-415c-8725-0415d9ca65da",
+      "exercise_name": "Ab Wheel Rollout",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Ab Wheel Rollout",
+      "classifier_best_id": "7015a839-6da8-415c-8725-0415d9ca65da",
+      "classifier_detected_name": "Ab Wheel Rollout",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Dead Bug",
+          "id": "7d4a3510-b1ea-41f0-8ee7-374da2520291",
+          "confidence": 20
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 2,
+      "source_file": "Screenshot 2026-03-08 at 7.18.44 AM.png",
+      "expected_order_index": 2,
+      "exercise_id": "7a51d583-b26a-466d-aec0-0d0c8ee711cf",
+      "exercise_name": "Arnold Press",
+      "score": 130,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Shoulder Press",
+      "classifier_best_id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+      "classifier_detected_name": "Seated Dumbbell Shoulder Press",
+      "classifier_confidence": 85,
+      "classifier_alternates": [
+        {
+          "name": "Arnold Press",
+          "id": "7a51d583-b26a-466d-aec0-0d0c8ee711cf",
+          "confidence": 60
+        },
+        {
+          "name": "Overhead Press",
+          "id": "86c586db-8e3f-4cd8-9c48-a6002ca4c8ac",
+          "confidence": 50
+        },
+        {
+          "name": "Lateral Raise",
+          "id": "8a737165-7b00-4deb-a2b4-4aabd3ddd9c5",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 3,
+      "source_file": "Screenshot 2026-03-08 at 7.19.02 AM.png",
+      "expected_order_index": 3,
+      "exercise_id": "2e0d149c-1700-49a0-9e92-0e170d6bcff2",
+      "exercise_name": "Back Extension",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Back Extension",
+      "classifier_best_id": "2e0d149c-1700-49a0-9e92-0e170d6bcff2",
+      "classifier_detected_name": "Back Extension",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Hip Thrust",
+          "id": "f603c63e-2b00-4561-8579-3e113d98ad3e",
+          "confidence": 30
+        },
+        {
+          "name": "Romanian Deadlift",
+          "id": "3bada2cd-0533-4069-848c-7b6aa2ead4b1",
+          "confidence": 20
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 4,
+      "source_file": "Screenshot 2026-03-08 at 7.19.17 AM.png",
+      "expected_order_index": 4,
+      "exercise_id": "d6c3cb23-3638-4e46-a746-463ab76fb8b2",
+      "exercise_name": "Back Squat",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Back Squat",
+      "classifier_best_id": "d6c3cb23-3638-4e46-a746-463ab76fb8b2",
+      "classifier_detected_name": "Back Squat",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Front Squat",
+          "id": "f27a2e10-af45-41e7-9b0e-e04b9169ffac",
+          "confidence": 60
+        },
+        {
+          "name": "Goblet Squat",
+          "id": "d795a455-16d6-4312-a86c-b097df9e1bd7",
+          "confidence": 50
+        }
+      ],
+      "visible_text": "BULLDOG GEAR",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 5,
+      "source_file": "Screenshot 2026-03-08 at 7.19.32 AM.png",
+      "expected_order_index": 5,
+      "exercise_id": "187395e4-7568-4a88-adf8-42dc9fcecd3f",
+      "exercise_name": "Barbell Curl",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Barbell Curl",
+      "classifier_best_id": "187395e4-7568-4a88-adf8-42dc9fcecd3f",
+      "classifier_detected_name": "Barbell Curl",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Preacher Curl",
+          "id": "f47cc1a3-1510-4667-9416-77332df2a107",
+          "confidence": 65
+        },
+        {
+          "name": "Hammer Curl",
+          "id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+          "confidence": 50
+        },
+        {
+          "name": "Cable Curl",
+          "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+          "confidence": 45
+        }
+      ],
+      "visible_text": "Biceps brachii (short head) Biceps brachii (long head) Brachialis Brachioradialis www.WEIGHTTRAINING.guide @WEIGHTTRAININGGUIDE WEIGHTTRAININGG",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 6,
+      "source_file": "Screenshot 2026-03-08 at 7.19.47 AM.png",
+      "expected_order_index": 6,
+      "exercise_id": "22da0254-d5d7-48f9-839b-9235a8135926",
+      "exercise_name": "Bench Press",
+      "score": 90,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Incline Dumbbell Press",
+      "classifier_best_id": "f90a1f8b-c3d6-4c74-8dbc-be06acbc4804",
+      "classifier_detected_name": "Incline Barbell Press",
+      "classifier_confidence": 50,
+      "classifier_alternates": [
+        {
+          "name": "Decline Bench Press",
+          "id": "47f5090a-cff4-443c-babd-ddd89e674689",
+          "confidence": 30
+        },
+        {
+          "name": "Bench Press",
+          "id": "22da0254-d5d7-48f9-839b-9235a8135926",
+          "confidence": 20
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 7,
+      "source_file": "Screenshot 2026-03-08 at 7.20.03 AM.png",
+      "expected_order_index": 7,
+      "exercise_id": "3e84990c-9e7e-40ef-a5d7-ccaad308d8fe",
+      "exercise_name": "Bent Over Barbell Row",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Bent Over Barbell Row",
+      "classifier_best_id": "3e84990c-9e7e-40ef-a5d7-ccaad308d8fe",
+      "classifier_detected_name": "Bent Over Barbell Row",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Barbell Curl",
+          "id": "187395e4-7568-4a88-adf8-42dc9fcecd3f",
+          "confidence": 20
+        },
+        {
+          "name": "Romanian Deadlift",
+          "id": "3bada2cd-0533-4069-848c-7b6aa2ead4b1",
+          "confidence": 15
+        },
+        {
+          "name": "Upright Row",
+          "id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+          "confidence": 10
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 8,
+      "source_file": "Screenshot 2026-03-08 at 7.20.16 AM.png",
+      "expected_order_index": 8,
+      "exercise_id": "68a08b31-7829-42a8-aae7-bd0bdc499fdc",
+      "exercise_name": "Biceps Curl",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Biceps Curl",
+      "classifier_best_id": "68a08b31-7829-42a8-aae7-bd0bdc499fdc",
+      "classifier_detected_name": "Dumbbell Biceps Curl",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Hammer Curl",
+          "id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+          "confidence": 70
+        },
+        {
+          "name": "Preacher Curl",
+          "id": "f47cc1a3-1510-4667-9416-77332df2a107",
+          "confidence": 50
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 9,
+      "source_file": "Screenshot 2026-03-08 at 7.20.35 AM.png",
+      "expected_order_index": 9,
+      "exercise_id": "d83fb115-643e-4eaf-acfc-efb5dc20dd6a",
+      "exercise_name": "Bike Sprint",
+      "score": 210,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Bike Sprint",
+      "classifier_best_id": "d83fb115-643e-4eaf-acfc-efb5dc20dd6a",
+      "classifier_detected_name": "Bike Sprint",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Rowing Sprint",
+          "id": "df285b83-9b1e-47fa-9c01-5cd55c6391cf",
+          "confidence": 30
+        }
+      ],
+      "visible_text": "CAROL",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 10,
+      "source_file": "Screenshot 2026-03-08 at 7.23.18 AM.png",
+      "expected_order_index": 10,
+      "exercise_id": "3066fbf7-0fdf-419f-b414-fcbf1df0b3f2",
+      "exercise_name": "Bulgarian Split Squat",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Bulgarian Split Squat",
+      "classifier_best_id": "3066fbf7-0fdf-419f-b414-fcbf1df0b3f2",
+      "classifier_detected_name": "Bulgarian Split Squat",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Walking Lunge",
+          "id": "92914d0a-1120-4496-86b4-ce1cb61c6634",
+          "confidence": 60
+        },
+        {
+          "name": "Goblet Squat",
+          "id": "d795a455-16d6-4312-a86c-b097df9e1bd7",
+          "confidence": 50
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 11,
+      "source_file": "Screenshot 2026-03-08 at 7.23.33 AM.png",
+      "expected_order_index": 11,
+      "exercise_id": "283f705a-9a71-424b-b581-0719a46c4079",
+      "exercise_name": "Cable Crunch",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Cable Crunch",
+      "classifier_best_id": "283f705a-9a71-424b-b581-0719a46c4079",
+      "classifier_detected_name": "Cable Crunch",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Cable Rope Overhead Extension",
+          "id": "2d264680-33d2-438c-898c-21b0ef986050",
+          "confidence": 10
+        },
+        {
+          "name": "Pallof Press",
+          "id": "76eda93c-586b-48bf-a299-edb88d60b9a8",
+          "confidence": 5
+        }
+      ],
+      "visible_text": "TRAINING",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 12,
+      "source_file": "Screenshot 2026-03-08 at 7.23.50 AM.png",
+      "expected_order_index": 12,
+      "exercise_id": "7b25425f-417f-478c-b944-b515e58e21cc",
+      "exercise_name": "Cable Curl",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Cable Curl",
+      "classifier_best_id": "7b25425f-417f-478c-b944-b515e58e21cc",
+      "classifier_detected_name": "Cable Curl",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Barbell Curl",
+          "id": "187395e4-7568-4a88-adf8-42dc9fcecd3f",
+          "confidence": 60
+        },
+        {
+          "name": "Hammer Curl",
+          "id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+          "confidence": 50
+        },
+        {
+          "name": "Biceps Curl",
+          "id": "68a08b31-7829-42a8-aae7-bd0bdc499fdc",
+          "confidence": 40
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 13,
+      "source_file": "Screenshot 2026-03-08 at 7.24.06 AM.png",
+      "expected_order_index": 13,
+      "exercise_id": "71ed4418-9960-427d-8066-dec3101eb47b",
+      "exercise_name": "Cable Lateral Raise",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Cable Lateral Raise",
+      "classifier_best_id": "71ed4418-9960-427d-8066-dec3101eb47b",
+      "classifier_detected_name": "Cable Lateral Raise",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Lateral Raise",
+          "id": "8a737165-7b00-4deb-a2b4-4aabd3ddd9c5",
+          "confidence": 80
+        },
+        {
+          "name": "Shoulder Press",
+          "id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+          "confidence": 30
+        }
+      ],
+      "visible_text": "Anterior deltoid Lateral deltoid Serratus anterior",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 14,
+      "source_file": "Screenshot 2026-03-08 at 7.24.31 AM.png",
+      "expected_order_index": 14,
+      "exercise_id": "2d264680-33d2-438c-898c-21b0ef986050",
+      "exercise_name": "Cable Rope Overhead Extension",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Cable Rope Overhead Extension",
+      "classifier_best_id": "2d264680-33d2-438c-898c-21b0ef986050",
+      "classifier_detected_name": "Cable Rope Overhead Extension",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Triceps Pushdown",
+          "id": "251920ae-4b93-4da4-b873-5adf0657d489",
+          "confidence": 60
+        },
+        {
+          "name": "Cable Curl",
+          "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+          "confidence": 40
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 15,
+      "source_file": "Screenshot 2026-03-08 at 7.24.51 AM.png",
+      "expected_order_index": 15,
+      "exercise_id": "6b5e6ef3-d5a1-49ce-a740-6a2f89b4d7f7",
+      "exercise_name": "Calf Raise",
+      "score": 120,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Standing Calf Raise",
+      "classifier_best_id": "4d3f2601-78a3-4ccd-8fc1-630235658161",
+      "classifier_detected_name": "Standing Calf Raise",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Seated Calf Raise",
+          "id": "cfa3a5ab-a85d-4a2c-a374-2127f7e41491",
+          "confidence": 60
+        },
+        {
+          "name": "Calf Raise",
+          "id": "6b5e6ef3-d5a1-49ce-a740-6a2f89b4d7f7",
+          "confidence": 50
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 16,
+      "source_file": "Screenshot 2026-03-08 at 7.25.12 AM.png",
+      "expected_order_index": 16,
+      "exercise_id": "5c504c6c-7ba4-4de8-aa7c-964de4027a89",
+      "exercise_name": "Chest Fly",
+      "score": 210,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Chest Fly",
+      "classifier_best_id": "5c504c6c-7ba4-4de8-aa7c-964de4027a89",
+      "classifier_detected_name": "Cable Chest Fly",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Incline Cable Fly",
+          "id": "2b5dd334-f40c-4c91-a0b3-a3bf93414134",
+          "confidence": 70
+        },
+        {
+          "name": "Cable Rope Overhead Extension",
+          "id": "2d264680-33d2-438c-898c-21b0ef986050",
+          "confidence": 30
+        },
+        {
+          "name": "Cable Crunch",
+          "id": "283f705a-9a71-424b-b581-0719a46c4079",
+          "confidence": 20
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 17,
+      "source_file": "Screenshot 2026-03-08 at 7.25.27 AM.png",
+      "expected_order_index": 17,
+      "exercise_id": "33ce5ff2-224a-4587-a932-fee6d0a3b51c",
+      "exercise_name": "Chest Supported Row",
+      "score": 16.666666666666664,
+      "score_reason": "detected_name_similarity",
+      "classifier_best_name": "Single Arm Dumbbell Row",
+      "classifier_best_id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+      "classifier_detected_name": "Single Arm Dumbbell Row",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Bent Over Barbell Row",
+          "id": "3e84990c-9e7e-40ef-a5d7-ccaad308d8fe",
+          "confidence": 70
+        },
+        {
+          "name": "Shrug",
+          "id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+          "confidence": 40
+        },
+        {
+          "name": "Single Arm Dumbbell Row",
+          "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+          "confidence": 95
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "vision_confirmed",
+      "review": {
+        "candidates": [
+          {
+            "id": "33ce5ff2-224a-4587-a932-fee6d0a3b51c",
+            "name": "Chest Supported Row",
+            "source": "sequence_expected"
+          },
+          {
+            "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+            "name": "Single Arm Dumbbell Row",
+            "source": "classifier_best"
+          },
+          {
+            "id": "3e84990c-9e7e-40ef-a5d7-ccaad308d8fe",
+            "name": "Bent Over Barbell Row",
+            "source": "classifier_alternate"
+          },
+          {
+            "id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+            "name": "Shrug",
+            "source": "classifier_alternate"
+          },
+          {
+            "id": "6b5e6ef3-d5a1-49ce-a740-6a2f89b4d7f7",
+            "name": "Calf Raise",
+            "source": "sequence_neighbor"
+          },
+          {
+            "id": "5c504c6c-7ba4-4de8-aa7c-964de4027a89",
+            "name": "Chest Fly",
+            "source": "sequence_neighbor"
+          },
+          {
+            "id": "e1c94c08-7eb3-4f81-9324-217dd90bdb98",
+            "name": "Chin-up",
+            "source": "sequence_neighbor"
+          },
+          {
+            "id": "a1c50802-bc72-4dd4-88a2-82ea422ed874",
+            "name": "Close Grip Bench Press",
+            "source": "sequence_neighbor"
+          }
+        ],
+        "chosen_id": "33ce5ff2-224a-4587-a932-fee6d0a3b51c",
+        "chosen_name": "Chest Supported Row",
+        "confidence": 1,
+        "supports_expected": true,
+        "reasoning": "The person is lying chest down on an inclined bench while rowing dumbbells, which matches the Chest Supported Row exercise. Although the classifier suggested Single Arm Dumbbell Row, both arms are used simultaneously here, not single arm, confirming this is a Chest Supported Row."
+      }
+    },
+    {
+      "image_index": 18,
+      "source_file": "Screenshot 2026-03-08 at 7.25.40 AM.png",
+      "expected_order_index": 18,
+      "exercise_id": "e1c94c08-7eb3-4f81-9324-217dd90bdb98",
+      "exercise_name": "Chin-up",
+      "score": 140,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Pull-up",
+      "classifier_best_id": "3d1c39e2-8bcd-4fa7-9e85-a8b5613cf302",
+      "classifier_detected_name": "Pull-up",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Chin-up",
+          "id": "e1c94c08-7eb3-4f81-9324-217dd90bdb98",
+          "confidence": 70
+        },
+        {
+          "name": "Wide Grip Lat Pulldown",
+          "id": "c4e1ac6b-85b5-4b6f-b2d6-62c5def90446",
+          "confidence": 40
+        }
+      ],
+      "visible_text": "Brachioradialis, Brachialis, Biceps Brachii, Posterior Deltoid, Middle Trapezius, Lower Trapezius, Rhomboids (deep), Triceps Brachii (Long Head), Lower Pectoralis Major, Teres Major, Latissimus Dorsi, www.WEIGHTTRAINING.guide, @WEIGHTTRAININGGUIDE, WEIGHTTRAININGG",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 19,
+      "source_file": "Screenshot 2026-03-08 at 7.26.10 AM.png",
+      "expected_order_index": 19,
+      "exercise_id": "a1c50802-bc72-4dd4-88a2-82ea422ed874",
+      "exercise_name": "Close Grip Bench Press",
+      "score": 140,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Bench Press",
+      "classifier_best_id": "22da0254-d5d7-48f9-839b-9235a8135926",
+      "classifier_detected_name": "Barbell Bench Press",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Close Grip Bench Press",
+          "id": "a1c50802-bc72-4dd4-88a2-82ea422ed874",
+          "confidence": 70
+        },
+        {
+          "name": "Decline Bench Press",
+          "id": "47f5090a-cff4-443c-babd-ddd89e674689",
+          "confidence": 60
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 20,
+      "source_file": "Screenshot 2026-03-08 at 7.26.29 AM.png",
+      "expected_order_index": 20,
+      "exercise_id": "43b0676c-deda-452c-aee5-34f4e2e90fad",
+      "exercise_name": "Close Grip Lat Pulldown",
+      "score": 0,
+      "score_reason": "detected_name_similarity",
+      "classifier_best_name": "Seated Cable Row",
+      "classifier_best_id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+      "classifier_detected_name": "Seated Cable Row",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Wide Grip Lat Pulldown",
+          "id": "c4e1ac6b-85b5-4b6f-b2d6-62c5def90446",
+          "confidence": 30
+        },
+        {
+          "name": "Lat Pulldown",
+          "id": "09e94363-2def-4b2d-b35c-2a2a280dfba4",
+          "confidence": 25
+        },
+        {
+          "name": "Cable Curl",
+          "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+          "confidence": 10
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "vision_confirmed",
+      "review": {
+        "candidates": [
+          {
+            "id": "43b0676c-deda-452c-aee5-34f4e2e90fad",
+            "name": "Close Grip Lat Pulldown",
+            "source": "sequence_expected"
+          },
+          {
+            "id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+            "name": "Seated Cable Row",
+            "source": "classifier_best"
+          },
+          {
+            "id": "c4e1ac6b-85b5-4b6f-b2d6-62c5def90446",
+            "name": "Wide Grip Lat Pulldown",
+            "source": "classifier_alternate"
+          },
+          {
+            "id": "09e94363-2def-4b2d-b35c-2a2a280dfba4",
+            "name": "Lat Pulldown",
+            "source": "classifier_alternate"
+          },
+          {
+            "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+            "name": "Cable Curl",
+            "source": "classifier_alternate"
+          },
+          {
+            "id": "e1c94c08-7eb3-4f81-9324-217dd90bdb98",
+            "name": "Chin-up",
+            "source": "sequence_neighbor"
+          },
+          {
+            "id": "a1c50802-bc72-4dd4-88a2-82ea422ed874",
+            "name": "Close Grip Bench Press",
+            "source": "sequence_neighbor"
+          },
+          {
+            "id": "7d4a3510-b1ea-41f0-8ee7-374da2520291",
+            "name": "Dead Bug",
+            "source": "sequence_neighbor"
+          }
+        ],
+        "chosen_id": "43b0676c-deda-452c-aee5-34f4e2e90fad",
+        "chosen_name": "Close Grip Lat Pulldown",
+        "confidence": 0.9,
+        "supports_expected": true,
+        "reasoning": "The individual is seated on a bench, pulling a cable downwards with a close grip handle attached to a high pulley, which matches the Close Grip Lat Pulldown exercise. The muscle groups highlighted (latissimus dorsi, biceps) also correspond to this exercise. Seated Cable Row typically uses a lower pulley and a different bench setup, not the tall pulldown machine shown here."
+      }
+    },
+    {
+      "image_index": 21,
+      "source_file": "Screenshot 2026-03-08 at 7.26.50 AM.png",
+      "expected_order_index": 21,
+      "exercise_id": "7d4a3510-b1ea-41f0-8ee7-374da2520291",
+      "exercise_name": "Dead Bug",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Dead Bug",
+      "classifier_best_id": "7d4a3510-b1ea-41f0-8ee7-374da2520291",
+      "classifier_detected_name": "Dead Bug",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Plank",
+          "id": "1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8",
+          "confidence": 50
+        },
+        {
+          "name": "Russian Twist",
+          "id": "c40bd626-4879-4eb3-a284-2c5254e3503a",
+          "confidence": 40
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 22,
+      "source_file": "Screenshot 2026-03-08 at 7.27.12 AM.png",
+      "expected_order_index": 22,
+      "exercise_id": "47f5090a-cff4-443c-babd-ddd89e674689",
+      "exercise_name": "Decline Bench Press",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Decline Bench Press",
+      "classifier_best_id": "47f5090a-cff4-443c-babd-ddd89e674689",
+      "classifier_detected_name": "Decline Bench Press",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Bench Press",
+          "id": "22da0254-d5d7-48f9-839b-9235a8135926",
+          "confidence": 70
+        },
+        {
+          "name": "Decline Press",
+          "id": "32598229-d69b-4be2-ae4e-99cd00769a92",
+          "confidence": 60
+        },
+        {
+          "name": "Incline Dumbbell Press",
+          "id": "f90a1f8b-c3d6-4c74-8dbc-be06acbc4804",
+          "confidence": 50
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 23,
+      "source_file": "Screenshot 2026-03-08 at 7.27.22 AM.png",
+      "expected_order_index": 24,
+      "exercise_id": "97e389e7-498e-4df5-8225-a0e0121189c7",
+      "exercise_name": "Dips (Chest Bias)",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Dips (Chest Bias)",
+      "classifier_best_id": "97e389e7-498e-4df5-8225-a0e0121189c7",
+      "classifier_detected_name": "Dips (Chest Bias)",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Push-up",
+          "id": "1cc535b2-4a27-4ecf-bd86-16594b756164",
+          "confidence": 40
+        },
+        {
+          "name": "Close Grip Bench Press",
+          "id": "a1c50802-bc72-4dd4-88a2-82ea422ed874",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 24,
+      "source_file": "Screenshot 2026-03-08 at 7.27.40 AM.png",
+      "expected_order_index": 25,
+      "exercise_id": "712405c7-7d8c-4b90-95ba-dc4294ac4c9a",
+      "exercise_name": "Dynamic Hip Mobility",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Dynamic Hip Mobility",
+      "classifier_best_id": "712405c7-7d8c-4b90-95ba-dc4294ac4c9a",
+      "classifier_detected_name": "Dynamic Hip Mobility",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Thoracic Rotation Mobility",
+          "id": "36336e54-6d1a-46a2-9b47-420cb834bf5b",
+          "confidence": 40
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 25,
+      "source_file": "Screenshot 2026-03-08 at 7.27.58 AM.png",
+      "expected_order_index": 26,
+      "exercise_id": "5885ba9b-c859-41b2-8dbb-21517d071896",
+      "exercise_name": "Face Pull",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Face Pull",
+      "classifier_best_id": "5885ba9b-c859-41b2-8dbb-21517d071896",
+      "classifier_detected_name": "Face Pull",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Seated Cable Row",
+          "id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+          "confidence": 30
+        },
+        {
+          "name": "Cable Rope Overhead Extension",
+          "id": "2d264680-33d2-438c-898c-21b0ef986050",
+          "confidence": 25
+        },
+        {
+          "name": "Reverse Pec Deck",
+          "id": "ff2138d0-d62d-468f-a473-728f7c19f529",
+          "confidence": 20
+        }
+      ],
+      "visible_text": "Lateral deltoid, Posterior deltoid, Teres minor, Infraspinatus, Trapezius (middle and lower), Brachioradialis, Brachialis, www.WEIGHTTRAINING.GUIDE, @WEIGHTTRAININGGUIDE, WEIGHTTRAININGG",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 26,
+      "source_file": "Screenshot 2026-03-08 at 7.28.12 AM.png",
+      "expected_order_index": 27,
+      "exercise_id": "f27a2e10-af45-41e7-9b0e-e04b9169ffac",
+      "exercise_name": "Front Squat",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Front Squat",
+      "classifier_best_id": "f27a2e10-af45-41e7-9b0e-e04b9169ffac",
+      "classifier_detected_name": "Front Squat",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Back Squat",
+          "id": "d6c3cb23-3638-4e46-a746-463ab76fb8b2",
+          "confidence": 60
+        },
+        {
+          "name": "Goblet Squat",
+          "id": "d795a455-16d6-4312-a86c-b097df9e1bd7",
+          "confidence": 40
+        }
+      ],
+      "visible_text": "training",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 27,
+      "source_file": "Screenshot 2026-03-08 at 7.28.25 AM.png",
+      "expected_order_index": 28,
+      "exercise_id": "d795a455-16d6-4312-a86c-b097df9e1bd7",
+      "exercise_name": "Goblet Squat",
+      "score": 210,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Goblet Squat",
+      "classifier_best_id": "d795a455-16d6-4312-a86c-b097df9e1bd7",
+      "classifier_detected_name": "Goblet Squat",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Bulgarian Split Squat",
+          "id": "3066fbf7-0fdf-419f-b414-fcbf1df0b3f2",
+          "confidence": 30
+        },
+        {
+          "name": "Front Squat",
+          "id": "f27a2e10-af45-41e7-9b0e-e04b9169ffac",
+          "confidence": 20
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 28,
+      "source_file": "Screenshot 2026-03-08 at 7.29.00 AM.png",
+      "expected_order_index": 29,
+      "exercise_id": "9a48c433-989b-4051-a02a-cb5813292789",
+      "exercise_name": "Hack Squat",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Hack Squat",
+      "classifier_best_id": "9a48c433-989b-4051-a02a-cb5813292789",
+      "classifier_detected_name": "Hack Squat",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Back Squat",
+          "id": "d6c3cb23-3638-4e46-a746-463ab76fb8b2",
+          "confidence": 60
+        },
+        {
+          "name": "Front Squat",
+          "id": "f27a2e10-af45-41e7-9b0e-e04b9169ffac",
+          "confidence": 50
+        }
+      ],
+      "visible_text": "HACK SQUAT",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 29,
+      "source_file": "Screenshot 2026-03-08 at 7.29.25 AM.png",
+      "expected_order_index": 30,
+      "exercise_id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+      "exercise_name": "Hammer Curl",
+      "score": 140,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Biceps Curl",
+      "classifier_best_id": "68a08b31-7829-42a8-aae7-bd0bdc499fdc",
+      "classifier_detected_name": "Dumbbell Biceps Curl",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Hammer Curl",
+          "id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+          "confidence": 70
+        },
+        {
+          "name": "Preacher Curl",
+          "id": "f47cc1a3-1510-4667-9416-77332df2a107",
+          "confidence": 60
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 30,
+      "source_file": "Screenshot 2026-03-08 at 7.29.41 AM.png",
+      "expected_order_index": 31,
+      "exercise_id": "05d75ac0-59c9-40ac-89e9-af5d459269ef",
+      "exercise_name": "Hanging Leg Raise",
+      "score": 210,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Hanging Leg Raise",
+      "classifier_best_id": "05d75ac0-59c9-40ac-89e9-af5d459269ef",
+      "classifier_detected_name": "Hanging Leg Raise",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Chin-up",
+          "id": "e1c94c08-7eb3-4f81-9324-217dd90bdb98",
+          "confidence": 50
+        },
+        {
+          "name": "Pull-up",
+          "id": "3d1c39e2-8bcd-4fa7-9e85-a8b5613cf302",
+          "confidence": 40
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 31,
+      "source_file": "Screenshot 2026-03-08 at 7.30.02 AM.png",
+      "expected_order_index": 32,
+      "exercise_id": "f603c63e-2b00-4561-8579-3e113d98ad3e",
+      "exercise_name": "Hip Thrust",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Hip Thrust",
+      "classifier_best_id": "f603c63e-2b00-4561-8579-3e113d98ad3e",
+      "classifier_detected_name": "Hip Thrust",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Glute Bridge",
+          "id": null,
+          "confidence": 50
+        }
+      ],
+      "visible_text": "Vastus lateralis Gluteus maximus Hamstrings Rectus femoris Vastus medialis Vastus lateralis www.WEIGHTTRAINING.guide @WEIGHTTRAININGGUIDE @WEIGHTTRAININGG",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 32,
+      "source_file": "Screenshot 2026-03-08 at 7.30.17 AM.png",
+      "expected_order_index": 33,
+      "exercise_id": "2b5dd334-f40c-4c91-a0b3-a3bf93414134",
+      "exercise_name": "Incline Cable Fly",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Incline Cable Fly",
+      "classifier_best_id": "2b5dd334-f40c-4c91-a0b3-a3bf93414134",
+      "classifier_detected_name": "Incline Cable Fly",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Cable Crunch",
+          "id": "283f705a-9a71-424b-b581-0719a46c4079",
+          "confidence": 20
+        },
+        {
+          "name": "Chest Fly",
+          "id": "5c504c6c-7ba4-4de8-aa7c-964de4027a89",
+          "confidence": 40
+        },
+        {
+          "name": "Incline Dumbbell Press",
+          "id": "f90a1f8b-c3d6-4c74-8dbc-be06acbc4804",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 33,
+      "source_file": "Screenshot 2026-03-08 at 7.30.33 AM.png",
+      "expected_order_index": 34,
+      "exercise_id": "f90a1f8b-c3d6-4c74-8dbc-be06acbc4804",
+      "exercise_name": "Incline Dumbbell Press",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Incline Dumbbell Press",
+      "classifier_best_id": "f90a1f8b-c3d6-4c74-8dbc-be06acbc4804",
+      "classifier_detected_name": "Incline Dumbbell Press",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Bench Press",
+          "id": "22da0254-d5d7-48f9-839b-9235a8135926",
+          "confidence": 70
+        },
+        {
+          "name": "Decline Bench Press",
+          "id": "47f5090a-cff4-443c-babd-ddd89e674689",
+          "confidence": 50
+        },
+        {
+          "name": "Push-up",
+          "id": "1cc535b2-4a27-4ecf-bd86-16594b756164",
+          "confidence": 40
+        }
+      ],
+      "visible_text": "Anterior deltoid\nUpper pectoralis major\nTriceps brachii\nWWW.WEIGHTTRAINING.GUIDE\nwww.WEIGHTTRAINING.guide\n@WEIGHTTRAININGGUIDE\nWEIGHTTRAININGG",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 34,
+      "source_file": "Screenshot 2026-03-08 at 7.30.49 AM.png",
+      "expected_order_index": 35,
+      "exercise_id": "66e4d133-718a-49a8-9759-f495e33d9342",
+      "exercise_name": "Jump Rope",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Jump Rope",
+      "classifier_best_id": "66e4d133-718a-49a8-9759-f495e33d9342",
+      "classifier_detected_name": "Jump Rope",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Bike Sprint",
+          "id": "d83fb115-643e-4eaf-acfc-efb5dc20dd6a",
+          "confidence": 10
+        },
+        {
+          "name": "Rowing Sprint",
+          "id": "df285b83-9b1e-47fa-9c01-5cd55c6391cf",
+          "confidence": 10
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 35,
+      "source_file": "Screenshot 2026-03-08 at 7.31.03 AM.png",
+      "expected_order_index": 36,
+      "exercise_id": "09e94363-2def-4b2d-b35c-2a2a280dfba4",
+      "exercise_name": "Lat Pulldown",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Lat Pulldown",
+      "classifier_best_id": "09e94363-2def-4b2d-b35c-2a2a280dfba4",
+      "classifier_detected_name": "Lat Pulldown",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Wide Grip Lat Pulldown",
+          "id": "c4e1ac6b-85b5-4b6f-b2d6-62c5def90446",
+          "confidence": 85
+        },
+        {
+          "name": "Close Grip Lat Pulldown",
+          "id": "43b0676c-deda-452c-aee5-34f4e2e90fad",
+          "confidence": 80
+        },
+        {
+          "name": "Seated Cable Row",
+          "id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+          "confidence": 50
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 36,
+      "source_file": "Screenshot 2026-03-08 at 7.31.19 AM.png",
+      "expected_order_index": 37,
+      "exercise_id": "8a737165-7b00-4deb-a2b4-4aabd3ddd9c5",
+      "exercise_name": "Lateral Raise",
+      "score": 210,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Lateral Raise",
+      "classifier_best_id": "8a737165-7b00-4deb-a2b4-4aabd3ddd9c5",
+      "classifier_detected_name": "Dumbbell Lateral Raise",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Arnold Press",
+          "id": "7a51d583-b26a-466d-aec0-0d0c8ee711cf",
+          "confidence": 40
+        },
+        {
+          "name": "Shoulder Press",
+          "id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+          "confidence": 30
+        }
+      ],
+      "visible_text": "Anterior deltoid\nLateral deltoid\nSerratus anterior\nwww.WEIGHTTRAINING.guide\nINSTAGRAM ICON @WEIGHTTRAININGGUIDE\nPINTEREST ICON WEIGHTTRAININGG",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 37,
+      "source_file": "Screenshot 2026-03-08 at 7.32.16 AM.png",
+      "expected_order_index": 38,
+      "exercise_id": "0bd52984-ef5a-4adc-9fd4-3e3363fc1414",
+      "exercise_name": "Leg Curl",
+      "score": 140,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Lying Leg Curl",
+      "classifier_best_id": "e419037e-04fb-43d9-86af-92c1fe8b350a",
+      "classifier_detected_name": "Lying Leg Curl",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Leg Curl",
+          "id": "0bd52984-ef5a-4adc-9fd4-3e3363fc1414",
+          "confidence": 70
+        },
+        {
+          "name": "Leg Extension",
+          "id": "999d051b-1a85-46c9-a6c8-4d09e09a7207",
+          "confidence": 20
+        }
+      ],
+      "visible_text": "TRAINING",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 38,
+      "source_file": "Screenshot 2026-03-08 at 7.32.31 AM.png",
+      "expected_order_index": 39,
+      "exercise_id": "999d051b-1a85-46c9-a6c8-4d09e09a7207",
+      "exercise_name": "Leg Extension",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Leg Extension",
+      "classifier_best_id": "999d051b-1a85-46c9-a6c8-4d09e09a7207",
+      "classifier_detected_name": "Leg Extension",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Seated Leg Curl",
+          "id": "cd4d6a20-0732-4cde-91e1-8197587ef506",
+          "confidence": 40
+        },
+        {
+          "name": "Leg Curl",
+          "id": "0bd52984-ef5a-4adc-9fd4-3e3363fc1414",
+          "confidence": 30
+        },
+        {
+          "name": "Lying Leg Curl",
+          "id": "e419037e-04fb-43d9-86af-92c1fe8b350a",
+          "confidence": 25
+        }
+      ],
+      "visible_text": "Rectus femoris Vastus medialis Vastus lateralis FITNESSVOLT FITNESSVOLNETWORK FITNESSVOLT.COM",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 39,
+      "source_file": "Screenshot 2026-03-08 at 7.32.42 AM.png",
+      "expected_order_index": 40,
+      "exercise_id": "f6e14b77-111b-4c4a-8c45-9d5cac861a7c",
+      "exercise_name": "Leg Press",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Leg Press",
+      "classifier_best_id": "f6e14b77-111b-4c4a-8c45-9d5cac861a7c",
+      "classifier_detected_name": "Leg Press",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Hack Squat",
+          "id": "9a48c433-989b-4051-a02a-cb5813292789",
+          "confidence": 40
+        },
+        {
+          "name": "Front Squat",
+          "id": "f27a2e10-af45-41e7-9b0e-e04b9169ffac",
+          "confidence": 20
+        }
+      ],
+      "visible_text": "Fitness Programmer.Com",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 40,
+      "source_file": "Screenshot 2026-03-08 at 7.33.05 AM.png",
+      "expected_order_index": 41,
+      "exercise_id": "e419037e-04fb-43d9-86af-92c1fe8b350a",
+      "exercise_name": "Lying Leg Curl",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Lying Leg Curl",
+      "classifier_best_id": "e419037e-04fb-43d9-86af-92c1fe8b350a",
+      "classifier_detected_name": "Lying Leg Curl",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Leg Curl",
+          "id": "0bd52984-ef5a-4adc-9fd4-3e3363fc1414",
+          "confidence": 85
+        },
+        {
+          "name": "Seated Leg Curl",
+          "id": "cd4d6a20-0732-4cde-91e1-8197587ef506",
+          "confidence": 70
+        },
+        {
+          "name": "Hamstring Curl",
+          "id": null,
+          "confidence": 50
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 41,
+      "source_file": "Screenshot 2026-03-08 at 7.33.20 AM.png",
+      "expected_order_index": 42,
+      "exercise_id": "86c586db-8e3f-4cd8-9c48-a6002ca4c8ac",
+      "exercise_name": "Overhead Press",
+      "score": 210,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Overhead Press",
+      "classifier_best_id": "86c586db-8e3f-4cd8-9c48-a6002ca4c8ac",
+      "classifier_detected_name": "Overhead Barbell Press",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Arnold Press",
+          "id": "7a51d583-b26a-466d-aec0-0d0c8ee711cf",
+          "confidence": 70
+        },
+        {
+          "name": "Shoulder Press",
+          "id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+          "confidence": 60
+        }
+      ],
+      "visible_text": "www.WEIGHTTRAINING.GUIDE @WEIGHTTRAININGGUIDE WEIGHTTRAININGG Lateral Deltoid Anterior Deltoid Triceps Brachii Serratus Anterior",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 42,
+      "source_file": "Screenshot 2026-03-08 at 7.33.34 AM.png",
+      "expected_order_index": 43,
+      "exercise_id": "a73875f8-fcab-41b9-85a7-172050f347e5",
+      "exercise_name": "Overhead Triceps Extension",
+      "score": 210,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Overhead Triceps Extension",
+      "classifier_best_id": "a73875f8-fcab-41b9-85a7-172050f347e5",
+      "classifier_detected_name": "Overhead Dumbbell Triceps Extension",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Skull Crusher",
+          "id": "0a7f6eff-7c79-4b81-af98-1c09ad85cef0",
+          "confidence": 50
+        },
+        {
+          "name": "Cable Rope Overhead Extension",
+          "id": "2d264680-33d2-438c-898c-21b0ef986050",
+          "confidence": 40
+        }
+      ],
+      "visible_text": "Triceps Brachii www.WEIGHTTRAINING.guide @WEIGHTTRAININGGUIDE WEIGHTTRAININGG",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 43,
+      "source_file": "Screenshot 2026-03-08 at 7.33.51 AM.png",
+      "expected_order_index": 44,
+      "exercise_id": "76eda93c-586b-48bf-a299-edb88d60b9a8",
+      "exercise_name": "Pallof Press",
+      "score": 100,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Cable Crunch",
+      "classifier_best_id": "283f705a-9a71-424b-b581-0719a46c4079",
+      "classifier_detected_name": "Cable Crunch",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Cable Rope Overhead Extension",
+          "id": "2d264680-33d2-438c-898c-21b0ef986050",
+          "confidence": 40
+        },
+        {
+          "name": "Pallof Press",
+          "id": "76eda93c-586b-48bf-a299-edb88d60b9a8",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 44,
+      "source_file": "Screenshot 2026-03-08 at 7.34.04 AM.png",
+      "expected_order_index": 45,
+      "exercise_id": "050a9080-9da8-4708-b524-17280aa04301",
+      "exercise_name": "Pec Deck Fly",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Pec Deck Fly",
+      "classifier_best_id": "050a9080-9da8-4708-b524-17280aa04301",
+      "classifier_detected_name": "Pec Deck Fly",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Chest Fly",
+          "id": "5c504c6c-7ba4-4de8-aa7c-964de4027a89",
+          "confidence": 60
+        },
+        {
+          "name": "Chest Supported Row",
+          "id": "33ce5ff2-224a-4587-a932-fee6d0a3b51c",
+          "confidence": 20
+        }
+      ],
+      "visible_text": "Upper Pectoralis Major, Serratus Anterior, Lower Pectoralis Major, Biceps Brachii (Short Head)",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 45,
+      "source_file": "Screenshot 2026-03-08 at 7.34.14 AM.png",
+      "expected_order_index": 46,
+      "exercise_id": "1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8",
+      "exercise_name": "Plank",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Plank",
+      "classifier_best_id": "1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8",
+      "classifier_detected_name": "Plank",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Side Plank",
+          "id": "e2da5aef-d786-4076-91fc-0b0092f86355",
+          "confidence": 50
+        },
+        {
+          "name": "Dead Bug",
+          "id": "7d4a3510-b1ea-41f0-8ee7-374da2520291",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 46,
+      "source_file": "Screenshot 2026-03-08 at 7.34.28 AM.png",
+      "expected_order_index": 47,
+      "exercise_id": "f47cc1a3-1510-4667-9416-77332df2a107",
+      "exercise_name": "Preacher Curl",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Preacher Curl",
+      "classifier_best_id": "f47cc1a3-1510-4667-9416-77332df2a107",
+      "classifier_detected_name": "Preacher Curl",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Barbell Curl",
+          "id": "187395e4-7568-4a88-adf8-42dc9fcecd3f",
+          "confidence": 70
+        },
+        {
+          "name": "Hammer Curl",
+          "id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+          "confidence": 65
+        },
+        {
+          "name": "Cable Curl",
+          "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+          "confidence": 60
+        }
+      ],
+      "visible_text": "TRAINING",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 47,
+      "source_file": "Screenshot 2026-03-08 at 7.34.42 AM.png",
+      "expected_order_index": 48,
+      "exercise_id": "3d1c39e2-8bcd-4fa7-9e85-a8b5613cf302",
+      "exercise_name": "Pull-up",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Pull-up",
+      "classifier_best_id": "3d1c39e2-8bcd-4fa7-9e85-a8b5613cf302",
+      "classifier_detected_name": "Pull-up",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Chin-up",
+          "id": "e1c94c08-7eb3-4f81-9324-217dd90bdb98",
+          "confidence": 80
+        },
+        {
+          "name": "Wide Grip Lat Pulldown",
+          "id": "c4e1ac6b-85b5-4b6f-b2d6-62c5def90446",
+          "confidence": 50
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 48,
+      "source_file": "Screenshot 2026-03-08 at 7.34.53 AM.png",
+      "expected_order_index": 49,
+      "exercise_id": "1cc535b2-4a27-4ecf-bd86-16594b756164",
+      "exercise_name": "Push-up",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Push-up",
+      "classifier_best_id": "1cc535b2-4a27-4ecf-bd86-16594b756164",
+      "classifier_detected_name": "Push-up",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Dips (Chest Bias)",
+          "id": "97e389e7-498e-4df5-8225-a0e0121189c7",
+          "confidence": 40
+        },
+        {
+          "name": "Chest Fly",
+          "id": "5c504c6c-7ba4-4de8-aa7c-964de4027a89",
+          "confidence": 30
+        }
+      ],
+      "visible_text": "TRAINING",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 49,
+      "source_file": "Screenshot 2026-03-08 at 7.35.11 AM.png",
+      "expected_order_index": 50,
+      "exercise_id": "77d46ca8-a14c-4b89-a87a-95bc7832ecae",
+      "exercise_name": "Rear Delt Fly",
+      "score": 205,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Rear Delt Fly",
+      "classifier_best_id": "77d46ca8-a14c-4b89-a87a-95bc7832ecae",
+      "classifier_detected_name": "Bent Over Dumbbell Rear Delt Fly",
+      "classifier_confidence": 85,
+      "classifier_alternates": [
+        {
+          "name": "Bent Over Barbell Row",
+          "id": "3e84990c-9e7e-40ef-a5d7-ccaad308d8fe",
+          "confidence": 30
+        },
+        {
+          "name": "Single Arm Dumbbell Row",
+          "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+          "confidence": 25
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 50,
+      "source_file": "Screenshot 2026-03-08 at 7.35.41 AM.png",
+      "expected_order_index": 52,
+      "exercise_id": "8dd7abda-9dbc-4060-b7cd-663002991c85",
+      "exercise_name": "Reverse Wrist Curl",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Reverse Wrist Curl",
+      "classifier_best_id": "8dd7abda-9dbc-4060-b7cd-663002991c85",
+      "classifier_detected_name": "Reverse Wrist Curl",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Wrist Curl",
+          "id": "660fdce6-4f13-42c1-ad8b-c91ff87e79b8",
+          "confidence": 70
+        },
+        {
+          "name": "Barbell Curl",
+          "id": "187395e4-7568-4a88-adf8-42dc9fcecd3f",
+          "confidence": 40
+        },
+        {
+          "name": "Preacher Curl",
+          "id": "f47cc1a3-1510-4667-9416-77332df2a107",
+          "confidence": 30
+        }
+      ],
+      "visible_text": "Wrist extensors www.weighttraining.guide @weighttrainingguide weighttrainingg",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 51,
+      "source_file": "Screenshot 2026-03-08 at 7.36.01 AM.png",
+      "expected_order_index": 53,
+      "exercise_id": "3bada2cd-0533-4069-848c-7b6aa2ead4b1",
+      "exercise_name": "Romanian Deadlift",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Romanian Deadlift",
+      "classifier_best_id": "3bada2cd-0533-4069-848c-7b6aa2ead4b1",
+      "classifier_detected_name": "Romanian Deadlift",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Deadlift",
+          "id": null,
+          "confidence": 50
+        },
+        {
+          "name": "Hip Thrust",
+          "id": "f603c63e-2b00-4561-8579-3e113d98ad3e",
+          "confidence": 40
+        },
+        {
+          "name": "Back Extension",
+          "id": "2e0d149c-1700-49a0-9e92-0e170d6bcff2",
+          "confidence": 30
+        }
+      ],
+      "visible_text": "TRAINING",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 52,
+      "source_file": "Screenshot 2026-03-08 at 7.36.21 AM.png",
+      "expected_order_index": 54,
+      "exercise_id": "df285b83-9b1e-47fa-9c01-5cd55c6391cf",
+      "exercise_name": "Rowing Sprint",
+      "score": 205,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Rowing Sprint",
+      "classifier_best_id": "df285b83-9b1e-47fa-9c01-5cd55c6391cf",
+      "classifier_detected_name": "Rowing on rowing machine",
+      "classifier_confidence": 85,
+      "classifier_alternates": [
+        {
+          "name": "Bike Sprint",
+          "id": "d83fb115-643e-4eaf-acfc-efb5dc20dd6a",
+          "confidence": 30
+        },
+        {
+          "name": "Treadmill Run",
+          "id": "63c1b131-e499-4a2f-947f-8eee2461560e",
+          "confidence": 20
+        }
+      ],
+      "visible_text": "Sunny",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 53,
+      "source_file": "Screenshot 2026-03-08 at 7.36.36 AM.png",
+      "expected_order_index": 55,
+      "exercise_id": "c40bd626-4879-4eb3-a284-2c5254e3503a",
+      "exercise_name": "Russian Twist",
+      "score": 205,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Russian Twist",
+      "classifier_best_id": "c40bd626-4879-4eb3-a284-2c5254e3503a",
+      "classifier_detected_name": "Russian Twist with Kettlebell",
+      "classifier_confidence": 85,
+      "classifier_alternates": [
+        {
+          "name": "Cable Crunch",
+          "id": "283f705a-9a71-424b-b581-0719a46c4079",
+          "confidence": 40
+        },
+        {
+          "name": "Dead Bug",
+          "id": "7d4a3510-b1ea-41f0-8ee7-374da2520291",
+          "confidence": 35
+        },
+        {
+          "name": "Plank",
+          "id": "1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 54,
+      "source_file": "Screenshot 2026-03-08 at 7.36.54 AM.png",
+      "expected_order_index": 56,
+      "exercise_id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+      "exercise_name": "Seated Cable Row",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Seated Cable Row",
+      "classifier_best_id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+      "classifier_detected_name": "Seated Cable Row",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Cable Curl",
+          "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+          "confidence": 40
+        },
+        {
+          "name": "Cable Rope Overhead Extension",
+          "id": "2d264680-33d2-438c-898c-21b0ef986050",
+          "confidence": 30
+        },
+        {
+          "name": "Single Arm Dumbbell Row",
+          "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+          "confidence": 25
+        }
+      ],
+      "visible_text": "www.WEIGHTTRAINING.GUIDE @WEIGHTTRAININGGUIDE WEIGHTTRAININGG Trapezius (middle and lower) Infraspinatus Rhomboids (deep) Latissimus dorsi Erector spinae (deep) Teres minor Posterior deltoid Teres major Triceps brachii (long head) Lower pectoralis major Brachialis Biceps brachii Brachioradialis",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 55,
+      "source_file": "Screenshot 2026-03-08 at 7.37.15 AM.png",
+      "expected_order_index": 57,
+      "exercise_id": "cfa3a5ab-a85d-4a2c-a374-2127f7e41491",
+      "exercise_name": "Seated Calf Raise",
+      "score": 210,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Seated Calf Raise",
+      "classifier_best_id": "cfa3a5ab-a85d-4a2c-a374-2127f7e41491",
+      "classifier_detected_name": "Seated Calf Raise",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Calf Raise",
+          "id": "6b5e6ef3-d5a1-49ce-a740-6a2f89b4d7f7",
+          "confidence": 60
+        },
+        {
+          "name": "Standing Calf Raise",
+          "id": "4d3f2601-78a3-4ccd-8fc1-630235658161",
+          "confidence": 50
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 56,
+      "source_file": "Screenshot 2026-03-08 at 7.38.06 AM.png",
+      "expected_order_index": 58,
+      "exercise_id": "cd4d6a20-0732-4cde-91e1-8197587ef506",
+      "exercise_name": "Seated Leg Curl",
+      "score": 140,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Lying Leg Curl",
+      "classifier_best_id": "e419037e-04fb-43d9-86af-92c1fe8b350a",
+      "classifier_detected_name": "Leg Curl",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Seated Leg Curl",
+          "id": "cd4d6a20-0732-4cde-91e1-8197587ef506",
+          "confidence": 70
+        },
+        {
+          "name": "Leg Curl",
+          "id": "0bd52984-ef5a-4adc-9fd4-3e3363fc1414",
+          "confidence": 50
+        }
+      ],
+      "visible_text": "Sartorius\nGracilis\nGastrocnemius\nHamstrings\nwww.WEIGHTTRAINING.GUIDE\n@WEIGHTTRAININGGUIDE\nWEIGHTTRAININGG",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 57,
+      "source_file": "Screenshot 2026-03-08 at 7.38.26 AM.png",
+      "expected_order_index": 59,
+      "exercise_id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+      "exercise_name": "Shoulder Press",
+      "score": 130,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Overhead Press",
+      "classifier_best_id": "86c586db-8e3f-4cd8-9c48-a6002ca4c8ac",
+      "classifier_detected_name": "Seated Shoulder Press on Machine",
+      "classifier_confidence": 80,
+      "classifier_alternates": [
+        {
+          "name": "Shoulder Press",
+          "id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+          "confidence": 60
+        },
+        {
+          "name": "Arnold Press",
+          "id": "7a51d583-b26a-466d-aec0-0d0c8ee711cf",
+          "confidence": 40
+        },
+        {
+          "name": "Upright Row",
+          "id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 58,
+      "source_file": "Screenshot 2026-03-08 at 7.38.42 AM.png",
+      "expected_order_index": 60,
+      "exercise_id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+      "exercise_name": "Shrug",
+      "score": 205,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Shrug",
+      "classifier_best_id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+      "classifier_detected_name": "Dumbbell Shrug",
+      "classifier_confidence": 85,
+      "classifier_alternates": [
+        {
+          "name": "Upright Row",
+          "id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+          "confidence": 60
+        },
+        {
+          "name": "Single Arm Dumbbell Row",
+          "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+          "confidence": 40
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 59,
+      "source_file": "Screenshot 2026-03-08 at 7.38.46 AM.png",
+      "expected_order_index": 61,
+      "exercise_id": "4ca0c50d-28a4-4d3e-9e8c-eb76e665052b",
+      "exercise_name": "Shrugs",
+      "score": 50,
+      "score_reason": "detected_name_similarity",
+      "classifier_best_name": "Shrug",
+      "classifier_best_id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+      "classifier_detected_name": "Dumbbell Shrugs",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Upright Row",
+          "id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+          "confidence": 60
+        },
+        {
+          "name": "Single Arm Dumbbell Row",
+          "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+          "confidence": 40
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "vision_plural_variant",
+      "review": {
+        "candidates": [
+          {
+            "id": "4ca0c50d-28a4-4d3e-9e8c-eb76e665052b",
+            "name": "Shrugs",
+            "source": "sequence_expected"
+          },
+          {
+            "id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+            "name": "Shrug",
+            "source": "classifier_best"
+          },
+          {
+            "id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+            "name": "Upright Row",
+            "source": "classifier_alternate"
+          },
+          {
+            "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+            "name": "Single Arm Dumbbell Row",
+            "source": "classifier_alternate"
+          },
+          {
+            "id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+            "name": "Shoulder Press",
+            "source": "sequence_neighbor"
+          },
+          {
+            "id": "e2da5aef-d786-4076-91fc-0b0092f86355",
+            "name": "Side Plank",
+            "source": "sequence_neighbor"
+          }
+        ],
+        "chosen_id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+        "chosen_name": "Shrug",
+        "confidence": 1,
+        "supports_expected": true,
+        "reasoning": "The image shows a person holding dumbbells with elevated shoulders, targeting the trapezius muscles, which aligns with the exercise known as Shrugs (or Shrug). This matches both the sequence expectation and the classifier best suggestion."
+      }
+    },
+    {
+      "image_index": 60,
+      "source_file": "Screenshot 2026-03-08 at 7.38.58 AM.png",
+      "expected_order_index": 62,
+      "exercise_id": "e2da5aef-d786-4076-91fc-0b0092f86355",
+      "exercise_name": "Side Plank",
+      "score": 190,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Side Plank",
+      "classifier_best_id": "e2da5aef-d786-4076-91fc-0b0092f86355",
+      "classifier_detected_name": "Side Plank",
+      "classifier_confidence": 70,
+      "classifier_alternates": [
+        {
+          "name": "Plank",
+          "id": "1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8",
+          "confidence": 40
+        },
+        {
+          "name": "Russian Twist",
+          "id": "c40bd626-4879-4eb3-a284-2c5254e3503a",
+          "confidence": 30
+        }
+      ],
+      "visible_text": "SIDE PLANK",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 61,
+      "source_file": "Screenshot 2026-03-08 at 7.57.32 AM.png",
+      "expected_order_index": 63,
+      "exercise_id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+      "exercise_name": "Single Arm Dumbbell Row",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Single Arm Dumbbell Row",
+      "classifier_best_id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+      "classifier_detected_name": "Single Arm Dumbbell Row",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Bent Over Barbell Row",
+          "id": "3e84990c-9e7e-40ef-a5d7-ccaad308d8fe",
+          "confidence": 70
+        },
+        {
+          "name": "Shrugs",
+          "id": "4ca0c50d-28a4-4d3e-9e8c-eb76e665052b",
+          "confidence": 40
+        },
+        {
+          "name": "Chest Supported Row",
+          "id": "33ce5ff2-224a-4587-a932-fee6d0a3b51c",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 62,
+      "source_file": "Screenshot 2026-03-08 at 7.57.45 AM.png",
+      "expected_order_index": 64,
+      "exercise_id": "0a7f6eff-7c79-4b81-af98-1c09ad85cef0",
+      "exercise_name": "Skull Crusher",
+      "score": 130,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Close Grip Bench Press",
+      "classifier_best_id": "a1c50802-bc72-4dd4-88a2-82ea422ed874",
+      "classifier_detected_name": "Close Grip Bench Press",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Close Grip Lat Pulldown",
+          "id": "43b0676c-deda-452c-aee5-34f4e2e90fad",
+          "confidence": 30
+        },
+        {
+          "name": "Skull Crusher",
+          "id": "0a7f6eff-7c79-4b81-af98-1c09ad85cef0",
+          "confidence": 60
+        },
+        {
+          "name": "Bench Press",
+          "id": "22da0254-d5d7-48f9-839b-9235a8135926",
+          "confidence": 60
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 63,
+      "source_file": "Screenshot 2026-03-08 at 7.58.01 AM.png",
+      "expected_order_index": 65,
+      "exercise_id": "4d3f2601-78a3-4ccd-8fc1-630235658161",
+      "exercise_name": "Standing Calf Raise",
+      "score": 205,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Standing Calf Raise",
+      "classifier_best_id": "4d3f2601-78a3-4ccd-8fc1-630235658161",
+      "classifier_detected_name": "Dumbbell Standing Calf Raise",
+      "classifier_confidence": 85,
+      "classifier_alternates": [
+        {
+          "name": "Calf Raise",
+          "id": "6b5e6ef3-d5a1-49ce-a740-6a2f89b4d7f7",
+          "confidence": 60
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 64,
+      "source_file": "Screenshot 2026-03-08 at 7.58.20 AM.png",
+      "expected_order_index": 66,
+      "exercise_id": "36336e54-6d1a-46a2-9b47-420cb834bf5b",
+      "exercise_name": "Thoracic Rotation Mobility",
+      "score": 110,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Hip Thrust",
+      "classifier_best_id": "f603c63e-2b00-4561-8579-3e113d98ad3e",
+      "classifier_detected_name": "Hip Thrust (variation with rotation)",
+      "classifier_confidence": 75,
+      "classifier_alternates": [
+        {
+          "name": "Dynamic Hip Mobility",
+          "id": "712405c7-7d8c-4b90-95ba-dc4294ac4c9a",
+          "confidence": 50
+        },
+        {
+          "name": "Thoracic Rotation Mobility",
+          "id": "36336e54-6d1a-46a2-9b47-420cb834bf5b",
+          "confidence": 40
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 65,
+      "source_file": "Screenshot 2026-03-08 at 7.58.33 AM.png",
+      "expected_order_index": 67,
+      "exercise_id": "63c1b131-e499-4a2f-947f-8eee2461560e",
+      "exercise_name": "Treadmill Run",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Treadmill Run",
+      "classifier_best_id": "63c1b131-e499-4a2f-947f-8eee2461560e",
+      "classifier_detected_name": "Treadmill Run",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Bike Sprint",
+          "id": "d83fb115-643e-4eaf-acfc-efb5dc20dd6a",
+          "confidence": 50
+        },
+        {
+          "name": "Rowing Sprint",
+          "id": "df285b83-9b1e-47fa-9c01-5cd55c6391cf",
+          "confidence": 40
+        },
+        {
+          "name": "Jump Rope",
+          "id": "66e4d133-718a-49a8-9759-f495e33d9342",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 66,
+      "source_file": "Screenshot 2026-03-08 at 7.58.49 AM.png",
+      "expected_order_index": 68,
+      "exercise_id": "251920ae-4b93-4da4-b873-5adf0657d489",
+      "exercise_name": "Triceps Pushdown",
+      "score": 140,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Cable Rope Overhead Extension",
+      "classifier_best_id": "2d264680-33d2-438c-898c-21b0ef986050",
+      "classifier_detected_name": "Cable Rope Overhead Extension",
+      "classifier_confidence": 90,
+      "classifier_alternates": [
+        {
+          "name": "Triceps Pushdown",
+          "id": "251920ae-4b93-4da4-b873-5adf0657d489",
+          "confidence": 70
+        },
+        {
+          "name": "Cable Curl",
+          "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+          "confidence": 30
+        }
+      ],
+      "visible_text": null,
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 67,
+      "source_file": "Screenshot 2026-03-08 at 7.59.03 AM.png",
+      "expected_order_index": 69,
+      "exercise_id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+      "exercise_name": "Upright Row",
+      "score": 205,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Upright Row",
+      "classifier_best_id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+      "classifier_detected_name": "Dumbbell Upright Row",
+      "classifier_confidence": 85,
+      "classifier_alternates": [
+        {
+          "name": "Shrug",
+          "id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+          "confidence": 40
+        },
+        {
+          "name": "Shrugs",
+          "id": "4ca0c50d-28a4-4d3e-9e8c-eb76e665052b",
+          "confidence": 40
+        },
+        {
+          "name": "Single Arm Dumbbell Row",
+          "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+          "confidence": 30
+        }
+      ],
+      "visible_text": "Middle and lower trapezius, Anterior deltoid, Supraspinatus (deep), Lateral deltoid, Serratus anterior, Brachialis, Biceps brachii, Brachioradialis",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 68,
+      "source_file": "Screenshot 2026-03-08 at 7.59.21 AM.png",
+      "expected_order_index": 70,
+      "exercise_id": "92914d0a-1120-4496-86b4-ce1cb61c6634",
+      "exercise_name": "Walking Lunge",
+      "score": 215,
+      "score_reason": "best_id_match",
+      "classifier_best_name": "Walking Lunge",
+      "classifier_best_id": "92914d0a-1120-4496-86b4-ce1cb61c6634",
+      "classifier_detected_name": "Unilateral Walking Lunge",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Bulgarian Split Squat",
+          "id": "3066fbf7-0fdf-419f-b414-fcbf1df0b3f2",
+          "confidence": 65
+        },
+        {
+          "name": "Goblet Squat",
+          "id": "d795a455-16d6-4312-a86c-b097df9e1bd7",
+          "confidence": 60
+        }
+      ],
+      "visible_text": "UNILATERAL WALKING LUNGE",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    },
+    {
+      "image_index": 69,
+      "source_file": "Screenshot 2026-03-08 at 7.59.38 AM.png",
+      "expected_order_index": 71,
+      "exercise_id": "c4e1ac6b-85b5-4b6f-b2d6-62c5def90446",
+      "exercise_name": "Wide Grip Lat Pulldown",
+      "score": 155,
+      "score_reason": "alternate_id_match",
+      "classifier_best_name": "Lat Pulldown",
+      "classifier_best_id": "09e94363-2def-4b2d-b35c-2a2a280dfba4",
+      "classifier_detected_name": "Lat Pulldown",
+      "classifier_confidence": 95,
+      "classifier_alternates": [
+        {
+          "name": "Wide Grip Lat Pulldown",
+          "id": "c4e1ac6b-85b5-4b6f-b2d6-62c5def90446",
+          "confidence": 85
+        },
+        {
+          "name": "Seated Cable Row",
+          "id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+          "confidence": 60
+        },
+        {
+          "name": "Chin-up",
+          "id": "e1c94c08-7eb3-4f81-9324-217dd90bdb98",
+          "confidence": 50
+        }
+      ],
+      "visible_text": "Biceps brachii, Brachioradialis, Brachialis, Posterior deltoid, Trapezius (middle and lower), Latissimus dorsi, Teres minor, Infraspinatus, Teres major",
+      "pair_banned": false,
+      "validation_status": "classifier_supported",
+      "review": null
+    }
+  ]
+}

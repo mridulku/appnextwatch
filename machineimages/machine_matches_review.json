@@ -1,0 +1,109 @@
+{
+  "generated_at": "2026-03-07T14:21:35.055Z",
+  "count": 4,
+  "items": [
+    {
+      "filename": "03_IMG_6634.jpg",
+      "source_file": "IMG_6634.HEIC",
+      "converted_path": "machineimages/converted/03_IMG_6634.jpg",
+      "match": {
+        "detected_machine_name": "Abduction/Adduction Machine",
+        "best_match_name": "Abduction/Adduction Machine",
+        "best_match_id": null,
+        "confidence": 40,
+        "alternates": [
+          {
+            "name": "Calf Raise Machine",
+            "id": "3eb1a230-32d4-4b02-9b9c-c5b3a40568f6",
+            "confidence": 10
+          },
+          {
+            "name": "Leg Press Machine",
+            "id": "7e2c9841-6cfd-470b-8705-3188f9148814",
+            "confidence": 10
+          },
+          {
+            "name": "Glute Drive Machine",
+            "id": "c1b2a68f-7145-4d8b-99c9-80b9510e7c75",
+            "confidence": 10
+          }
+        ],
+        "reasoning": "The machine shown is designed for hip abduction and adduction exercises based on the handles and seat position, targeting inner and outer thigh muscles. The catalog does not list a specific 'Abduction/Adduction Machine' by name, so no exact catalog ID can be matched. Closest alternate matches have lower confidence as the machine is distinct from calf raise, leg press, or glute drive machines.",
+        "visible_brand_or_model": "cult.sport",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 6271,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "06_IMG_6637.jpg",
+      "source_file": "IMG_6637.HEIC",
+      "converted_path": "machineimages/converted/06_IMG_6637.jpg",
+      "match": {
+        "detected_machine_name": "Stair Climber",
+        "best_match_name": null,
+        "best_match_id": null,
+        "confidence": 0,
+        "alternates": [],
+        "reasoning": "The machine in the image appears to be a stair climber or stepper machine, but no exact match for such a machine exists in the provided catalog. Hence, no confident match can be made.",
+        "visible_brand_or_model": null,
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 3957,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "16_IMG_6647.jpg",
+      "source_file": "IMG_6647.HEIC",
+      "converted_path": "machineimages/converted/16_IMG_6647.jpg",
+      "match": {
+        "detected_machine_name": "Decline Bench/Decline Sit-up Bench",
+        "best_match_name": null,
+        "best_match_id": null,
+        "confidence": 0,
+        "alternates": [],
+        "reasoning": "The machine shown is a decline bench typically used for decline sit-ups or decline bench exercises. This type of bench is not explicitly listed in the provided catalog, so there is no confident match.",
+        "visible_brand_or_model": "None visible",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5035,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "26_IMG_6657.jpg",
+      "source_file": "IMG_6657.HEIC",
+      "converted_path": "machineimages/converted/26_IMG_6657.jpg",
+      "match": {
+        "detected_machine_name": "Free weights setup with barbell and plates on platform",
+        "best_match_name": "Smith Machine",
+        "best_match_id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+        "confidence": 20,
+        "alternates": [
+          {
+            "name": "Bench Press Station",
+            "id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+            "confidence": 10
+          },
+          {
+            "name": "Incline Bench",
+            "id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+            "confidence": 10
+          }
+        ],
+        "reasoning": "The image shows a barbell and plates on a lifting platform which is typical for free weight workouts like deadlifts or squats. There is no visible guided barbell or machine frame typical to a Smith Machine. Since the catalog includes Smith Machine but not explicitly a platform setup or free weights category, the closest match in the catalog by association of barbell exercises is Smith Machine, but confidence is low as this is not a machine, more free weights setup.",
+        "visible_brand_or_model": "CULTSPORT",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 6175,
+        "model": "gpt-4.1-mini"
+      }
+    }
+  ]
+}

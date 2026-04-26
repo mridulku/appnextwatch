@@ -550,6 +550,7 @@ async function writeSessionFromSnapshot(args: {
         set_index: idx + 1,
         planned_reps: clampInt(setRow?.reps, 1, 100),
         planned_weight_kg: setRow?.weight_kg === null || setRow?.weight_kg === undefined ? null : clampWeight(setRow?.weight_kg),
+        planned_speed_kph: setRow?.speed_kph === null || setRow?.speed_kph === undefined ? null : clampWeight(setRow?.speed_kph),
       });
       if (setInsert.error) throw setInsert.error;
     }

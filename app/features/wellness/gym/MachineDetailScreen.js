@@ -1,15 +1,16 @@
-import { ActivityIndicator, Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../../context/AuthContext';
+import { listMachineMovementMappings } from '../../../core/api/exerciseMovementsDb';
 import { getOrCreateAppUser } from '../../../core/api/foodInventoryDb';
 import { addUserMachine, removeUserMachine } from '../../../core/api/gymMachinesDb';
-import { listMachineExerciseMappings } from '../../../core/api/musclesDb';
 import { ITEM_PLACEHOLDER_IMAGE } from '../../../core/placeholders';
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
-import { formatScore } from './muscles/scoreBand';
+import { formatScore } from './detail/useGymDetailData';
+import ExerciseGroupSection from './components/ExerciseGroupSection';
 
 function MachineDetailScreen({ route, navigation }) {
   const { user } = useAuth();
@@ -18,11 +19,9 @@ function MachineDetailScreen({ route, navigation }) {
   const [isAdded, setIsAdded] = useState(route.params?.isAdded ?? true);
   const [inlineError, setInlineError] = useState('');
   const [loadingMappings, setLoadingMappings] = useState(true);
-  const [exerciseMatches, setExerciseMatches] = useState([]);
+  const [movementMatches, setMovementMatches] = useState([]);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const fromCatalog = Boolean(route.params?.fromCatalog);
-
-  const machineName = item?.name || route.params?.machineName || 'Machine';
-  const subtitle = `${item?.zone || 'Gym Zone'} • ${Array.isArray(item?.primary_muscles) && item.primary_muscles.length ? item.primary_muscles.join(', ') : 'Strength'}`;
 
   useEffect(() => {
     let isActive = true;
@@ -34,9 +33,9 @@ function MachineDetailScreen({ route, navigation }) {
       }
       try {
         setLoadingMappings(true);
-        const exercises = await listMachineExerciseMappings(itemId);
+        const movements = await listMachineMovementMappings({ machineId: itemId });
         if (!isActive) return;
-        setExerciseMatches(exercises || []);
+        setMovementMatches(movements || []);
       } catch (error) {
         if (!isActive) return;
         setInlineError(error?.message || 'Could not load machine mappings');
@@ -50,6 +49,13 @@ function MachineDetailScreen({ route, navigation }) {
       isActive = false;
     };
   }, [itemId]);
+  const machineName = item?.name || route.params?.machineName || 'Machine';
+  const subtitle = [item?.zone, item?.primary_muscles].filter(Boolean).join(' • ') || 'Gym machine';
+  const heroImageSource = item?.image_url ? { uri: item.image_url } : ITEM_PLACEHOLDER_IMAGE;
+  const movementRows = (movementMatches || []).map((row) => ({
+    ...(row.movement || {}),
+    muscle: `${row.movement?.primary_muscle_group || 'Movement'} • ${formatScore(row.relevance_score)}`,
+  }));
 
   const onToggleSaved = () => {
     if (!itemId || isMutating) return;
@@ -93,52 +99,32 @@ function MachineDetailScreen({ route, navigation }) {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.heroCard}>
-          <Image source={ITEM_PLACEHOLDER_IMAGE} style={styles.heroImage} resizeMode="cover" />
+          <TouchableOpacity activeOpacity={0.92} onPress={() => setImageViewerVisible(true)}>
+            <Image source={heroImageSource} style={styles.heroImage} resizeMode="cover" />
+          </TouchableOpacity>
           <View style={styles.heroTextWrap}>
             <Text style={styles.heroTitle}>{machineName}</Text>
             <Text style={styles.heroSubtitle}>{subtitle}</Text>
+            <Text style={styles.heroHint}>Tap image to enlarge</Text>
           </View>
         </View>
 
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Exercises you can do on this machine</Text>
+          <Text style={styles.sectionTitle}>Movements you can do on this machine</Text>
+          <Text style={styles.sectionSubtitle}>Open a movement, then choose the exact variant you want to inspect.</Text>
           {loadingMappings ? (
             <View style={styles.loadingInline}>
               <ActivityIndicator color={COLORS.accent} />
-              <Text style={styles.loadingInlineText}>Loading exercises...</Text>
+              <Text style={styles.loadingInlineText}>Loading movements...</Text>
             </View>
-          ) : exerciseMatches.length ? (
-            exerciseMatches.map((row) => (
-              <TouchableOpacity
-                key={row.id}
-                style={styles.linkRow}
-                activeOpacity={0.9}
-                onPress={() =>
-                  navigation.navigate('ExerciseDetail', {
-                    itemId: row.exercise_id,
-                    item: row.catalog_exercise,
-                    exerciseName: row.catalog_exercise?.name,
-                    fromCatalog: true,
-                    isAdded: false,
-                  })
-                }
-              >
-                <View style={styles.metricTextWrap}>
-                  <Text style={styles.metricTitle}>{row.catalog_exercise?.name || 'Exercise'}</Text>
-                  <Text style={styles.metricMeta}>
-                    {row.catalog_exercise?.primary_muscle_group || 'Workout'} • {row.catalog_exercise?.equipment || 'Bodyweight'}
-                  </Text>
-                </View>
-                <View style={styles.linkRight}>
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{formatScore(row.relevance_score)}</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={16} color={COLORS.muted} />
-                </View>
-              </TouchableOpacity>
-            ))
+          ) : movementRows.length ? (
+            <ExerciseGroupSection
+              section={{ type: 'flat', items: movementRows }}
+              navigation={navigation}
+              selectedCatalogIdSet={new Set()}
+            />
           ) : (
-            <Text style={styles.emptyText}>No exercise matches yet.</Text>
+            <Text style={styles.emptyText}>No curated movements mapped yet for this machine.</Text>
           )}
         </View>
 
@@ -177,6 +163,25 @@ function MachineDetailScreen({ route, navigation }) {
           </TouchableOpacity>
         ) : null}
       </View>
+
+      <Modal visible={imageViewerVisible} transparent animationType="fade" onRequestClose={() => setImageViewerVisible(false)}>
+        <View style={styles.viewerRoot}>
+          <Pressable style={styles.viewerBackdrop} onPress={() => setImageViewerVisible(false)} />
+          <View style={styles.viewerCard}>
+            <View style={styles.viewerHeader}>
+              <Text style={styles.viewerTitle}>{machineName}</Text>
+              <TouchableOpacity
+                style={styles.viewerCloseButton}
+                activeOpacity={0.9}
+                onPress={() => setImageViewerVisible(false)}
+              >
+                <Ionicons name="close" size={18} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+            <Image source={heroImageSource} style={styles.viewerImage} resizeMode="contain" />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -208,6 +213,7 @@ const styles = StyleSheet.create({
   heroTextWrap: { flex: 1 },
   heroTitle: { color: COLORS.text, fontSize: 24, fontWeight: '700' },
   heroSubtitle: { color: COLORS.muted, fontSize: UI_TOKENS.typography.subtitle, marginTop: 4 },
+  heroHint: { color: COLORS.accent, fontSize: UI_TOKENS.typography.meta, marginTop: 6, fontWeight: '600' },
   sectionCard: {
     borderRadius: UI_TOKENS.radius.md,
     borderWidth: UI_TOKENS.border.hairline,
@@ -226,74 +232,6 @@ const styles = StyleSheet.create({
   loadingInlineText: {
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.meta,
-  },
-  metricRow: {
-    borderRadius: UI_TOKENS.radius.sm,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.2)',
-    backgroundColor: COLORS.cardSoft,
-    paddingHorizontal: UI_TOKENS.spacing.sm,
-    paddingVertical: UI_TOKENS.spacing.xs,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: UI_TOKENS.spacing.sm,
-  },
-  linkRow: {
-    borderRadius: UI_TOKENS.radius.sm,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.2)',
-    backgroundColor: COLORS.cardSoft,
-    paddingHorizontal: UI_TOKENS.spacing.sm,
-    paddingVertical: UI_TOKENS.spacing.xs,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: UI_TOKENS.spacing.sm,
-  },
-  metricTextWrap: {
-    flex: 1,
-    minWidth: 0,
-  },
-  metricTitle: {
-    color: COLORS.text,
-    fontSize: UI_TOKENS.typography.subtitle,
-    fontWeight: '700',
-  },
-  metricMeta: {
-    marginTop: 2,
-    color: COLORS.muted,
-    fontSize: UI_TOKENS.typography.meta,
-  },
-  metricBadges: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: UI_TOKENS.spacing.xs,
-  },
-  linkRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: UI_TOKENS.spacing.xs,
-  },
-  badge: {
-    borderRadius: UI_TOKENS.radius.sm,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.3)',
-    backgroundColor: 'rgba(162,167,179,0.12)',
-    paddingHorizontal: UI_TOKENS.spacing.xs,
-    paddingVertical: 2,
-  },
-  badgeWarn: {
-    borderColor: 'rgba(255,164,116,0.45)',
-    backgroundColor: 'rgba(255,164,116,0.16)',
-  },
-  badgeText: {
-    color: COLORS.muted,
-    fontSize: UI_TOKENS.typography.meta,
-    fontWeight: '700',
-  },
-  badgeWarnText: {
-    color: '#FFB98F',
   },
   emptyText: {
     color: COLORS.muted,
@@ -350,6 +288,52 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: UI_TOKENS.typography.meta + 1,
     fontWeight: '700',
+  },
+  viewerRoot: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: UI_TOKENS.spacing.md,
+  },
+  viewerBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(5, 7, 16, 0.82)',
+  },
+  viewerCard: {
+    borderRadius: UI_TOKENS.radius.lg,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.24)',
+    backgroundColor: COLORS.card,
+    overflow: 'hidden',
+  },
+  viewerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: UI_TOKENS.spacing.md,
+    paddingTop: UI_TOKENS.spacing.md,
+    paddingBottom: UI_TOKENS.spacing.xs,
+    gap: UI_TOKENS.spacing.sm,
+  },
+  viewerTitle: {
+    flex: 1,
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.subtitle + 2,
+    fontWeight: '700',
+  },
+  viewerCloseButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(162,167,179,0.12)',
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.24)',
+  },
+  viewerImage: {
+    width: '100%',
+    height: 420,
+    backgroundColor: 'rgba(255,255,255,0.02)',
   },
   buttonDisabled: { opacity: 0.6 },
 });

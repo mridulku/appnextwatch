@@ -25,6 +25,7 @@
 | 2.0 | 2026-02-21 | Codex | Wellness IA checkpoint: root tabs reduced to Gym/Food/Test, Gym + Food now include first-class Chat tabs, Home/Sessions moved under Test (Later), and Gym Chat now uses Supabase Edge Function `chat_db` with OpenAI-backed DB-context responses + debug payload visibility |
 | 2.1 | 2026-02-24 | Codex | Gym delivery checkpoint: DB-backed Sessions + Templates flows, expanded/scored muscle-exercise-machine mapping surfaces, Gym Chat history UX, and server-side OpenAI Whisper voice-to-text via Edge Function `chat_transcribe` |
 | 2.2 | 2026-02-25 | Codex | Added experimental Gym `Chat Lab` tab for unstructured text → structured `create_session` parsing via dedicated Edge Function `chat_session_lab_parse`, with client-side confirmation before DB session creation |
+| 2.3 | 2026-02-26 | Codex | Wellness-first restructure: removed category-based app entry, made Wellness the only post-login shell, and embedded Movies as a first-class Wellness tab |
 
 ### Implementation Notes
 - 2026-02-16: Codebase was reorganized to mirror runtime navigation and module responsibilities:
@@ -144,24 +145,31 @@
   - `Complete session` finalizes the active recording and persists it as session-linked audio log.
   - Added session-level saved recordings UI with per-part playback/transcription and combined transcript generation.
   - Added DB linkage field `user_audio_clips.gym_session_id` for deterministic session-audio retrieval.
+- 2026-02-26: Wellness-first app shell:
+  - Removed category-gated app startup routing (`movies/fitness/food` selector path).
+  - App now routes authenticated users directly into `WellnessApp`.
+  - Added `Movies` as a top-level Wellness tab (`Gym`, `Food`, `Movies`, `Test`) by embedding existing `MoviesAppNavigator`.
+  - Removed category-switch affordances from shared settings and movie profile.
 
 > NOTE:
 > This PRD is derived only from the current NextWatch app code under `appnextwatch/`.
 > Claims below are backed by code references. Items not directly inferable are marked as assumptions/open questions.
 
 ## 1. Context
-NextWatch is an Expo React Native app that currently operates as a multi-mode product with two active experiences:
-- **Movies app mode** (explore reels, directory, chat, lists, profile)
-- **Wellness app mode** labeled **Fitness / Food** (sessions, home, gym hub, food hub)
+NextWatch is an Expo React Native app with a Wellness-first shell and four primary tabs:
+- **Gym**
+- **Food**
+- **Movies** (embedded movie navigator)
+- **Test**
 
 Code references:
 - `appnextwatch/App.js`
 - `appnextwatch/screens/CategorySelectorScreen.js`
 
 ### 1.1 Product Shape Today
-- App launches to login (demo credentials flow), then routes by saved category (`movies`, `fitness`, `food`) or shows category selector.
-- Movies mode is a bottom-tab app with nested stacks for directory, lists, and profile.
-- Wellness mode is a bottom-tab app with `Gym`, `Food`, and `Test`; legacy Home/Sessions experiences are now exposed as Test-only "Later" tools.
+- App launches to login (demo credentials flow), then routes authenticated users directly to `WellnessApp`.
+- Wellness mode is a bottom-tab app with `Gym`, `Food`, `Movies`, and `Test`; legacy Home/Sessions experiences are exposed as Test-only "Later" tools.
+- Movies experience remains a nested movie-tab navigator, now mounted inside Wellness as the `Movies` tab.
 
 Code references:
 - `appnextwatch/screens/LoginScreen.js`

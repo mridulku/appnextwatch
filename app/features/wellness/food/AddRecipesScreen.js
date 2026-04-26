@@ -21,12 +21,13 @@ import { FOOD_RECIPES } from '../../../data/wellness/foodRecipes';
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
 
-const CATEGORY_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Other'];
+const CATEGORY_ORDER = ['Breakfast', 'Lunch / Dinner', 'Snacks', 'Other'];
 const FOOTER_HEIGHT = 74;
 
 function normalizeMealType(row) {
   const value = String(row?.meal_type || '').trim();
   if (!value) return 'Other';
+  if (value === 'Lunch' || value === 'Dinner') return 'Lunch / Dinner';
   if (CATEGORY_ORDER.includes(value)) return value;
   return 'Other';
 }

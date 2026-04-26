@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AppNextwatch Strategy Note</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --accent-2: #0f766e;
+      --warn: #b45309;
+      --warn-soft: #fffbeb;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    body {
+      padding: 32px;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #3b82f6 100%);
+      color: white;
+      border-radius: 20px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.18);
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      line-height: 1.15;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 980px;
+      color: rgba(255,255,255,0.92);
+      font-size: 15px;
+    }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 20px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .toc-toggle {
+      display: block;
+    }
+
+    .toc-toggle summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
+      transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .toc-toggle summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .toc-toggle summary:hover {
+      border-color: #bfdbfe;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.08);
+    }
+
+    .toc-toggle[open] summary {
+      border-color: #bfdbfe;
+      background: linear-gradient(180deg, #f8fbff 0%, #f3f8ff 100%);
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.08);
+      margin-bottom: 14px;
+    }
+
+    .toc-summary-copy {
+      min-width: 0;
+    }
+
+    .toc-summary-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+      line-height: 1.2;
+    }
+
+    .toc-summary-title::before {
+      content: "▸";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      flex: 0 0 auto;
+    }
+
+    .toc-toggle[open] .toc-summary-title::before {
+      content: "▾";
+    }
+
+    .toc-summary-subtitle {
+      margin: 6px 0 0 36px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .toc-summary-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .toc ul {
+      margin: 0;
+      padding-left: 22px;
+      columns: 1;
+      column-gap: 0;
+    }
+
+    .toc li {
+      margin: 6px 0;
+      break-inside: avoid;
+    }
+
+    .toc a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .toc ul ul {
+      margin-top: 6px;
+      padding-left: 20px;
+    }
+
+    .toc .toc-subsection {
+      list-style: circle;
+    }
+
+    .toc-content {
+      padding: 4px 6px 2px;
+    }
+
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin: 28px 0 12px;
+      font-size: 21px;
+      line-height: 1.3;
+    }
+
+    h4 {
+      margin: 20px 0 10px;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0 14px;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .note {
+      background: #f8fbff;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      padding: 14px 16px;
+      margin: 16px 0;
+    }
+
+    .warn {
+      background: var(--warn-soft);
+      border-left-color: var(--warn);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 4px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      background: #fcfcfd;
+    }
+
+    .card h4 {
+      margin-top: 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    table {
+      width: max-content;
+      min-width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 12px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: var(--accent-soft);
+      color: #111827;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .subtle th {
+      background: #f3f4f6;
+    }
+
+    .is-resizable-table th {
+      min-width: 120px;
+    }
+
+    .column-resize-handle {
+      position: absolute;
+      top: 0;
+      right: -4px;
+      width: 8px;
+      height: 100%;
+      cursor: col-resize;
+      user-select: none;
+      touch-action: none;
+      z-index: 2;
+    }
+
+    .column-resize-handle::after {
+      content: "";
+      position: absolute;
+      top: 20%;
+      bottom: 20%;
+      left: 50%;
+      width: 2px;
+      transform: translateX(-50%);
+      background: rgba(37, 99, 235, 0.16);
+      border-radius: 999px;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    .is-resizable-table th:hover .column-resize-handle::after,
+    .is-resizable-table th.is-resizing .column-resize-handle::after {
+      opacity: 1;
+    }
+
+    .code {
+      background: #111827;
+      color: #f9fafb;
+      padding: 14px 16px;
+      border-radius: 14px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      margin: 14px 0;
+    }
+
+    .workflow-box {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin: 14px 0;
+      background: #fbfdff;
+    }
+
+    .workflow-box h4 {
+      margin-top: 0;
+      color: #111827;
+    }
+
+    .screen-shot {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      background: #f8fafc;
+      box-shadow: var(--shadow);
+      margin: 16px auto;
+      max-width: 420px;
+    }
+
+    .screen-shot img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #e5e7eb;
+    }
+
+    .screen-shot-caption {
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .wireframe-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .wireframe-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #fcfcfd;
+      padding: 16px;
+    }
+
+    .wireframe-card h4 {
+      margin: 0 0 10px;
+    }
+
+    .wireframe-box {
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      padding: 14px;
+      margin: 12px 0 14px;
+    }
+
+    .wireframe-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .wireframe-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .wireframe-chip,
+    .wireframe-block,
+    .wireframe-square {
+      border: 1px solid #dbe3ee;
+      background: #fff;
+      border-radius: 12px;
+    }
+
+    .wireframe-chip {
+      height: 30px;
+      min-width: 62px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .wireframe-block {
+      height: 44px;
+      flex: 1;
+    }
+
+    .wireframe-square {
+      width: 46px;
+      height: 46px;
+      flex: 0 0 auto;
+    }
+
+    .wireframe-tall {
+      height: 110px;
+      border-radius: 18px;
+    }
+
+    .wireframe-grid-7 {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .wireframe-day {
+      aspect-ratio: 1 / 1;
+      border: 1px solid #dbe3ee;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .mini-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 26px 0;
+    }
+
+    .commentable-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .comment-trigger {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .comment-trigger:hover {
+      background: var(--accent-soft);
+    }
+
+    .comment-anchor {
+      margin: 10px 0 14px;
+    }
+
+    .comment-editor,
+    .saved-comment-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fbfdff;
+      padding: 14px;
+    }
+
+    .comment-editor {
+      margin-top: 10px;
+    }
+
+    .comment-editor textarea,
+    .review-output {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .saved-comment-card {
+      border-left: 4px solid var(--accent);
+    }
+
+    .saved-comment-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .saved-comment-text {
+      white-space: pre-wrap;
+    }
+
+    .comment-actions,
+    .review-panel-actions,
+    .review-output-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .comment-btn,
+    .review-widget-toggle,
+    .review-panel button {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .comment-btn.primary,
+    .review-widget-toggle,
+    .review-panel .primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .comment-btn.danger,
+    .review-panel .danger {
+      color: #b91c1c;
+      border-color: #fecaca;
+      background: #fff;
+    }
+
+    .comment-btn:hover,
+    .review-widget-toggle:hover,
+    .review-panel button:hover,
+    .comment-btn.primary:hover,
+    .review-panel .primary:hover {
+      filter: brightness(0.98);
+    }
+
+    .review-widget {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 30;
+    }
+
+    .review-widget-toggle {
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+      border-radius: 999px;
+      padding: 12px 16px;
+    }
+
+    .review-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 0 7px;
+      margin-left: 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .review-panel {
+      position: fixed;
+      right: 24px;
+      bottom: 84px;
+      width: min(460px, calc(100vw - 32px));
+      max-height: min(76vh, 820px);
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+      z-index: 31;
+      display: none;
+    }
+
+    .review-panel.is-open {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .review-panel-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      background: #fbfdff;
+    }
+
+    .review-panel-header h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .review-panel-body {
+      padding: 16px 18px 18px;
+      overflow: auto;
+    }
+
+    .review-comment-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .review-comment-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: #fcfcfd;
+    }
+
+    .review-comment-item h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+    }
+
+    .review-comment-item .review-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .review-empty {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0;
+    }
+
+    @media (max-width: 960px) {
+      body { padding: 18px; }
+      .toc ul { columns: 1; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .wireframe-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 28px; }
+      h2 { font-size: 24px; }
+      .review-widget,
+      .review-panel {
+        right: 18px;
+      }
+      .toc-toggle summary {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .toc-summary-subtitle {
+        margin-left: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <section class="hero">
+      <h1>AppNextwatch Product Strategy Note</h1>
+      <p>
+        This is the living product and systems document for AppNextwatch. It is meant to explain how the current app is structured,
+        how a user actually moves through each tab, what data and database layers support those interactions, and where future orchestration
+        decisions should be made. The document is intentionally operational: it should be usable as both product reference and build-planning surface.
+      </p>
+    </section>
+
+    <section class="toc">
+      <details class="toc-toggle">
+        <summary>
+          <div class="toc-summary-copy">
+            <div class="toc-summary-title">Contents</div>
+            <p class="toc-summary-subtitle">Expand for the current app map, user journeys, data model, and release workflow.</p>
+          </div>
+          <span class="toc-summary-meta">Living Doc</span>
+        </summary>
+        <div class="toc-content">
+          <ul>
+            <li><a href="#overview">1. Document Purpose</a></li>
+            <li><a href="#product-snapshot">2. Product Snapshot</a></li>
+            <li><a href="#navigation-architecture">3. Navigation Architecture</a></li>
+            <li><a href="#screen-atlas">4. Screen Atlas and Wireframes</a></li>
+            <li><a href="#gym-tab">5. Gym Tab</a></li>
+            <li><a href="#food-tab">6. Food Tab</a></li>
+            <li><a href="#movies-tab">7. Movies Tab</a></li>
+            <li><a href="#settings-tab">8. Settings Tab</a></li>
+            <li><a href="#test-tab">9. Test Tab</a></li>
+            <li><a href="#data-layer">10. Data and Backend Architecture</a></li>
+            <li><a href="#release-ops">11. Release and Operating Model</a></li>
+            <li><a href="#orchestration-priorities">12. Product Direction and Orchestration Priorities</a></li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <section class="section" id="overview">
+      <h2>1. Document Purpose</h2>
+      <p>
+        AppNextwatch is no longer a single-purpose movie app. It is now a multi-surface personal product with five active bottom tabs:
+        <strong>Gym</strong>, <strong>Food</strong>, <strong>Movies</strong>, <strong>Settings</strong>, and <strong>Test</strong>.
+        Each tab serves a different product role, and each role has a different relationship to persistent data, user flow, and release risk.
+      </p>
+      <p>
+        This note should answer five practical questions at all times:
+      </p>
+      <ul>
+        <li>What does the user see first in each tab?</li>
+        <li>What is the main action loop in that tab?</li>
+        <li>Which screens and stacks are involved?</li>
+        <li>Which data tables or APIs power the experience?</li>
+        <li>Which parts are core product, support systems, or experiments?</li>
+      </ul>
+      <div class="note">
+        <strong>Working principle:</strong> the document should reflect the app <em>as implemented</em>, not an idealized roadmap version. Future ideas belong in the final section as priorities, not as if they already exist.
+      </div>
+    </section>
+
+    <section class="section" id="product-snapshot">
+      <h2>2. Product Snapshot</h2>
+      <p>
+        The current app shape is best understood as one stable shell with five tabs, where Gym is the most execution-driven product area,
+        Movies is the most content-browsing area, Settings is the support/admin surface, and Test is the experiment lab.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tab</th>
+              <th>Primary User Job</th>
+              <th>Main Entry Screen</th>
+              <th>Data Pattern</th>
+              <th>Product Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Gym</strong></td>
+              <td>View, plan, and log gym sessions against specific calendar dates.</td>
+              <td>`GymHubScreen` embedding `GymSessionsScreen`</td>
+              <td>Supabase-backed session, exercise, set, and catalog tables</td>
+              <td>Core execution loop</td>
+            </tr>
+            <tr>
+              <td><strong>Food</strong></td>
+              <td>Browse and use a personal recipe list from a simplified food home.</td>
+              <td>`FoodHubScreen` embedding `CookHomeScreen`</td>
+              <td>Supabase-backed user recipes, inventory, utensils, and catalog data</td>
+              <td>Secondary lifestyle module</td>
+            </tr>
+            <tr>
+              <td><strong>Movies</strong></td>
+              <td>Discover, browse, and drill into movies, talent, and awards.</td>
+              <td>`MoviesAppNavigator` with Explore / Directory / Chat / Lists / Profile</td>
+              <td>Supabase-backed movie directory plus local fallback data</td>
+              <td>Content and exploration module</td>
+            </tr>
+            <tr>
+              <td><strong>Settings</strong></td>
+              <td>Manage library-like reference data that no longer belongs in the main tabs.</td>
+              <td>`SettingsHubScreen`</td>
+              <td>Same Supabase tables as Gym/Food, but exposed as management screens</td>
+              <td>Support infrastructure</td>
+            </tr>
+            <tr>
+              <td><strong>Test</strong></td>
+              <td>Run infra checks and prototype gym-adjacent experiments.</td>
+              <td>`TestHomeScreen`</td>
+              <td>Mixed: Supabase probes, chat experiments, audio recorder, voice prototypes</td>
+              <td>Experiment and diagnostic lab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pill-row">
+        <span class="pill">Gym is the strongest product spine</span>
+        <span class="pill">Settings is now support, not front-stage</span>
+        <span class="pill">Test is intentionally non-core</span>
+      </div>
+    </section>
+
+    <section class="section" id="navigation-architecture">
+      <h2>3. Navigation Architecture</h2>
+      <p>
+        The app uses a root auth gate, then a wellness-first shell that contains the five bottom tabs. Movies is not a separate app anymore; it is nested as one tab inside the broader shell.
+      </p>
+      <div class="table-wrap">
+        <table class="subtle">
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>What It Does</th>
+              <th>Current Implementation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Auth gate</strong></td>
+              <td>Decides whether the user sees login or the product shell.</td>
+              <td>`RootNavigator` in `app/App.js`, driven by `AuthContext`.</td>
+            </tr>
+            <tr>
+              <td><strong>Main shell</strong></td>
+              <td>Bottom-tab layout for Gym, Food, Movies, Settings, and Test.</td>
+              <td>`WellnessAppNavigator` in `app/App.js`.</td>
+            </tr>
+            <tr>
+              <td><strong>Per-tab stacks</strong></td>
+              <td>Each tab owns its own stack so detail screens feel local to that tab.</td>
+              <td>`WellnessGymStack`, `WellnessFoodStack`, `WellnessSettingsStack`, `WellnessTestStack`, plus nested movie stacks.</td>
+            </tr>
+            <tr>
+              <td><strong>Shared visual shell</strong></td>
+              <td>Ensures a common dark theme, hidden stack headers where appropriate, and consistent tab styling.</td>
+              <td>`SHARED_STACK_OPTIONS` and theme tokens in `app/theme/colors.js` and `app/ui/tokens.js`.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h4>Login state</h4>
+          <p>
+            Authentication is currently local/demo authentication, not remote identity. `AuthContext` validates against seeded users and stores the current user in memory.
+          </p>
+          <p class="muted">Implication: login is product framing, not security boundary.</p>
+        </div>
+        <div class="card">
+          <h4>App user resolution</h4>
+          <p>
+            Once inside wellness modules, the app resolves or creates an `app_users` row in Supabase so user-owned wellness data can be attached to a stable database identity.
+          </p>
+          <p class="muted">Implication: the UI auth user and the persistence-layer app user are related, but not the same concept.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="screen-atlas">
+      <h2>4. Screen Atlas and Wireframes</h2>
+      <p>
+        This section is the start of a living screen reference. Where possible, it should use real screenshots from the simulator. Where a live capture is not yet available, it should still document the layout as a wireframe so product changes can be discussed against something concrete.
+      </p>
+      <div class="note">
+        <strong>Current capture state:</strong> the Gym home calendar below is a real simulator screenshot captured from the running app. The remaining layouts are code-derived wireframes based on the current screen implementations. This split exists because the simulator in this environment can be launched and captured, but cannot be fully driven by accessibility automation from this terminal session.
+      </div>
+
+      <h3>Live capture: Gym home</h3>
+      <div class="screen-shot">
+        <img src="./strategy_assets/simulator-current.png" alt="Gym home calendar screenshot from iOS simulator" />
+        <div class="screen-shot-caption">
+          Real current-state capture. The screen opens directly into the Gym calendar with month controls, an info button for the legend modal, a list/calendar toggle, and day cells that encode session state.
+        </div>
+      </div>
+
+      <h3>Key screen wireframes</h3>
+      <div class="wireframe-grid">
+        <div class="wireframe-card">
+          <h4>Gym home calendar</h4>
+          <div class="wireframe-box">
+            <div class="wireframe-row">
+              <div class="wireframe-square"></div>
+              <div class="wireframe-block"></div>
+              <div class="wireframe-square"></div>
+              <div class="wireframe-square"></div>
+              <div class="wireframe-square"></div>
+            </div>
+            <div class="wireframe-grid-7">
+              <div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div>
+              <div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div>
+              <div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div><div class="wireframe-day"></div>
+            </div>
+          </div>
+          <p><strong>Purpose:</strong> entry point for planning, review, and retro-logging.</p>
+          <p><strong>Main actions:</strong> change month, toggle list/calendar, open legend modal, tap a session day, tap an empty day.</p>
+          <p><strong>Data dependency:</strong> `user_gym_sessions` plus exercise metadata to derive status and day type.</p>
+        </div>
+
+        <div class="wireframe-card">
+          <h4>Create session builder</h4>
+          <div class="wireframe-box">
+            <div class="wireframe-row">
+              <div class="wireframe-block"></div>
+              <div class="wireframe-chip">Add</div>
+            </div>
+            <div class="wireframe-row">
+              <div class="wireframe-block wireframe-tall"></div>
+            </div>
+            <div class="wireframe-row">
+              <div class="wireframe-block wireframe-tall"></div>
+            </div>
+          </div>
+          <p><strong>Purpose:</strong> build a session from exercises only, without overloading the user with metadata.</p>
+          <p><strong>Main actions:</strong> add exercise, expand a card, edit sets, reorder cards, continue.</p>
+          <p><strong>Data dependency:</strong> movement and variant options from the gym catalog tables.</p>
+        </div>
+
+        <div class="wireframe-card">
+          <h4>Finalize session</h4>
+          <div class="wireframe-box">
+            <div class="wireframe-row"><div class="wireframe-block"></div></div>
+            <div class="wireframe-row"><div class="wireframe-block"></div></div>
+            <div class="wireframe-row"><div class="wireframe-block"></div></div>
+          </div>
+          <p><strong>Purpose:</strong> confirm the session name and date at the end of the builder flow.</p>
+          <p><strong>Main actions:</strong> adjust title, adjust date, save the session.</p>
+          <p><strong>Constraint:</strong> only one session can be saved per day.</p>
+        </div>
+
+        <div class="wireframe-card">
+          <h4>Session detail / review</h4>
+          <div class="wireframe-box">
+            <div class="wireframe-row"><div class="wireframe-block"></div></div>
+            <div class="wireframe-row"><div class="wireframe-block wireframe-tall"></div></div>
+            <div class="wireframe-row"><div class="wireframe-block wireframe-tall"></div></div>
+          </div>
+          <p><strong>Purpose:</strong> review a session in a static, scrollable format.</p>
+          <p><strong>Main actions:</strong> inspect collapsed or expanded exercise cards, duplicate, delete, or start a planned session.</p>
+          <p><strong>Behavior:</strong> collapsed cards surface planned or actual set chips depending on session state.</p>
+        </div>
+
+        <div class="wireframe-card">
+          <h4>Session player</h4>
+          <div class="wireframe-box">
+            <div class="wireframe-row">
+              <div class="wireframe-chip">Back</div>
+              <div class="wireframe-block"></div>
+            </div>
+            <div class="wireframe-row">
+              <div class="wireframe-block"></div>
+              <div class="wireframe-square"></div>
+              <div class="wireframe-square"></div>
+            </div>
+            <div class="wireframe-row">
+              <div class="wireframe-block wireframe-tall"></div>
+            </div>
+            <div class="wireframe-row">
+              <div class="wireframe-block"></div>
+              <div class="wireframe-block"></div>
+              <div class="wireframe-block"></div>
+            </div>
+          </div>
+          <p><strong>Purpose:</strong> execute the workout one exercise at a time.</p>
+          <p><strong>Main actions:</strong> pause/resume, complete, edit planned-as-done sets, move previous/next, view last-time reference and video.</p>
+          <p><strong>Behavior:</strong> leaving the screen pauses the local session timer UI.</p>
+        </div>
+
+        <div class="wireframe-card">
+          <h4>Settings home</h4>
+          <div class="wireframe-box">
+            <div class="wireframe-row"><div class="wireframe-block"></div></div>
+            <div class="wireframe-row"><div class="wireframe-block"></div></div>
+          </div>
+          <p><strong>Purpose:</strong> route into Gym settings or Food settings without turning Settings into another mini-app home.</p>
+          <p><strong>Main actions:</strong> open Gym settings, open Food settings, then return back to Settings home.</p>
+          <p><strong>Product role:</strong> support infrastructure, not primary product loop.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="gym-tab">
+      <h2>5. Gym Tab</h2>
+      <p>
+        Gym is the most productized area of the app. The home is now directly calendar-first. The user lands on a month selector and a calendar/list toggle, then interacts with days rather than generic session lists.
+      </p>
+      <div class="note">
+        <strong>Current product model:</strong> one date corresponds to at most one session. A day can therefore be rendered as a single calendar cell with one dominant state: completed, planned, missed, rest, or nothing planned.
+      </div>
+      <h3>Main user flow</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Step</th>
+              <th>User Action</th>
+              <th>What the App Does</th>
+              <th>Primary Files</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Open Gym tab</td>
+              <td>Show the Gym title bar and immediately render the sessions calendar surface.</td>
+              <td>`app/features/wellness/gym/GymHubScreen.js`, `app/features/wellness/gym/GymSessionsScreen.js`</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Change month or switch calendar/list view</td>
+              <td>Recompute month cells and render session state per day.</td>
+              <td>`GymSessionsScreen.js`</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Tap a day with a session</td>
+              <td>Navigate into the static session detail / review flow.</td>
+              <td>`GymSessionWorkScreen.js`, `GymLogDetailScreen.js`</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Tap an empty day</td>
+              <td>Open create-session flow with that date prefilled, allowing retroactive or future planning against a specific calendar day.</td>
+              <td>`GymSessionCreateScreen.js`, `GymSessionFinalizeScreen.js`</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Start an upcoming or ongoing session</td>
+              <td>Enter the dedicated session player, one exercise card at a time.</td>
+              <td>`GymSessionPlayerScreen.js`</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Log actual sets and complete the session</td>
+              <td>Persist actual set logs, move session status through in-progress and complete, and preserve the workout in history.</td>
+              <td>`GymSessionWorkScreen.js`, `GymSessionPlayerScreen.js`, `gymSessionsDb.js`</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Current Gym surfaces</h3>
+      <ul>
+        <li><strong>Calendar/list home:</strong> primary planning and review surface.</li>
+        <li><strong>Create session:</strong> image-first builder where movements and variants are chosen, ordered, and given planned sets.</li>
+        <li><strong>Finalize session:</strong> name and date confirmation before save.</li>
+        <li><strong>Session work screen:</strong> static detailed view of planned vs actual with duplication and deletion actions.</li>
+        <li><strong>Session player:</strong> focused workout execution mode with planned sets, last-time reference, inline editing, and exercise progression.</li>
+        <li><strong>Catalog and settings screens:</strong> muscles, exercises, and machines are no longer first-class home content; they live under Settings.</li>
+      </ul>
+
+      <h3>Gym data model</h3>
+      <div class="table-wrap">
+        <table class="subtle">
+          <thead>
+            <tr>
+              <th>Table / Concept</th>
+              <th>Purpose</th>
+              <th>Used By</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>`app_users`</strong></td>
+              <td>Persistent per-user identity used by wellness data.</td>
+              <td>`foodInventoryDb.js`, `gymSessionsDb.js`</td>
+            </tr>
+            <tr>
+              <td><strong>`user_gym_sessions`</strong></td>
+              <td>Session headers: title, date, status, duration, calories, note, started/completed timestamps.</td>
+              <td>Gym calendar, work screen, player, duplication, deletion</td>
+            </tr>
+            <tr>
+              <td><strong>`user_gym_session_exercises`</strong></td>
+              <td>Ordered exercise rows inside a session.</td>
+              <td>Create flow, detail view, player, reorder logic</td>
+            </tr>
+            <tr>
+              <td><strong>`user_gym_session_sets`</strong></td>
+              <td>Planned and actual set-level values.</td>
+              <td>Logging actuals, showing planned vs done, history comparisons</td>
+            </tr>
+            <tr>
+              <td><strong>`catalog_exercise_movements`</strong></td>
+              <td>Movement-level catalog with primary day, media, aliases, and presentation metadata.</td>
+              <td>Create screen, session views, calendar day-type labels</td>
+            </tr>
+            <tr>
+              <td><strong>`catalog_exercises`</strong></td>
+              <td>Variant-level exercise entries with equipment, muscle group, images, and variant labels.</td>
+              <td>Create screen, detail views, settings catalogs</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <strong>Current product constraint:</strong> the save flow enforces one session per calendar day. That is now a product rule, not just a UI preference.
+      </div>
+      <h3>How the user experiences Gym now</h3>
+      <div class="grid-2">
+        <div class="card">
+          <h4>Calendar-first planning</h4>
+          <p>
+            The user does not start from a generic “record session” widget anymore. They start from the date layer itself. Empty days become opportunities to plan or retro-log, and filled days become entry points into review or execution.
+          </p>
+        </div>
+        <div class="card">
+          <h4>Execution-first logging</h4>
+          <p>
+            Planned sessions are meant to become active sessions through the player. The player is deliberately narrower than the detail screen: one exercise at a time, inline set editing, and progression through the workout.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="food-tab">
+      <h2>6. Food Tab</h2>
+      <p>
+        Food has been simplified aggressively. The main Food tab is no longer a multi-surface space with chat, planning, and library browsing. It now behaves more like a focused recipe session surface with add actions and a personal saved-recipe list.
+      </p>
+      <h3>Main user flow</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Step</th>
+              <th>User Action</th>
+              <th>What the App Does</th>
+              <th>Primary Files</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Open Food tab</td>
+              <td>Show a simple Food title bar and embed the recipe home without extra hero clutter.</td>
+              <td>`FoodHubScreen.js`, `CookHomeScreen.js`</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Browse saved recipes by meal category</td>
+              <td>Render recipe sections for Breakfast, Lunch, Dinner, Snacks, and Other, with collapse support.</td>
+              <td>`CookHomeScreen.js`</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Add a recipe</td>
+              <td>Open add-recipe flow and persist user-owned recipe selections.</td>
+              <td>`AddRecipesScreen.js`, catalog selection hooks</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Open a saved recipe</td>
+              <td>Navigate into cooking session or recipe-detail flow.</td>
+              <td>`CookRecipeScreen.js`</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Food storage pattern</h3>
+      <p>
+        Food shares the same Supabase client and app-user model as Gym. It uses user-owned inventory, utensils, and recipes backed by catalog tables and user join tables. The main home uses a generic catalog-selection pattern rather than a bespoke recipe-only implementation.
+      </p>
+      <div class="table-wrap">
+        <table class="subtle">
+          <thead>
+            <tr>
+              <th>Area</th>
+              <th>Current Behavior</th>
+              <th>Where It Lives Now</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Recipes</strong></td>
+              <td>Main content in Food tab.</td>
+              <td>`CookHomeScreen.js`</td>
+            </tr>
+            <tr>
+              <td><strong>Inventory</strong></td>
+              <td>No longer front-stage in Food home.</td>
+              <td>Settings → Food settings</td>
+            </tr>
+            <tr>
+              <td><strong>Utensils</strong></td>
+              <td>No longer front-stage in Food home.</td>
+              <td>Settings → Food settings</td>
+            </tr>
+            <tr>
+              <td><strong>Food chat / plan</strong></td>
+              <td>Removed from the main Food tab because they were not core to the current use loop.</td>
+              <td>Not part of primary product flow</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Food backend shape</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data Family</th>
+              <th>Main Tables / Modules</th>
+              <th>Why It Matters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>User identity</strong></td>
+              <td>`app_users`, resolved through `getOrCreateAppUser()`</td>
+              <td>Food ownership is attached to the same persistent app user as Gym.</td>
+            </tr>
+            <tr>
+              <td><strong>Inventory</strong></td>
+              <td>`user_ingredients`, `catalog_ingredients`, `foodInventoryDb.js`</td>
+              <td>Inventory is still an important data layer even though it is no longer the homepage surface.</td>
+            </tr>
+            <tr>
+              <td><strong>Utensils</strong></td>
+              <td>User utensil tables and add/detail screens</td>
+              <td>These are support systems for cooking flows and settings management.</td>
+            </tr>
+            <tr>
+              <td><strong>Recipes</strong></td>
+              <td>Recipe list and cook session modules</td>
+              <td>This is the part the user actually sees first when entering the Food tab.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="movies-tab">
+      <h2>7. Movies Tab</h2>
+      <p>
+        Movies remains a richer browsing module with its own nested tab navigator. It is structurally different from Gym and Food because it is not centered on user-owned daily logging. Instead, it is centered on discovery, directory exploration, and media detail.
+      </p>
+      <h3>Movies sub-navigation</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Movie Sub-Tab</th>
+              <th>Job</th>
+              <th>Current Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Explore</strong></td>
+              <td>Swipe or scroll through movie-first discovery.</td>
+              <td>`ExploreReelsScreen` loads movies from Supabase with local fallback data and presents trailer-rich reel cards.</td>
+            </tr>
+            <tr>
+              <td><strong>Directory</strong></td>
+              <td>Browse movies, actors, actresses, directors, and awards.</td>
+              <td>`DirectoryScreen` hydrates data from Supabase and opportunistically enriches missing wiki images.</td>
+            </tr>
+            <tr>
+              <td><strong>Chat</strong></td>
+              <td>Movie chat surface.</td>
+              <td>Still exists in the nested Movies navigator; currently one of the client-side OpenAI surfaces.</td>
+            </tr>
+            <tr>
+              <td><strong>Lists</strong></td>
+              <td>Browse curated or structured movie collections.</td>
+              <td>`ListsHomeScreen` plus `ListDetailScreen`.</td>
+            </tr>
+            <tr>
+              <td><strong>Profile</strong></td>
+              <td>User-side movie profile and watched films.</td>
+              <td>`ProfileScreen`, `FilmsWatchedScreen`.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Movies uses Supabase heavily for persistent content (`movies`, `actors`, `directors`, award-related tables), but unlike Gym, it still preserves local fallback datasets so the experience can remain usable if the backend response is missing or incomplete.
+      </p>
+      <div class="table-wrap">
+        <table class="subtle">
+          <thead>
+            <tr>
+              <th>Movies System Layer</th>
+              <th>Current Implementation</th>
+              <th>Operational Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Content fetch</strong></td>
+              <td>`supabaseApi.js` and related directory hooks</td>
+              <td>Primary content path for movies, talent, and awards.</td>
+            </tr>
+            <tr>
+              <td><strong>Fallback data</strong></td>
+              <td>Bundled local movie datasets</td>
+              <td>Keeps the experience usable when Supabase is unavailable or incomplete.</td>
+            </tr>
+            <tr>
+              <td><strong>Detail navigation</strong></td>
+              <td>Nested stacks inside the Movies tab</td>
+              <td>Makes Movies behave like a self-contained content product inside the broader app.</td>
+            </tr>
+            <tr>
+              <td><strong>Chat</strong></td>
+              <td>Client-side OpenAI path, still present</td>
+              <td>Known architectural debt; should migrate server-side if retained.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note warn">
+        <strong>Security note:</strong> the movie chat surface still depends on client-side OpenAI wiring in the current app. That is acceptable for development, but not the desired long-term production architecture.
+      </div>
+    </section>
+
+    <section class="section" id="settings-tab">
+      <h2>8. Settings Tab</h2>
+      <p>
+        Settings is now a deliberate support surface. It is no longer a dumping ground for generic profile items. Its main job is to hold the data-management screens that were cluttering Gym and Food.
+      </p>
+      <div class="grid-2">
+        <div class="card">
+          <h4>Gym settings</h4>
+          <p>
+            Provides segmented access to <strong>Muscles</strong>, <strong>Exercises</strong>, and <strong>Machines</strong>. These are catalog-management and exploration surfaces, not the main workout loop.
+          </p>
+          <p class="muted">File map: `GymSettingsScreen.js`, `MusclesHomeScreen.js`, `ExercisesHomeScreen.js`, `GymHomeScreen.js`.</p>
+        </div>
+        <div class="card">
+          <h4>Food settings</h4>
+          <p>
+            Provides segmented access to <strong>Inventory</strong> and <strong>Utensils</strong>. These are support systems for meal execution rather than homepage content.
+          </p>
+          <p class="muted">File map: `FoodSettingsScreen.js`, `FoodInventoryScreen.js`, `FoodUtensilsScreen.js`.</p>
+        </div>
+      </div>
+      <p>
+        The main architectural implication is good: the core tabs are becoming execution-oriented, while Settings carries the reference data and maintenance surfaces.
+      </p>
+      <div class="workflow-box">
+        <h4>Why Settings exists now</h4>
+        <p>
+          Settings should be treated as controlled infrastructure. If a screen exists primarily to maintain catalogs, reference lists, or support data, it belongs here rather than in the main Gym or Food tabs. This keeps the primary tabs focused on use, not administration.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="test-tab">
+      <h2>9. Test Tab</h2>
+      <p>
+        Test is intentionally not part of the main user product loop. It is a controlled lab for diagnostics and experimental features that should not crowd the real tabs.
+      </p>
+      <div class="table-wrap">
+        <table class="subtle">
+          <thead>
+            <tr>
+              <th>Group</th>
+              <th>Current Items</th>
+              <th>Why It Exists</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Infra</strong></td>
+              <td>`Tables`, `OpenAI test connection`</td>
+              <td>Validate environment configuration, Supabase connectivity, and API round-trips.</td>
+            </tr>
+            <tr>
+              <td><strong>Gym experiments</strong></td>
+              <td>`Audio Recorder`, `Voice Gym Coach`, `Basic Chat`, `Create Workout Session`</td>
+              <td>Keep experimental gym-adjacent surfaces available without polluting the real Gym product flow.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        This tab is strategically useful because it preserves speed of experimentation while protecting the main product from accumulating half-finished surfaces.
+      </p>
+      <div class="note">
+        <strong>Operational rule:</strong> if a feature is useful mainly for validation, QA, or prototyping, it should live in Test until it has a clear case for graduating into Gym, Food, Movies, or Settings.
+      </div>
+    </section>
+
+    <section class="section" id="data-layer">
+      <h2>10. Data and Backend Architecture</h2>
+      <p>
+        AppNextwatch is currently a hybrid app in terms of data patterns. The Movies area is content-oriented and partially tolerant of local fallback data. The wellness areas are user-owned and strongly tied to Supabase persistence.
+      </p>
+      <h3>Core backend layers</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Current Role</th>
+              <th>Important Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Supabase client</strong></td>
+              <td>Main persistence client for movies metadata and all wellness data.</td>
+              <td>Created lazily in `app/core/integrations/supabase.js` from `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`.</td>
+            </tr>
+            <tr>
+              <td><strong>API modules</strong></td>
+              <td>Thin data-access layer around Supabase tables and edge-function calls.</td>
+              <td>Examples: `gymSessionsDb.js`, `foodInventoryDb.js`, `supabaseApi.js`, `audioRecorderDb.js`.</td>
+            </tr>
+            <tr>
+              <td><strong>Hooks</strong></td>
+              <td>View-facing orchestration helpers that resolve user identity, hold loading/error state, and expose app actions.</td>
+              <td>Example: `useGymSessions()`.</td>
+            </tr>
+            <tr>
+              <td><strong>Supabase Edge Functions</strong></td>
+              <td>Server-side route for gym transcription and chat/orchestration experiments.</td>
+              <td>Used by Gym chat and audio-transcription paths; preferable to client-side OpenAI calls.</td>
+            </tr>
+            <tr>
+              <td><strong>Local fallbacks</strong></td>
+              <td>Static data kept for resilience or earlier app behavior.</td>
+              <td>Most visible in Movies, where local catalog data still backs the UI if Supabase fetches fail.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Important database families</h3>
+      <div class="table-wrap">
+        <table class="subtle">
+          <thead>
+            <tr>
+              <th>Database Family</th>
+              <th>Main Tables</th>
+              <th>Product Area</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>App identity</strong></td>
+              <td>`app_users`</td>
+              <td>Wellness ownership resolution</td>
+            </tr>
+            <tr>
+              <td><strong>Gym session system</strong></td>
+              <td>`user_gym_sessions`, `user_gym_session_exercises`, `user_gym_session_sets`</td>
+              <td>Gym calendar, session detail, player, history</td>
+            </tr>
+            <tr>
+              <td><strong>Gym catalog system</strong></td>
+              <td>`catalog_exercise_movements`, `catalog_exercises`</td>
+              <td>Exercise library, create-session picker, settings catalogs</td>
+            </tr>
+            <tr>
+              <td><strong>Food personal data</strong></td>
+              <td>`user_ingredients`, user recipe tables, utensil tables</td>
+              <td>Food recipes, inventory, utensils</td>
+            </tr>
+            <tr>
+              <td><strong>Movie content</strong></td>
+              <td>`movies`, `actors`, `directors`, `award_shows`, `award_years`, `award_entries`</td>
+              <td>Explore, Directory, awards, detail pages</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Infrastructure and integration notes</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Concern</th>
+              <th>Current State</th>
+              <th>Implication</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Authentication</strong></td>
+              <td>Demo/local auth through `AuthContext`; wellness data resolves to `app_users` in Supabase.</td>
+              <td>The login layer is currently a product shell, not a hardened account system.</td>
+            </tr>
+            <tr>
+              <td><strong>Environment config</strong></td>
+              <td>Supabase requires `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` to be present at build or OTA runtime.</td>
+              <td>If those values are missing, major wellness features degrade immediately.</td>
+            </tr>
+            <tr>
+              <td><strong>OpenAI architecture</strong></td>
+              <td>Gym experiments largely use Supabase Edge Functions; some Movies/Food/Test screens still use client-side OpenAI wiring.</td>
+              <td>The app currently has two AI architectures in parallel; server-side should win over time.</td>
+            </tr>
+            <tr>
+              <td><strong>Release model</strong></td>
+              <td>TestFlight provides the native shell, while most day-to-day UI and logic changes can ship over OTA.</td>
+              <td>Structural product work is now constrained not only by code, but also by runtime compatibility and release discipline.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <strong>Architectural reality:</strong> the app is already well past “single-screen prototype” stage. It has enough persistent structure now that product decisions should increasingly be made in terms of table families, route boundaries, and release risk, not just UI tweaks.
+      </div>
+    </section>
+
+    <section class="section" id="release-ops">
+      <h2>11. Release and Operating Model</h2>
+      <p>
+        The app already has a working TestFlight + OTA operating loop. That matters because this is now a daily-use product, not just a local dev sandbox.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Release Path</th>
+              <th>Use When</th>
+              <th>Current Command / Mechanism</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>OTA update</strong></td>
+              <td>JS-only changes: UI, logic, navigation, text, behavior</td>
+              <td>`npx eas-cli update --branch production --message "..."`</td>
+            </tr>
+            <tr>
+              <td><strong>Native build + submit</strong></td>
+              <td>Runtime or native changes: permissions, SDK, native packages, config</td>
+              <td>`npx eas-cli build -p ios --profile production` then submit</td>
+            </tr>
+            <tr>
+              <td><strong>Fallback submission path</strong></td>
+              <td>If `eas submit` fails</td>
+              <td>Apple Transporter or `fastlane pilot`</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The release reference already lives in `RELEASE_WORKFLOW.md`. This HTML note should not replace it. Instead, this note should help explain <em>what kind of product change</em> is being made, while `RELEASE_WORKFLOW.md` explains <em>how to ship it safely</em>.
+      </p>
+    </section>
+
+    <section class="section" id="orchestration-priorities">
+      <h2>12. Product Direction and Orchestration Priorities</h2>
+      <p>
+        The app is becoming more coherent, but that coherence is still uneven across modules. The strongest strategy is to keep deepening the most real user loops rather than expanding side surfaces.
+      </p>
+      <div class="table-wrap">
+        <table class="subtle">
+          <thead>
+            <tr>
+              <th>Priority Area</th>
+              <th>Why It Matters</th>
+              <th>Current Direction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Gym execution loop</strong></td>
+              <td>This is the clearest day-to-day utility and the strongest product spine.</td>
+              <td>Keep making planning, starting, logging, and history lower-friction.</td>
+            </tr>
+            <tr>
+              <td><strong>Food simplification</strong></td>
+              <td>Food should not become a second overloaded wellness sandbox.</td>
+              <td>Keep the main tab narrow; let support data remain in Settings.</td>
+            </tr>
+            <tr>
+              <td><strong>Movies architecture</strong></td>
+              <td>Movies is useful, but structurally different from the wellness system.</td>
+              <td>Preserve it as a content module, but be deliberate about whether it is core to the same product vision.</td>
+            </tr>
+            <tr>
+              <td><strong>Settings discipline</strong></td>
+              <td>Settings can easily become a catch-all graveyard.</td>
+              <td>Keep it limited to support and management surfaces.</td>
+            </tr>
+            <tr>
+              <td><strong>Test containment</strong></td>
+              <td>Experiments are useful only if they stay isolated from the main product loop.</td>
+              <td>Continue moving half-finished or risky surfaces into Test instead of leaving them in Gym/Food.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="workflow-box">
+        <h4>Working product thesis</h4>
+        <p>
+          AppNextwatch should evolve around a small number of real, repeatable user jobs. Right now the clearest one is gym session execution and recall. That means future orchestration work should treat the app not as a pile of features, but as a system with one strong operational core and several supporting surfaces around it.
+        </p>
+      </div>
+      <div class="note warn">
+        <strong>Main risk:</strong> if new experiments, catalogs, and side systems continue to be added without this document being updated, the app will drift back into feature accumulation. This note should be treated as the place where structural changes are made explicit before or immediately after they ship.
+      </div>
+    </section>
+
+  </div>
+  <div class="review-widget">
+    <button class="review-widget-toggle" type="button" id="review-widget-toggle">
+      Review Notes
+      <span class="review-badge" id="review-comment-count">0</span>
+    </button>
+  </div>
+
+  <aside class="review-panel" id="review-panel" aria-hidden="true">
+    <div class="review-panel-header">
+      <div>
+        <h3>Review Notes</h3>
+        <p class="muted">Section-level notes collected from this document.</p>
+      </div>
+      <button type="button" id="review-panel-close">Close</button>
+    </div>
+    <div class="review-panel-body">
+      <div class="review-panel-actions">
+        <button type="button" class="primary" id="generate-review-text">Generate Combined Review Text</button>
+        <button type="button" class="danger" id="delete-all-review-notes">Delete All Notes</button>
+      </div>
+      <div class="review-comment-list" id="review-comment-list"></div>
+      <div id="review-output-wrap" style="display:none; margin-top:16px;">
+        <h4>Combined Review Text</h4>
+        <textarea class="review-output" id="review-output" readonly></textarea>
+        <div class="review-output-actions">
+          <button type="button" class="primary" id="copy-review-text">Copy All</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var STORAGE_KEY = "appnextwatch_strategy_review_comments";
+      var TABLE_WIDTHS_KEY = "appnextwatch_strategy_table_widths";
+      var commentTargets = [
+        { id: "overview", label: "1. Document Purpose" },
+        { id: "product-snapshot", label: "2. Product Snapshot" },
+        { id: "navigation-architecture", label: "3. Navigation Architecture" },
+        { id: "screen-atlas", label: "4. Screen Atlas and Wireframes" },
+        { id: "gym-tab", label: "5. Gym Tab" },
+        { id: "food-tab", label: "6. Food Tab" },
+        { id: "movies-tab", label: "7. Movies Tab" },
+        { id: "settings-tab", label: "8. Settings Tab" },
+        { id: "test-tab", label: "9. Test Tab" },
+        { id: "data-layer", label: "10. Data and Backend Architecture" },
+        { id: "release-ops", label: "11. Release and Operating Model" },
+        { id: "orchestration-priorities", label: "12. Product Direction and Orchestration Priorities" }
+      ];
+
+      var targetMap = new Map();
+      commentTargets.forEach(function (item, index) {
+        item.order = index;
+        targetMap.set(item.id, item);
+      });
+
+      function loadComments() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function loadTableWidths() {
+        try {
+          return JSON.parse(localStorage.getItem(TABLE_WIDTHS_KEY) || "{}");
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function saveComments() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(comments));
+      }
+
+      function saveTableWidths() {
+        localStorage.setItem(TABLE_WIDTHS_KEY, JSON.stringify(tableWidths));
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function collectSavedComments() {
+        return commentTargets
+          .filter(function (target) {
+            return comments[target.id] && comments[target.id].trim();
+          })
+          .map(function (target) {
+            return {
+              id: target.id,
+              label: target.label,
+              text: comments[target.id].trim(),
+              order: target.order
+            };
+          });
+      }
+
+      function updateCount() {
+        commentCount.textContent = String(collectSavedComments().length);
+      }
+
+      function renderCombinedText() {
+        var saved = collectSavedComments();
+        if (!saved.length) {
+          reviewOutput.value = "";
+          reviewOutputWrap.style.display = "none";
+          return;
+        }
+        reviewOutput.value = saved.map(function (item) {
+          return "Section: " + item.label + "\nRequested changes:\n- " + item.text;
+        }).join("\n\n");
+        reviewOutputWrap.style.display = "block";
+      }
+
+      function renderReviewPanel() {
+        var saved = collectSavedComments();
+        if (!saved.length) {
+          reviewCommentList.innerHTML = '<p class="review-empty">No saved review notes yet.</p>';
+          return;
+        }
+        reviewCommentList.innerHTML = saved.map(function (item) {
+          return (
+            '<div class="review-comment-item">' +
+            '<h4>' + escapeHtml(item.label) + '</h4>' +
+            '<div class="review-meta">Section ID: ' + escapeHtml(item.id) + '</div>' +
+            '<div>' + escapeHtml(item.text).replace(/\n/g, "<br/>") + '</div>' +
+            '</div>'
+          );
+        }).join("");
+      }
+
+      function closeAllEditors() {
+        document.querySelectorAll(".comment-editor").forEach(function (node) {
+          node.style.display = "none";
+        });
+      }
+
+      function getCommentAnchor(sectionId) {
+        return document.querySelector('.comment-anchor[data-comment-anchor="' + sectionId + '"]');
+      }
+
+      function renderSectionComment(sectionId) {
+        var anchor = getCommentAnchor(sectionId);
+        if (!anchor) return;
+
+        var savedCard = anchor.querySelector(".saved-comment-card");
+        var editor = anchor.querySelector(".comment-editor");
+        var deleteButton = anchor.querySelector('.comment-editor [data-comment-delete="' + sectionId + '"]');
+        var existing = comments[sectionId] || "";
+
+        if (existing.trim()) {
+          savedCard.innerHTML =
+            '<div class="saved-comment-label">Review note</div>' +
+            '<div class="saved-comment-text">' + escapeHtml(existing).replace(/\n/g, "<br/>") + "</div>" +
+            '<div class="comment-actions">' +
+            '<button type="button" class="comment-btn" data-comment-edit="' + sectionId + '">Edit</button>' +
+            '<button type="button" class="comment-btn danger" data-comment-delete="' + sectionId + '">Delete</button>' +
+            "</div>";
+          savedCard.style.display = "block";
+          deleteButton.style.display = "inline-block";
+        } else {
+          savedCard.innerHTML = "";
+          savedCard.style.display = "none";
+          deleteButton.style.display = "none";
+        }
+
+        var textarea = editor.querySelector("textarea");
+        textarea.value = existing;
+        editor.style.display = "none";
+      }
+
+      function openEditor(sectionId) {
+        closeAllEditors();
+        var anchor = getCommentAnchor(sectionId);
+        if (!anchor) return;
+        var editor = anchor.querySelector(".comment-editor");
+        var textarea = anchor.querySelector("textarea");
+        var deleteButton = anchor.querySelector('.comment-editor [data-comment-delete="' + sectionId + '"]');
+        textarea.value = comments[sectionId] || "";
+        deleteButton.style.display = comments[sectionId] && comments[sectionId].trim() ? "inline-block" : "none";
+        editor.style.display = "block";
+        textarea.focus();
+      }
+
+      function attachCommentUI(target) {
+        var sectionNode = document.getElementById(target.id);
+        if (!sectionNode) return;
+
+        var heading = target.id.indexOf("mvp-") === 0
+          ? document.querySelector('h3#' + target.id + ', h4#' + target.id)
+          : sectionNode.querySelector(":scope > h2");
+        if (!heading) return;
+
+        var wrapper = document.createElement("div");
+        wrapper.className = "commentable-heading";
+        heading.parentNode.insertBefore(wrapper, heading);
+        wrapper.appendChild(heading);
+
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "comment-trigger";
+        button.textContent = "+ Comment";
+        button.setAttribute("data-comment-open", target.id);
+        wrapper.appendChild(button);
+
+        var anchor = document.createElement("div");
+        anchor.className = "comment-anchor";
+        anchor.setAttribute("data-comment-anchor", target.id);
+        anchor.innerHTML =
+          '<div class="saved-comment-card" style="display:none;"></div>' +
+          '<div class="comment-editor" style="display:none;">' +
+          '<textarea placeholder="Add review note for this section..."></textarea>' +
+          '<div class="comment-actions">' +
+          '<button type="button" class="comment-btn primary" data-comment-save="' + target.id + '">Save</button>' +
+          '<button type="button" class="comment-btn" data-comment-cancel="' + target.id + '">Cancel</button>' +
+          '<button type="button" class="comment-btn danger" data-comment-delete="' + target.id + '" style="display:none;">Delete</button>' +
+          '</div>' +
+          '</div>';
+
+        wrapper.insertAdjacentElement("afterend", anchor);
+        renderSectionComment(target.id);
+      }
+
+      function makeTableKey(table, tableIndex) {
+        var section = table.closest(".section");
+        var sectionId = section ? section.id : "document";
+        var headers = Array.prototype.slice.call(table.querySelectorAll("thead th"))
+          .map(function (th) {
+            return th.textContent.replace(/\s+/g, " ").trim().toLowerCase();
+          })
+          .join("|");
+        return sectionId + "::" + tableIndex + "::" + headers;
+      }
+
+      function ensureColGroup(table, columnCount) {
+        var colgroup = table.querySelector("colgroup");
+        if (!colgroup) {
+          colgroup = document.createElement("colgroup");
+          for (var i = 0; i < columnCount; i += 1) {
+            colgroup.appendChild(document.createElement("col"));
+          }
+          table.insertBefore(colgroup, table.firstChild);
+        }
+        while (colgroup.children.length < columnCount) {
+          colgroup.appendChild(document.createElement("col"));
+        }
+        return colgroup;
+      }
+
+      function applyStoredWidths(table, tableKey, headers, colgroup) {
+        var stored = tableWidths[tableKey];
+        if (!stored) return;
+        headers.forEach(function (header, index) {
+          if (!stored[index]) return;
+          colgroup.children[index].style.width = stored[index] + "px";
+          header.style.width = stored[index] + "px";
+        });
+      }
+
+      function initializeResizableTables() {
+        var tables = Array.prototype.slice.call(document.querySelectorAll(".table-wrap table"));
+        tables.forEach(function (table, tableIndex) {
+          var headers = Array.prototype.slice.call(table.querySelectorAll("thead th"));
+          if (!headers.length) return;
+
+          table.classList.add("is-resizable-table");
+          var tableKey = makeTableKey(table, tableIndex);
+          var colgroup = ensureColGroup(table, headers.length);
+          applyStoredWidths(table, tableKey, headers, colgroup);
+
+          headers.forEach(function (header, columnIndex) {
+            if (header.querySelector(".column-resize-handle")) return;
+
+            var handle = document.createElement("span");
+            handle.className = "column-resize-handle";
+            header.appendChild(handle);
+
+            handle.addEventListener("pointerdown", function (event) {
+              event.preventDefault();
+              event.stopPropagation();
+
+              var startX = event.clientX;
+              var startWidth = header.getBoundingClientRect().width;
+              header.classList.add("is-resizing");
+
+              function onPointerMove(moveEvent) {
+                var nextWidth = Math.max(120, startWidth + (moveEvent.clientX - startX));
+                colgroup.children[columnIndex].style.width = nextWidth + "px";
+                header.style.width = nextWidth + "px";
+              }
+
+              function onPointerUp() {
+                header.classList.remove("is-resizing");
+                window.removeEventListener("pointermove", onPointerMove);
+                window.removeEventListener("pointerup", onPointerUp);
+
+                var finalWidth = Math.round(header.getBoundingClientRect().width);
+                if (!tableWidths[tableKey]) {
+                  tableWidths[tableKey] = {};
+                }
+                tableWidths[tableKey][columnIndex] = finalWidth;
+                saveTableWidths();
+              }
+
+              window.addEventListener("pointermove", onPointerMove);
+              window.addEventListener("pointerup", onPointerUp);
+            });
+          });
+        });
+      }
+
+      var comments = loadComments();
+      var tableWidths = loadTableWidths();
+      var reviewWidgetToggle = document.getElementById("review-widget-toggle");
+      var reviewPanel = document.getElementById("review-panel");
+      var reviewPanelClose = document.getElementById("review-panel-close");
+      var reviewCommentList = document.getElementById("review-comment-list");
+      var reviewOutputWrap = document.getElementById("review-output-wrap");
+      var reviewOutput = document.getElementById("review-output");
+      var generateReviewText = document.getElementById("generate-review-text");
+      var copyReviewText = document.getElementById("copy-review-text");
+      var deleteAllReviewNotes = document.getElementById("delete-all-review-notes");
+      var commentCount = document.getElementById("review-comment-count");
+      commentTargets.forEach(attachCommentUI);
+      initializeResizableTables();
+      updateCount();
+      renderReviewPanel();
+
+      document.addEventListener("click", function (event) {
+        var openId = event.target.getAttribute("data-comment-open");
+        if (openId) {
+          openEditor(openId);
+          return;
+        }
+
+        var saveId = event.target.getAttribute("data-comment-save");
+        if (saveId) {
+          var anchor = getCommentAnchor(saveId);
+          var textarea = anchor.querySelector("textarea");
+          var value = textarea.value.trim();
+          if (value) {
+            comments[saveId] = value;
+          } else {
+            delete comments[saveId];
+          }
+          saveComments();
+          renderSectionComment(saveId);
+          updateCount();
+          renderReviewPanel();
+          renderCombinedText();
+          return;
+        }
+
+        var cancelId = event.target.getAttribute("data-comment-cancel");
+        if (cancelId) {
+          renderSectionComment(cancelId);
+          return;
+        }
+
+        var editId = event.target.getAttribute("data-comment-edit");
+        if (editId) {
+          openEditor(editId);
+          return;
+        }
+
+        var deleteId = event.target.getAttribute("data-comment-delete");
+        if (deleteId) {
+          delete comments[deleteId];
+          saveComments();
+          renderSectionComment(deleteId);
+          updateCount();
+          renderReviewPanel();
+          renderCombinedText();
+          return;
+        }
+      });
+
+      reviewWidgetToggle.addEventListener("click", function () {
+        var isOpen = reviewPanel.classList.toggle("is-open");
+        reviewPanel.setAttribute("aria-hidden", isOpen ? "false" : "true");
+        if (isOpen) {
+          renderReviewPanel();
+        }
+      });
+
+      reviewPanelClose.addEventListener("click", function () {
+        reviewPanel.classList.remove("is-open");
+        reviewPanel.setAttribute("aria-hidden", "true");
+      });
+
+      generateReviewText.addEventListener("click", function () {
+        renderCombinedText();
+      });
+
+      deleteAllReviewNotes.addEventListener("click", function () {
+        if (!collectSavedComments().length) return;
+        var confirmed = window.confirm("Delete all saved review notes for this document?");
+        if (!confirmed) return;
+
+        comments = {};
+        saveComments();
+        commentTargets.forEach(function (target) {
+          renderSectionComment(target.id);
+        });
+        updateCount();
+        renderReviewPanel();
+        renderCombinedText();
+      });
+
+      copyReviewText.addEventListener("click", function () {
+        if (!reviewOutput.value) {
+          renderCombinedText();
+        }
+        if (!reviewOutput.value) return;
+        navigator.clipboard.writeText(reviewOutput.value).then(function () {
+          copyReviewText.textContent = "Copied";
+          window.setTimeout(function () {
+            copyReviewText.textContent = "Copy All";
+          }, 1200);
+        });
+      });
+
+      Object.keys(comments).forEach(function (sectionId) {
+        renderSectionComment(sectionId);
+      });
+    });
+  </script>
+</body>
+</html>

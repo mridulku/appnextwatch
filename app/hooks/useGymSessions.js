@@ -8,8 +8,11 @@ import {
   getGymSessionDetail,
   getOrCreateCurrentAppUserId,
   listUserGymSessions,
+  listRecentCompletedGymSessions,
+  listUserSessionMovementLibrary,
   listUserSessionExerciseLibrary,
   reorderSessionExercises,
+  updateGymSession,
   updateGymSessionStatus,
   upsertActualSetLog,
 } from '../core/api/gymSessionsDb';
@@ -21,6 +24,7 @@ export default function useGymSessions() {
   const [error, setError] = useState('');
   const [sessions, setSessions] = useState([]);
   const [exerciseOptions, setExerciseOptions] = useState([]);
+  const [movementOptions, setMovementOptions] = useState([]);
   const [appUserId, setAppUserId] = useState(null);
 
   const ensureUserId = useCallback(async () => {
@@ -55,6 +59,19 @@ export default function useGymSessions() {
       return rows;
     } catch (nextError) {
       setError(nextError?.message || 'Unable to load exercise list right now.');
+      return [];
+    }
+  }, [ensureUserId]);
+
+  const loadMovementOptions = useCallback(async () => {
+    try {
+      setError('');
+      const userId = await ensureUserId();
+      const rows = await listUserSessionMovementLibrary({ userId });
+      setMovementOptions(rows);
+      return rows;
+    } catch (nextError) {
+      setError(nextError?.message || 'Unable to load movement list right now.');
       return [];
     }
   }, [ensureUserId]);
@@ -99,8 +116,18 @@ export default function useGymSessions() {
     [ensureUserId, refresh],
   );
 
+  const update = useCallback(
+    async ({ sessionId, payload }) => {
+      const userId = await ensureUserId();
+      const result = await updateGymSession({ userId, sessionId, payload });
+      await refresh();
+      return result;
+    },
+    [ensureUserId, refresh],
+  );
+
   const logActualSet = useCallback(
-    async ({ sessionExerciseId, setIndex, actualReps, actualWeightKg }) => {
+    async ({ sessionExerciseId, setIndex, actualReps, actualWeightKg, actualSpeedKph }) => {
       const userId = await ensureUserId();
       return upsertActualSetLog({
         userId,
@@ -108,6 +135,7 @@ export default function useGymSessions() {
         setIndex,
         actualReps,
         actualWeightKg,
+        actualSpeedKph,
       });
     },
     [ensureUserId],
@@ -131,6 +159,14 @@ export default function useGymSessions() {
     [ensureUserId],
   );
 
+  const listRecentCompleted = useCallback(
+    async ({ excludeSessionId = '', limit = 12 } = {}) => {
+      const userId = await ensureUserId();
+      return listRecentCompletedGymSessions({ userId, excludeSessionId, limit });
+    },
+    [ensureUserId],
+  );
+
   useEffect(() => {
     refresh();
   }, [refresh]);
@@ -141,15 +177,19 @@ export default function useGymSessions() {
       error,
       sessions,
       exerciseOptions,
+      movementOptions,
       refresh,
       loadExerciseOptions,
+      loadMovementOptions,
       create,
       remove,
       duplicate,
+      update,
       setStatus,
       logActualSet,
       reorder,
       getDetail,
+      listRecentCompleted,
       appUserId,
       setError,
     }),
@@ -160,13 +200,17 @@ export default function useGymSessions() {
       duplicate,
       error,
       exerciseOptions,
+      movementOptions,
       getDetail,
+      listRecentCompleted,
       loadExerciseOptions,
+      loadMovementOptions,
       loading,
       logActualSet,
       refresh,
       reorder,
       sessions,
+      update,
       setStatus,
     ],
   );

@@ -1,13 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   SafeAreaView,
   SectionList,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -17,16 +14,13 @@ import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogIt
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
-import { FOOD_RECIPES } from '../../../data/wellness/foodRecipes';
-import { MODULE_KEYS } from '../../../core/api/userModuleStateDb';
-import ModuleReadyChip from '../../../ui/components/ModuleReadyChip';
 import COLORS from '../../../theme/colors';
+import { getDishImageSourceByName } from './dishImages';
 
-const CATEGORY_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Other'];
+const CATEGORY_ORDER = ['Breakfast', 'Lunch / Dinner', 'Snacks', 'Other'];
 const CATEGORY_ICONS = {
   Breakfast: '🌅',
-  Lunch: '🍛',
-  Dinner: '🌙',
+  'Lunch / Dinner': '🍛',
   Snacks: '🍿',
   Other: '🍽️',
 };
@@ -34,15 +28,9 @@ const CATEGORY_ICONS = {
 function normalizeMealType(row) {
   const value = String(row?.meal_type || '').trim();
   if (!value) return 'Other';
+  if (value === 'Lunch' || value === 'Dinner') return 'Lunch / Dinner';
   if (CATEGORY_ORDER.includes(value)) return value;
   return 'Other';
-}
-
-function findLocalRecipeIdByName(name) {
-  const normalized = String(name || '').trim().toLowerCase();
-  if (!normalized) return null;
-  const matched = FOOD_RECIPES.find((entry) => entry.name.trim().toLowerCase() === normalized);
-  return matched?.id ?? null;
 }
 
 function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
@@ -68,13 +56,24 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
     },
   });
 
-  const sections = useMemo(
-    () =>
-      selection.groupedUserSections.map((section) => ({
-        ...section,
-        data: selection.expandedCategories[section.title] ? section.data : [],
-      })),
-    [selection.groupedUserSections, selection.expandedCategories],
+  const sections = useMemo(() => {
+    const grouped = selection.catalogRows.reduce((acc, row) => {
+      const category = normalizeMealType(row);
+      if (!acc[category]) acc[category] = [];
+      acc[category].push(row);
+      return acc;
+    }, {});
+
+    return CATEGORY_ORDER.filter((category) => grouped[category]?.length).map((category) => ({
+      title: category,
+      itemCount: grouped[category].length,
+      data: selection.expandedCategories[category] ? grouped[category] : [],
+    }));
+  }, [selection.catalogRows, selection.expandedCategories]);
+
+  const visibleItemCount = useMemo(
+    () => sections.reduce((sum, section) => sum + section.itemCount, 0),
+    [sections],
   );
 
   useFocusEffect(
@@ -84,9 +83,6 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
   );
 
   const RootContainer = embedded ? View : SafeAreaView;
-  const openAddScreen = () => navigation?.navigate('AddRecipes');
-  const openVoiceCommand = () =>
-    Alert.alert('Voice Command', 'Recipe voice command is coming soon.');
 
   if (selection.loading) {
     return (
@@ -105,42 +101,34 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
         <View style={styles.headerWrap}>
           {showHeader ? (
             <>
-              <Text style={styles.title}>Recipes</Text>
-              <Text style={styles.subtitle}>Save recipes from catalog into your personal list.</Text>
+              <Text style={styles.title}>Dishes</Text>
+              <Text style={styles.subtitle}>Browse the full dish catalog by meal type.</Text>
             </>
           ) : null}
-
         </View>
 
         {selection.error ? (
           <View style={styles.errorCard}>
             <Text style={styles.errorText}>{selection.error}</Text>
-            <TouchableOpacity style={styles.retryButton} activeOpacity={0.9} onPress={selection.hydrate}>
-              <Text style={styles.retryText}>Retry</Text>
-            </TouchableOpacity>
           </View>
         ) : null}
 
-        {selection.groupedUserSections.length === 0 ? (
+        {visibleItemCount === 0 ? (
           <View style={styles.emptyWrap}>
-            <Text style={styles.emptyTitle}>No saved recipes yet</Text>
-            <Text style={styles.emptySubtitle}>Add recipes you actually cook to build your own short list.</Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={openAddScreen}>
-              <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
-              <Text style={styles.emptyCtaText}>Add recipes</Text>
-            </TouchableOpacity>
+            <Text style={styles.emptyTitle}>No dishes available</Text>
+            <Text style={styles.emptySubtitle}>Recipe catalog rows will appear here once available.</Text>
           </View>
         ) : (
           <SectionList
             sections={sections}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             stickySectionHeadersEnabled={false}
-            contentContainerStyle={[styles.listContent, { paddingBottom: 130 + insets.bottom }]}
+            contentContainerStyle={[styles.listContent, { paddingBottom: 24 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
             renderSectionHeader={({ section }) => (
               <CollapsibleSection
                 title={section.title}
-                subtitle="Saved recipes"
+                subtitle="Recipe catalog"
                 icon={CATEGORY_ICONS[section.title] || '🍽️'}
                 iconIsEmoji
                 expanded={Boolean(selection.expandedCategories[section.title])}
@@ -150,53 +138,32 @@ function CookHomeScreen({ navigation, embedded = false, showHeader = true }) {
               />
             )}
             renderItem={({ item }) => {
-              const recipe = item.catalog_recipe;
-              const localRecipeId = findLocalRecipeIdByName(recipe?.name);
-
               return (
                 <SelectedCatalogItemCard
-                  title={recipe?.name || 'Recipe'}
-                  subtitle={`${normalizeMealType(recipe)} • ${recipe?.total_minutes || '--'} min • ${recipe?.difficulty || 'Easy'}`}
-                  onPress={
-                    localRecipeId
-                      ? () =>
-                          navigation.navigate('CookRecipe', {
-                            recipeId: localRecipeId,
-                            recipeName: recipe?.name,
-                            savedRecipeId: item.recipe_id,
-                          })
-                      : undefined
+                  title={item?.name || 'Recipe'}
+                  subtitle={`${normalizeMealType(item)} • ${item?.total_minutes || '--'} min • ${item?.difficulty || 'Easy'}`}
+                  imageSource={getDishImageSourceByName(item?.name)}
+                  onPress={() =>
+                    navigation.navigate('FoodDishDetail', {
+                      dishId: item.id,
+                      recipeId: item.id,
+                      dishName: item?.name,
+                    })
                   }
-                  topAction={
-                    localRecipeId
-                      ? {
-                          iconName: 'create-outline',
-                          onPress: () =>
-                            navigation.navigate('CookRecipe', {
-                              recipeId: localRecipeId,
-                              recipeName: recipe?.name,
-                              savedRecipeId: item.recipe_id,
-                            }),
-                        }
-                      : undefined
-                  }
+                  topAction={{
+                    iconName: 'open-outline',
+                    onPress: () =>
+                      navigation.navigate('FoodDishDetail', {
+                        dishId: item.id,
+                        recipeId: item.id,
+                        dishName: item?.name,
+                      }),
+                  }}
                 />
               );
             }}
           />
         )}
-      </View>
-      <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
-        <ModuleReadyChip moduleKey={MODULE_KEYS.FOOD_RECIPES} />
-
-        <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceCommand}>
-          <Ionicons name="mic" size={18} color={COLORS.bg} />
-          <Text style={styles.voiceButtonText}>Voice Command</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomAddButton} activeOpacity={0.9} onPress={openAddScreen}>
-          <Ionicons name="add-circle-outline" size={16} color={COLORS.text} />
-          <Text style={styles.bottomAddButtonText}>Add Recipe</Text>
-        </TouchableOpacity>
       </View>
     </RootContainer>
   );
@@ -252,20 +219,6 @@ const styles = StyleSheet.create({
     color: '#FFB4A8',
     fontSize: 14,
   },
-  retryButton: {
-    marginTop: 10,
-    alignSelf: 'flex-start',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,124,123,0.45)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  retryText: {
-    color: '#FFB4A8',
-    fontWeight: '700',
-    fontSize: 12,
-  },
   emptyWrap: {
     flex: 1,
     justifyContent: 'center',
@@ -280,139 +233,16 @@ const styles = StyleSheet.create({
   },
   emptySubtitle: {
     color: COLORS.muted,
-    fontSize: 24,
+    fontSize: 20,
     textAlign: 'center',
     marginTop: 8,
-    lineHeight: 29,
-  },
-  emptyCta: {
-    marginTop: 16,
-    backgroundColor: COLORS.accent,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  emptyCtaText: {
-    color: COLORS.bg,
-    fontSize: 15,
-    fontWeight: '700',
+    lineHeight: 25,
   },
   listContent: {
     paddingBottom: 28,
   },
   groupSection: {
-    marginTop: 4,
-  },
-  itemRow: {
-    marginTop: 8,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.18)',
-    backgroundColor: COLORS.card,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  itemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    flex: 1,
-  },
-  itemIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(90,209,232,0.3)',
-    backgroundColor: 'rgba(90,209,232,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  itemEmoji: {
-    fontSize: 16,
-  },
-  itemTextWrap: {
-    flex: 1,
-  },
-  itemTitle: {
-    color: COLORS.text,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  itemMeta: {
-    color: COLORS.muted,
-    fontSize: 11,
-    marginTop: 2,
-  },
-  rowActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  removeButton: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,124,123,0.45)',
-    backgroundColor: 'rgba(255,124,123,0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  removeButtonText: {
-    color: '#FF9C92',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  bottomBar: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    backgroundColor: 'rgba(14,15,20,0.96)',
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.24)',
-    padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  voiceButton: {
-    flex: 1,
-    borderRadius: 14,
-    backgroundColor: COLORS.accent,
-    minHeight: 46,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  voiceButtonText: {
-    color: COLORS.bg,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  bottomAddButton: {
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.35)',
-    backgroundColor: COLORS.card,
-    minHeight: 46,
-    paddingHorizontal: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  bottomAddButtonText: {
-    color: COLORS.text,
-    fontSize: 13,
-    fontWeight: '600',
+    marginBottom: 8,
   },
 });
 

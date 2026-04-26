@@ -1,0 +1,366 @@
+{
+  "generated_at": "2026-03-08T02:34:45.601Z",
+  "count": 72,
+  "items": [
+    {
+      "order_index": 1,
+      "exercise_id": "7015a839-6da8-415c-8725-0415d9ca65da",
+      "exercise_name": "Ab Wheel Rollout"
+    },
+    {
+      "order_index": 2,
+      "exercise_id": "7a51d583-b26a-466d-aec0-0d0c8ee711cf",
+      "exercise_name": "Arnold Press"
+    },
+    {
+      "order_index": 3,
+      "exercise_id": "2e0d149c-1700-49a0-9e92-0e170d6bcff2",
+      "exercise_name": "Back Extension"
+    },
+    {
+      "order_index": 4,
+      "exercise_id": "d6c3cb23-3638-4e46-a746-463ab76fb8b2",
+      "exercise_name": "Back Squat"
+    },
+    {
+      "order_index": 5,
+      "exercise_id": "187395e4-7568-4a88-adf8-42dc9fcecd3f",
+      "exercise_name": "Barbell Curl"
+    },
+    {
+      "order_index": 6,
+      "exercise_id": "22da0254-d5d7-48f9-839b-9235a8135926",
+      "exercise_name": "Bench Press"
+    },
+    {
+      "order_index": 7,
+      "exercise_id": "3e84990c-9e7e-40ef-a5d7-ccaad308d8fe",
+      "exercise_name": "Bent Over Barbell Row"
+    },
+    {
+      "order_index": 8,
+      "exercise_id": "68a08b31-7829-42a8-aae7-bd0bdc499fdc",
+      "exercise_name": "Biceps Curl"
+    },
+    {
+      "order_index": 9,
+      "exercise_id": "d83fb115-643e-4eaf-acfc-efb5dc20dd6a",
+      "exercise_name": "Bike Sprint"
+    },
+    {
+      "order_index": 10,
+      "exercise_id": "3066fbf7-0fdf-419f-b414-fcbf1df0b3f2",
+      "exercise_name": "Bulgarian Split Squat"
+    },
+    {
+      "order_index": 11,
+      "exercise_id": "283f705a-9a71-424b-b581-0719a46c4079",
+      "exercise_name": "Cable Crunch"
+    },
+    {
+      "order_index": 12,
+      "exercise_id": "7b25425f-417f-478c-b944-b515e58e21cc",
+      "exercise_name": "Cable Curl"
+    },
+    {
+      "order_index": 13,
+      "exercise_id": "71ed4418-9960-427d-8066-dec3101eb47b",
+      "exercise_name": "Cable Lateral Raise"
+    },
+    {
+      "order_index": 14,
+      "exercise_id": "2d264680-33d2-438c-898c-21b0ef986050",
+      "exercise_name": "Cable Rope Overhead Extension"
+    },
+    {
+      "order_index": 15,
+      "exercise_id": "6b5e6ef3-d5a1-49ce-a740-6a2f89b4d7f7",
+      "exercise_name": "Calf Raise"
+    },
+    {
+      "order_index": 16,
+      "exercise_id": "5c504c6c-7ba4-4de8-aa7c-964de4027a89",
+      "exercise_name": "Chest Fly"
+    },
+    {
+      "order_index": 17,
+      "exercise_id": "33ce5ff2-224a-4587-a932-fee6d0a3b51c",
+      "exercise_name": "Chest Supported Row"
+    },
+    {
+      "order_index": 18,
+      "exercise_id": "e1c94c08-7eb3-4f81-9324-217dd90bdb98",
+      "exercise_name": "Chin-up"
+    },
+    {
+      "order_index": 19,
+      "exercise_id": "a1c50802-bc72-4dd4-88a2-82ea422ed874",
+      "exercise_name": "Close Grip Bench Press"
+    },
+    {
+      "order_index": 20,
+      "exercise_id": "43b0676c-deda-452c-aee5-34f4e2e90fad",
+      "exercise_name": "Close Grip Lat Pulldown"
+    },
+    {
+      "order_index": 21,
+      "exercise_id": "7d4a3510-b1ea-41f0-8ee7-374da2520291",
+      "exercise_name": "Dead Bug"
+    },
+    {
+      "order_index": 22,
+      "exercise_id": "47f5090a-cff4-443c-babd-ddd89e674689",
+      "exercise_name": "Decline Bench Press"
+    },
+    {
+      "order_index": 23,
+      "exercise_id": "32598229-d69b-4be2-ae4e-99cd00769a92",
+      "exercise_name": "Decline Press"
+    },
+    {
+      "order_index": 24,
+      "exercise_id": "97e389e7-498e-4df5-8225-a0e0121189c7",
+      "exercise_name": "Dips (Chest Bias)"
+    },
+    {
+      "order_index": 25,
+      "exercise_id": "712405c7-7d8c-4b90-95ba-dc4294ac4c9a",
+      "exercise_name": "Dynamic Hip Mobility"
+    },
+    {
+      "order_index": 26,
+      "exercise_id": "5885ba9b-c859-41b2-8dbb-21517d071896",
+      "exercise_name": "Face Pull"
+    },
+    {
+      "order_index": 27,
+      "exercise_id": "f27a2e10-af45-41e7-9b0e-e04b9169ffac",
+      "exercise_name": "Front Squat"
+    },
+    {
+      "order_index": 28,
+      "exercise_id": "d795a455-16d6-4312-a86c-b097df9e1bd7",
+      "exercise_name": "Goblet Squat"
+    },
+    {
+      "order_index": 29,
+      "exercise_id": "9a48c433-989b-4051-a02a-cb5813292789",
+      "exercise_name": "Hack Squat"
+    },
+    {
+      "order_index": 30,
+      "exercise_id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+      "exercise_name": "Hammer Curl"
+    },
+    {
+      "order_index": 31,
+      "exercise_id": "05d75ac0-59c9-40ac-89e9-af5d459269ef",
+      "exercise_name": "Hanging Leg Raise"
+    },
+    {
+      "order_index": 32,
+      "exercise_id": "f603c63e-2b00-4561-8579-3e113d98ad3e",
+      "exercise_name": "Hip Thrust"
+    },
+    {
+      "order_index": 33,
+      "exercise_id": "2b5dd334-f40c-4c91-a0b3-a3bf93414134",
+      "exercise_name": "Incline Cable Fly"
+    },
+    {
+      "order_index": 34,
+      "exercise_id": "f90a1f8b-c3d6-4c74-8dbc-be06acbc4804",
+      "exercise_name": "Incline Dumbbell Press"
+    },
+    {
+      "order_index": 35,
+      "exercise_id": "66e4d133-718a-49a8-9759-f495e33d9342",
+      "exercise_name": "Jump Rope"
+    },
+    {
+      "order_index": 36,
+      "exercise_id": "09e94363-2def-4b2d-b35c-2a2a280dfba4",
+      "exercise_name": "Lat Pulldown"
+    },
+    {
+      "order_index": 37,
+      "exercise_id": "8a737165-7b00-4deb-a2b4-4aabd3ddd9c5",
+      "exercise_name": "Lateral Raise"
+    },
+    {
+      "order_index": 38,
+      "exercise_id": "0bd52984-ef5a-4adc-9fd4-3e3363fc1414",
+      "exercise_name": "Leg Curl"
+    },
+    {
+      "order_index": 39,
+      "exercise_id": "999d051b-1a85-46c9-a6c8-4d09e09a7207",
+      "exercise_name": "Leg Extension"
+    },
+    {
+      "order_index": 40,
+      "exercise_id": "f6e14b77-111b-4c4a-8c45-9d5cac861a7c",
+      "exercise_name": "Leg Press"
+    },
+    {
+      "order_index": 41,
+      "exercise_id": "e419037e-04fb-43d9-86af-92c1fe8b350a",
+      "exercise_name": "Lying Leg Curl"
+    },
+    {
+      "order_index": 42,
+      "exercise_id": "86c586db-8e3f-4cd8-9c48-a6002ca4c8ac",
+      "exercise_name": "Overhead Press"
+    },
+    {
+      "order_index": 43,
+      "exercise_id": "a73875f8-fcab-41b9-85a7-172050f347e5",
+      "exercise_name": "Overhead Triceps Extension"
+    },
+    {
+      "order_index": 44,
+      "exercise_id": "76eda93c-586b-48bf-a299-edb88d60b9a8",
+      "exercise_name": "Pallof Press"
+    },
+    {
+      "order_index": 45,
+      "exercise_id": "050a9080-9da8-4708-b524-17280aa04301",
+      "exercise_name": "Pec Deck Fly"
+    },
+    {
+      "order_index": 46,
+      "exercise_id": "1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8",
+      "exercise_name": "Plank"
+    },
+    {
+      "order_index": 47,
+      "exercise_id": "f47cc1a3-1510-4667-9416-77332df2a107",
+      "exercise_name": "Preacher Curl"
+    },
+    {
+      "order_index": 48,
+      "exercise_id": "3d1c39e2-8bcd-4fa7-9e85-a8b5613cf302",
+      "exercise_name": "Pull-up"
+    },
+    {
+      "order_index": 49,
+      "exercise_id": "1cc535b2-4a27-4ecf-bd86-16594b756164",
+      "exercise_name": "Push-up"
+    },
+    {
+      "order_index": 50,
+      "exercise_id": "77d46ca8-a14c-4b89-a87a-95bc7832ecae",
+      "exercise_name": "Rear Delt Fly"
+    },
+    {
+      "order_index": 51,
+      "exercise_id": "ff2138d0-d62d-468f-a473-728f7c19f529",
+      "exercise_name": "Reverse Pec Deck"
+    },
+    {
+      "order_index": 52,
+      "exercise_id": "8dd7abda-9dbc-4060-b7cd-663002991c85",
+      "exercise_name": "Reverse Wrist Curl"
+    },
+    {
+      "order_index": 53,
+      "exercise_id": "3bada2cd-0533-4069-848c-7b6aa2ead4b1",
+      "exercise_name": "Romanian Deadlift"
+    },
+    {
+      "order_index": 54,
+      "exercise_id": "df285b83-9b1e-47fa-9c01-5cd55c6391cf",
+      "exercise_name": "Rowing Sprint"
+    },
+    {
+      "order_index": 55,
+      "exercise_id": "c40bd626-4879-4eb3-a284-2c5254e3503a",
+      "exercise_name": "Russian Twist"
+    },
+    {
+      "order_index": 56,
+      "exercise_id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+      "exercise_name": "Seated Cable Row"
+    },
+    {
+      "order_index": 57,
+      "exercise_id": "cfa3a5ab-a85d-4a2c-a374-2127f7e41491",
+      "exercise_name": "Seated Calf Raise"
+    },
+    {
+      "order_index": 58,
+      "exercise_id": "cd4d6a20-0732-4cde-91e1-8197587ef506",
+      "exercise_name": "Seated Leg Curl"
+    },
+    {
+      "order_index": 59,
+      "exercise_id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+      "exercise_name": "Shoulder Press"
+    },
+    {
+      "order_index": 60,
+      "exercise_id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+      "exercise_name": "Shrug"
+    },
+    {
+      "order_index": 61,
+      "exercise_id": "4ca0c50d-28a4-4d3e-9e8c-eb76e665052b",
+      "exercise_name": "Shrugs"
+    },
+    {
+      "order_index": 62,
+      "exercise_id": "e2da5aef-d786-4076-91fc-0b0092f86355",
+      "exercise_name": "Side Plank"
+    },
+    {
+      "order_index": 63,
+      "exercise_id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+      "exercise_name": "Single Arm Dumbbell Row"
+    },
+    {
+      "order_index": 64,
+      "exercise_id": "0a7f6eff-7c79-4b81-af98-1c09ad85cef0",
+      "exercise_name": "Skull Crusher"
+    },
+    {
+      "order_index": 65,
+      "exercise_id": "4d3f2601-78a3-4ccd-8fc1-630235658161",
+      "exercise_name": "Standing Calf Raise"
+    },
+    {
+      "order_index": 66,
+      "exercise_id": "36336e54-6d1a-46a2-9b47-420cb834bf5b",
+      "exercise_name": "Thoracic Rotation Mobility"
+    },
+    {
+      "order_index": 67,
+      "exercise_id": "63c1b131-e499-4a2f-947f-8eee2461560e",
+      "exercise_name": "Treadmill Run"
+    },
+    {
+      "order_index": 68,
+      "exercise_id": "251920ae-4b93-4da4-b873-5adf0657d489",
+      "exercise_name": "Triceps Pushdown"
+    },
+    {
+      "order_index": 69,
+      "exercise_id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+      "exercise_name": "Upright Row"
+    },
+    {
+      "order_index": 70,
+      "exercise_id": "92914d0a-1120-4496-86b4-ce1cb61c6634",
+      "exercise_name": "Walking Lunge"
+    },
+    {
+      "order_index": 71,
+      "exercise_id": "c4e1ac6b-85b5-4b6f-b2d6-62c5def90446",
+      "exercise_name": "Wide Grip Lat Pulldown"
+    },
+    {
+      "order_index": 72,
+      "exercise_id": "660fdce6-4f13-42c1-ad8b-c91ff87e79b8",
+      "exercise_name": "Wrist Curl"
+    }
+  ]
+}

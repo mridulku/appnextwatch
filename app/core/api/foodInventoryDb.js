@@ -38,7 +38,7 @@ export async function listCatalogIngredients({ search = '', category = 'All' } =
   const client = getClientOrThrow();
   let query = client
     .from('catalog_ingredients')
-    .select('id,name,category,unit_type')
+    .select('id,name,category,unit_type,calories_kcal,protein_g,carbs_g,fat_g,nutrition_basis_amount,nutrition_basis_unit')
     .order('name', { ascending: true });
 
   const normalizedSearch = String(search || '').trim();

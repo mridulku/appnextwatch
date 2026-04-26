@@ -10,6 +10,7 @@ function SelectedItemCard({
   title,
   subtitle,
   imageUrl,
+  imageSource,
   badges = [],
   onPress,
   onRemove,
@@ -60,7 +61,7 @@ function SelectedItemCard({
     >
       <View style={styles.leftColumn}>
         <Image
-          source={imageUrl ? { uri: imageUrl } : ITEM_PLACEHOLDER_IMAGE}
+          source={imageSource || (imageUrl ? { uri: imageUrl } : ITEM_PLACEHOLDER_IMAGE)}
           style={styles.image}
           resizeMode="cover"
         />

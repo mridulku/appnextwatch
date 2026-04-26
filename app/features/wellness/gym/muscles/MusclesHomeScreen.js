@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
-  SectionList,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,18 +11,13 @@ import {
 } from 'react-native';
 
 import CatalogItemCard from '../../../../ui/components/CatalogItemCard';
-import CollapsibleSection from '../../../../components/CollapsibleSection';
 import COLORS from '../../../../theme/colors';
 import UI_TOKENS from '../../../../ui/tokens';
+import GroupByPills from '../components/GroupByPills';
+import CatalogGroupSection from '../components/CatalogGroupSection';
+import LibrarySearchBar from '../library/components/LibrarySearchBar';
 import useMuscleExplorer from './useMuscleExplorer';
-import { DAY_CATEGORY_ORDER, classifyMuscleForDay } from '../dayCategory';
-
-const GROUP_ICONS = {
-  Push: 'fitness-outline',
-  Pull: 'body-outline',
-  Legs: 'walk-outline',
-  General: 'albums-outline',
-};
+import { groupMuscles, MUSCLE_GROUP_BY_MODES, MUSCLE_GROUP_BY_OPTIONS } from './muscleGrouping';
 
 function ChevronAction() {
   return (
@@ -32,55 +27,92 @@ function ChevronAction() {
   );
 }
 
-function MusclesHomeScreen({ navigation, embedded = false, showHeader = true }) {
-  const { loading, error, muscles, subgroups, exerciseMaps, refresh } = useMuscleExplorer();
-  const [expandedGroups, setExpandedGroups] = useState({});
+function MuscleCard({ item, navigation }) {
+  return (
+    <CatalogItemCard
+      title={item.subgroupLabel}
+      subtitle={`${item.groupLabel} • ${item.exerciseCount || 0} exercises • ${item.machineCount || 0} machines`}
+      imageUrl={item.image_url}
+      actionLabel="View"
+      actionVariant="muted"
+      onPress={() =>
+        navigation.navigate('MuscleDetail', {
+          groupKey: item.groupKey,
+          subKey: item.subgroupKey,
+          groupLabel: item.groupLabel,
+          subLabel: item.subgroupLabel,
+        })
+      }
+      rightAction={<ChevronAction />}
+    />
+  );
+}
 
-  const subgroupRows = useMemo(() => {
-    const muscleById = Object.fromEntries(muscles.map((muscle) => [muscle.id, muscle]));
-    return subgroups.map((subgroup) => {
+function MusclesHomeScreen({ navigation, embedded = false, showHeader = true }) {
+  const active = useMuscleExplorer();
+  const { loading, error, warning, refresh, muscles = [], subgroups = [], exerciseMaps = [], machineMaps = [] } = active;
+  const [queryInput, setQueryInput] = useState('');
+  const [query, setQuery] = useState('');
+  const [groupBy, setGroupBy] = useState(MUSCLE_GROUP_BY_MODES.DAY);
+  const [expandedKeys, setExpandedKeys] = useState(() => new Set(['section:Push']));
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setQuery(String(queryInput || '').trim().toLowerCase());
+    }, 280);
+    return () => clearTimeout(timer);
+  }, [queryInput]);
+
+  const rows = useMemo(() => {
+    const muscleById = Object.fromEntries((muscles || []).map((muscle) => [muscle.id, muscle]));
+    return (subgroups || []).map((subgroup) => {
       const parentMuscle = muscleById[subgroup.muscle_id];
-      const mappedExerciseIds = new Set(
-        exerciseMaps
-          .filter((map) => map.muscle_subgroup_id === subgroup.id)
-          .map((map) => map.exercise_id),
-      );
+      const mappedExerciseIds = new Set((exerciseMaps || []).filter((map) => map.muscle_subgroup_id === subgroup.id).map((map) => map.exercise_id));
+      const mappedMachineIds = new Set((machineMaps || []).filter((map) => map.muscle_subgroup_id === subgroup.id).map((map) => map.machine_id));
       return {
         id: subgroup.id,
         subgroupKey: subgroup.name_key,
         subgroupLabel: subgroup.name,
         groupKey: parentMuscle?.name_key || '',
         groupLabel: parentMuscle?.name || 'Muscle',
-        category: classifyMuscleForDay(parentMuscle),
+        image_url: subgroup.image_url || parentMuscle?.image_url || null,
         exerciseCount: mappedExerciseIds.size,
+        machineCount: mappedMachineIds.size,
       };
     });
-  }, [muscles, subgroups, exerciseMaps]);
+  }, [exerciseMaps, machineMaps, muscles, subgroups]);
 
-  const sections = useMemo(() => {
-    const grouped = subgroupRows.reduce((acc, row) => {
-      if (!acc[row.category]) acc[row.category] = [];
-      acc[row.category].push(row);
-      return acc;
-    }, {});
+  const groupedRows = useMemo(() => groupMuscles(rows, groupBy, query), [rows, groupBy, query]);
+  const topMuscleImageByName = useMemo(
+    () => Object.fromEntries((muscles || []).map((row) => [String(row.name || ''), row.image_url || null])),
+    [muscles],
+  );
 
-    return DAY_CATEGORY_ORDER.filter((category) => grouped[category]?.length).map((category) => ({
-      title: category,
-      itemCount: grouped[category].length,
-      data: expandedGroups[category]
-        ? grouped[category].slice().sort((a, b) => a.subgroupLabel.localeCompare(b.subgroupLabel))
-        : [],
-    }));
-  }, [expandedGroups, subgroupRows]);
+  const getSectionMeta = useMemo(() => {
+    const pushImage = topMuscleImageByName.Chest || null;
+    const pullImage = topMuscleImageByName.Back || null;
+    const legsImage = topMuscleImageByName.Legs || null;
+    const generalImage = topMuscleImageByName.Core || topMuscleImageByName.Back || null;
 
-  const toggleGroup = (title) => {
-    setExpandedGroups((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }));
-  };
+    return ({ title }) => {
+      if (title === 'Push') return { imageUrl: pushImage, subtitle: 'Chest, shoulders, and triceps' };
+      if (title === 'Pull') return { imageUrl: pullImage, subtitle: 'Back and biceps' };
+      if (title === 'Legs') return { imageUrl: legsImage, subtitle: 'Leg and glute muscles' };
+      if (title === 'General') return { imageUrl: generalImage, subtitle: 'Core and mixed support muscles' };
+      return { imageUrl: generalImage, subtitle: 'Muscle group' };
+    };
+  }, [topMuscleImageByName]);
 
   const RootContainer = embedded ? View : SafeAreaView;
+
+  function toggleExpandedKey(key) {
+    setExpandedKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
 
   if (loading) {
     return (
@@ -95,61 +127,80 @@ function MusclesHomeScreen({ navigation, embedded = false, showHeader = true }) 
 
   return (
     <RootContainer style={styles.safeArea}>
-      <SectionList
-        sections={sections}
-        keyExtractor={(item) => item.id || `${item.groupKey}_${item.subgroupKey}`}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-        ListHeaderComponent={
-          <>
-            {showHeader ? (
-              <View style={styles.headerWrap}>
-                <Text style={styles.title}>Muscles</Text>
-                <Text style={styles.subtitle}>Explore exercises by muscle group</Text>
-              </View>
-            ) : null}
+      <View style={[styles.container, embedded && styles.containerEmbedded]}>
+        <View style={styles.headerWrap}>
+          {showHeader ? (
+            <>
+              <Text style={styles.title}>Muscles</Text>
+              <Text style={styles.subtitle}>Browse muscle groups by day or as a flat anatomy map.</Text>
+            </>
+          ) : null}
+          <View style={styles.searchRow}>
+            <View style={styles.searchWrap}>
+              <LibrarySearchBar
+                value={queryInput}
+                onChangeText={setQueryInput}
+                showFilterButton={false}
+                placeholder="Search muscles"
+              />
+            </View>
+            <View style={styles.groupSelectorWrap}>
+              <GroupByPills value={groupBy} onChange={setGroupBy} options={MUSCLE_GROUP_BY_OPTIONS} title="Group muscles" />
+            </View>
+          </View>
+        </View>
 
-            {error ? (
-              <View style={styles.errorCard}>
-                <Text style={styles.errorText}>{error}</Text>
-                <TouchableOpacity style={styles.retryButton} activeOpacity={0.9} onPress={refresh}>
-                  <Text style={styles.retryText}>Retry</Text>
-                </TouchableOpacity>
-              </View>
-            ) : null}
-          </>
-        }
-        stickySectionHeadersEnabled={false}
-        renderSectionHeader={({ section }) => (
-          <CollapsibleSection
-            title={section.title}
-            subtitle="Muscle groups"
-            icon={GROUP_ICONS[section.title] || 'barbell-outline'}
-            expanded={Boolean(expandedGroups[section.title])}
-            onToggle={() => toggleGroup(section.title)}
-            countLabel={`${section.itemCount}`}
-            style={styles.groupSection}
-          />
-        )}
-        renderItem={({ item }) => (
-          <CatalogItemCard
-            title={item.subgroupLabel}
-            subtitle={`${item.groupLabel} • ${item.exerciseCount} exercises`}
-            actionLabel="View"
-            actionVariant="muted"
-            onPress={() =>
-              navigation.navigate('MuscleDetail', {
-                groupKey: item.groupKey,
-                subKey: item.subgroupKey,
-                groupLabel: item.groupLabel,
-                subLabel: item.subgroupLabel,
-              })
-            }
-            rightAction={<ChevronAction />}
-          />
-        )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
+        {warning ? (
+          <View style={styles.warningCard}>
+            <Text style={styles.warningText}>{warning}</Text>
+          </View>
+        ) : null}
+
+        {error ? (
+          <View style={styles.errorCard}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} activeOpacity={0.9} onPress={refresh}>
+              <Text style={styles.retryText}>Retry</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
+        <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+          {rows.length === 0 ? (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyCardTitle}>No muscles available</Text>
+              <Text style={styles.emptyCardText}>Muscle explorer data is empty. Retry after seeding data.</Text>
+              <TouchableOpacity style={styles.retryButton} activeOpacity={0.9} onPress={refresh}>
+                <Text style={styles.retryText}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          ) : groupedRows.length && groupedRows.some((section) => (section.items?.length || section.groups?.length)) ? (
+            groupedRows.map((section, index) => (
+              <CatalogGroupSection
+                key={`${section.type}_${section.title || 'flat'}_${index}`}
+                section={section}
+                getSectionMeta={getSectionMeta}
+                countLabel="muscle"
+                expandedKeys={expandedKeys}
+                onToggleKey={toggleExpandedKey}
+                renderItem={(item) => (
+                  <View key={item.id} style={styles.cardWrap}>
+                    <MuscleCard item={item} navigation={navigation} />
+                  </View>
+                )}
+              />
+            ))
+          ) : (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyCardTitle}>No muscles match this search</Text>
+              <Text style={styles.emptyCardText}>Try a different term or switch grouping.</Text>
+              <TouchableOpacity style={styles.retryButton} activeOpacity={0.9} onPress={() => setQueryInput('')}>
+                <Text style={styles.retryText}>Clear search</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </ScrollView>
+      </View>
     </RootContainer>
   );
 }
@@ -159,16 +210,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.bg,
   },
-  listContent: {
-    paddingHorizontal: UI_TOKENS.spacing.md,
-    paddingTop: UI_TOKENS.spacing.sm,
-    paddingBottom: UI_TOKENS.spacing.xl + 10,
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+    paddingHorizontal: 16,
+    paddingTop: 8,
   },
-  groupSection: {
-    marginTop: 4,
+  containerEmbedded: {
+    paddingTop: 6,
   },
   headerWrap: {
-    marginBottom: UI_TOKENS.spacing.sm,
+    marginBottom: 8,
+    gap: 10,
   },
   title: {
     color: COLORS.text,
@@ -176,12 +229,26 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   subtitle: {
-    marginTop: 4,
     color: COLORS.muted,
-    fontSize: UI_TOKENS.typography.subtitle,
+    fontSize: 12,
+    marginTop: 2,
   },
-  separator: {
-    height: UI_TOKENS.spacing.sm,
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  searchWrap: {
+    flex: 1,
+  },
+  groupSelectorWrap: {
+    width: 138,
+  },
+  listContent: {
+    paddingBottom: UI_TOKENS.spacing.xl + 10,
+  },
+  cardWrap: {
+    marginBottom: UI_TOKENS.spacing.sm,
   },
   loadingWrap: {
     flex: 1,
@@ -193,15 +260,17 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.subtitle,
   },
-  chevronAction: {
-    width: UI_TOKENS.control.iconButton,
-    height: UI_TOKENS.control.iconButton,
-    borderRadius: UI_TOKENS.radius.sm,
+  warningCard: {
+    borderRadius: UI_TOKENS.radius.md,
     borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.32)',
-    backgroundColor: COLORS.card,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: 'rgba(245,201,106,0.42)',
+    backgroundColor: 'rgba(245,201,106,0.12)',
+    padding: UI_TOKENS.spacing.sm,
+    marginBottom: UI_TOKENS.spacing.sm,
+  },
+  warningText: {
+    color: COLORS.accent,
+    fontSize: UI_TOKENS.typography.meta,
   },
   errorCard: {
     borderRadius: UI_TOKENS.radius.md,
@@ -228,6 +297,35 @@ const styles = StyleSheet.create({
     color: '#FFB4A8',
     fontSize: UI_TOKENS.typography.meta,
     fontWeight: '700',
+  },
+  emptyCard: {
+    borderRadius: UI_TOKENS.radius.md,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.2)',
+    backgroundColor: COLORS.card,
+    padding: UI_TOKENS.spacing.md,
+    marginTop: UI_TOKENS.spacing.sm,
+    alignItems: 'flex-start',
+    gap: UI_TOKENS.spacing.xs,
+  },
+  emptyCardTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.subtitle,
+    fontWeight: '700',
+  },
+  emptyCardText: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.subtitle,
+  },
+  chevronAction: {
+    width: UI_TOKENS.control.iconButton,
+    height: UI_TOKENS.control.iconButton,
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.32)',
+    backgroundColor: COLORS.card,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

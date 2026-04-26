@@ -1,13 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   SafeAreaView,
   SectionList,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -17,8 +14,6 @@ import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogIt
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import { useAuth } from '../../../context/AuthContext';
 import useCatalogSelection from '../../../hooks/useCatalogSelection';
-import { MODULE_KEYS } from '../../../core/api/userModuleStateDb';
-import ModuleReadyChip from '../../../ui/components/ModuleReadyChip';
 import COLORS from '../../../theme/colors';
 
 const CATEGORY_ORDER = ['Pans', 'Knives', 'Appliances', 'Containers', 'Tools'];
@@ -55,13 +50,24 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
     },
   });
 
-  const sections = useMemo(
-    () =>
-      selection.groupedUserSections.map((section) => ({
-        ...section,
-        data: selection.expandedCategories[section.title] ? section.data : [],
-      })),
-    [selection.groupedUserSections, selection.expandedCategories],
+  const sections = useMemo(() => {
+    const grouped = selection.catalogRows.reduce((acc, row) => {
+      const category = normalizeCategory(row);
+      if (!acc[category]) acc[category] = [];
+      acc[category].push(row);
+      return acc;
+    }, {});
+
+    return CATEGORY_ORDER.filter((category) => grouped[category]?.length).map((category) => ({
+      title: category,
+      itemCount: grouped[category].length,
+      data: selection.expandedCategories[category] ? grouped[category] : [],
+    }));
+  }, [selection.catalogRows, selection.expandedCategories]);
+
+  const visibleItemCount = useMemo(
+    () => sections.reduce((sum, section) => sum + section.itemCount, 0),
+    [sections],
   );
 
   useFocusEffect(
@@ -71,9 +77,6 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
   );
 
   const RootContainer = embedded ? View : SafeAreaView;
-  const openAddScreen = () => navigation?.navigate('AddUtensils');
-  const openVoiceCommand = () =>
-    Alert.alert('Voice Command', 'Utensil voice command is coming soon.');
 
   if (selection.loading) {
     return (
@@ -93,41 +96,33 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
           {showHero ? (
             <>
               <Text style={styles.title}>Utensils</Text>
-              <Text style={styles.subtitle}>Track what you already have in your kitchen.</Text>
+              <Text style={styles.subtitle}>Browse the full utensil catalog by category.</Text>
             </>
           ) : null}
-
         </View>
 
         {selection.error ? (
           <View style={styles.errorCard}>
             <Text style={styles.errorText}>{selection.error}</Text>
-            <TouchableOpacity style={styles.retryButton} activeOpacity={0.9} onPress={selection.hydrate}>
-              <Text style={styles.retryText}>Retry</Text>
-            </TouchableOpacity>
           </View>
         ) : null}
 
-        {selection.groupedUserSections.length === 0 ? (
+        {visibleItemCount === 0 ? (
           <View style={styles.emptyWrap}>
-            <Text style={styles.emptyTitle}>No utensils yet</Text>
-            <Text style={styles.emptySubtitle}>Add utensils from catalog to set up your kitchen profile.</Text>
-            <TouchableOpacity style={styles.emptyCta} activeOpacity={0.9} onPress={openAddScreen}>
-              <Ionicons name="add-circle-outline" size={16} color={COLORS.bg} />
-              <Text style={styles.emptyCtaText}>Add utensils</Text>
-            </TouchableOpacity>
+            <Text style={styles.emptyTitle}>No utensils available</Text>
+            <Text style={styles.emptySubtitle}>Utensil catalog rows will appear here once available.</Text>
           </View>
         ) : (
           <SectionList
             sections={sections}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             stickySectionHeadersEnabled={false}
-            contentContainerStyle={[styles.listContent, { paddingBottom: 130 + insets.bottom }]}
+            contentContainerStyle={[styles.listContent, { paddingBottom: 24 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
             renderSectionHeader={({ section }) => (
               <CollapsibleSection
                 title={section.title}
-                subtitle="Selected utensils"
+                subtitle="Utensil catalog"
                 icon={CATEGORY_ICONS[section.title] || '🍽️'}
                 iconIsEmoji
                 expanded={Boolean(selection.expandedCategories[section.title])}
@@ -136,43 +131,32 @@ function FoodUtensilsScreen({ navigation, embedded = false, showHero = true }) {
                 style={styles.groupSection}
               />
             )}
-            renderItem={({ item }) => {
-              const utensil = item.catalog_utensil;
-              return (
-                <SelectedCatalogItemCard
-                  title={utensil?.name || 'Utensil'}
-                  subtitle={`${normalizeCategory(utensil)}${utensil?.note ? ` • ${utensil.note}` : ''}`}
-                  onPress={() =>
+            renderItem={({ item }) => (
+              <SelectedCatalogItemCard
+                title={item?.name || 'Utensil'}
+                subtitle={`${normalizeCategory(item)}${item?.note ? ` • ${item.note}` : ''}`}
+                onPress={() =>
+                  navigation?.navigate('UtensilDetail', {
+                    itemId: item.id,
+                    item,
+                    readOnly: true,
+                    fromCatalog: true,
+                  })
+                }
+                topAction={{
+                  iconName: 'open-outline',
+                  onPress: () =>
                     navigation?.navigate('UtensilDetail', {
-                      itemId: item.utensil_id,
-                      item: utensil,
-                    })
-                  }
-                  topAction={{
-                    iconName: 'create-outline',
-                    onPress: () =>
-                      navigation?.navigate('UtensilDetail', {
-                        itemId: item.utensil_id,
-                        item: utensil,
-                      }),
-                  }}
-                />
-              );
-            }}
+                      itemId: item.id,
+                      item,
+                      readOnly: true,
+                      fromCatalog: true,
+                    }),
+                }}
+              />
+            )}
           />
         )}
-      </View>
-      <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
-        <ModuleReadyChip moduleKey={MODULE_KEYS.FOOD_UTENSILS} />
-
-        <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceCommand}>
-          <Ionicons name="mic" size={18} color={COLORS.bg} />
-          <Text style={styles.voiceButtonText}>Voice Command</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomAddButton} activeOpacity={0.9} onPress={openAddScreen}>
-          <Ionicons name="add-circle-outline" size={16} color={COLORS.text} />
-          <Text style={styles.bottomAddButtonText}>Add Utensil</Text>
-        </TouchableOpacity>
       </View>
     </RootContainer>
   );
@@ -228,20 +212,6 @@ const styles = StyleSheet.create({
     color: '#FFB4A8',
     fontSize: 14,
   },
-  retryButton: {
-    marginTop: 10,
-    alignSelf: 'flex-start',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,124,123,0.45)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  retryText: {
-    color: '#FFB4A8',
-    fontWeight: '700',
-    fontSize: 12,
-  },
   emptyWrap: {
     flex: 1,
     justifyContent: 'center',
@@ -256,134 +226,16 @@ const styles = StyleSheet.create({
   },
   emptySubtitle: {
     color: COLORS.muted,
-    fontSize: 24,
+    fontSize: 20,
     textAlign: 'center',
     marginTop: 8,
-    lineHeight: 29,
-  },
-  emptyCta: {
-    marginTop: 16,
-    backgroundColor: COLORS.accent,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  emptyCtaText: {
-    color: COLORS.bg,
-    fontSize: 15,
-    fontWeight: '700',
+    lineHeight: 25,
   },
   listContent: {
     paddingBottom: 28,
   },
   groupSection: {
-    marginTop: 4,
-  },
-  itemRow: {
-    marginTop: 8,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.18)',
-    backgroundColor: COLORS.card,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  itemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    flex: 1,
-  },
-  itemIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(90,209,232,0.3)',
-    backgroundColor: 'rgba(90,209,232,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  itemEmoji: {
-    fontSize: 16,
-  },
-  itemTextWrap: {
-    flex: 1,
-  },
-  itemTitle: {
-    color: COLORS.text,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  itemMeta: {
-    color: COLORS.muted,
-    fontSize: 11,
-    marginTop: 2,
-  },
-  bottomBar: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    backgroundColor: 'rgba(14,15,20,0.96)',
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.24)',
-    padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  voiceButton: {
-    flex: 1,
-    borderRadius: 14,
-    backgroundColor: COLORS.accent,
-    minHeight: 46,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  voiceButtonText: {
-    color: COLORS.bg,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  bottomAddButton: {
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(162,167,179,0.35)',
-    backgroundColor: COLORS.card,
-    minHeight: 46,
-    paddingHorizontal: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  bottomAddButtonText: {
-    color: COLORS.text,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  removeButton: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,124,123,0.45)',
-    backgroundColor: 'rgba(255,124,123,0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  removeButtonText: {
-    color: '#FF9C92',
-    fontSize: 12,
-    fontWeight: '700',
+    marginBottom: 8,
   },
 });
 

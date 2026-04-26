@@ -1,110 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
-import ExercisesHomeScreen from './ExercisesHomeScreen';
-import GymHomeScreen from './GymHomeScreen';
-import MusclesHomeScreen from './muscles/MusclesHomeScreen';
-import GymTemplatesHomeScreen from './GymTemplatesHomeScreen';
-import SegmentedControl from '../../../ui/components/SegmentedControl';
 import COLORS from '../../../theme/colors';
 import UI_TOKENS from '../../../ui/tokens';
-import GymChatScreen from './GymChatScreen';
 import GymSessionsScreen from './GymSessionsScreen';
-import GymChatLabScreen from './GymChatLabScreen';
-
-const PRIMARY_TABS = [
-  { key: 'chat', label: 'Chat', icon: '💬' },
-  { key: 'logs', label: 'Sessions', icon: '🗒️' },
-  { key: 'library', label: 'Library', icon: '📚' },
-  { key: 'chat_lab', label: 'Chat Lab', icon: '🧪' },
-];
-
-const LIBRARY_TABS = [
-  { key: 'templates', label: 'Templates', icon: '🧩' },
-  { key: 'muscles', label: 'Muscles', icon: '💪' },
-  { key: 'exercises', label: 'Exercises', icon: '🤸' },
-  { key: 'machines', label: 'Machines', icon: '🏋️' },
-];
-
-function normalizePrimarySegment(value) {
-  if (value === 'Chat' || value === 'chat') return 'chat';
-  if (value === 'Chat Lab' || value === 'chat_lab' || value === 'chatlab') return 'chat_lab';
-  if (value === 'Logs' || value === 'logs') return 'logs';
-  if (value === 'Library' || value === 'library') return 'library';
-  if (value === 'Plan' || value === 'plan' || value === 'My Stats' || value === 'my_stats') return 'logs';
-  if (value === 'Machines' || value === 'Exercises' || value === 'Muscles' || value === 'Templates') return 'library';
-  return 'chat';
-}
-
-function normalizeLibrarySegment(value) {
-  if (value === 'Templates' || value === 'templates') return 'templates';
-  if (value === 'Exercises' || value === 'exercises') return 'exercises';
-  if (value === 'Machines' || value === 'machines') return 'machines';
-  return 'muscles';
-}
-
-function GymHubScreen({ navigation, route }) {
-  const [segment, setSegment] = useState(normalizePrimarySegment(route.params?.initialSegment));
-  const [librarySegment, setLibrarySegment] = useState(normalizeLibrarySegment(route.params?.initialSegment));
-
-  useEffect(() => {
-    const incoming = route.params?.initialSegment;
-    setSegment(normalizePrimarySegment(incoming));
-    if (incoming) setLibrarySegment(normalizeLibrarySegment(incoming));
-  }, [route.params?.initialSegment]);
-
-  const libraryContent = useMemo(() => {
-    if (librarySegment === 'templates') {
-      return <GymTemplatesHomeScreen navigation={navigation} embedded showHeader={false} />;
-    }
-    if (librarySegment === 'exercises') {
-      return <ExercisesHomeScreen navigation={navigation} embedded showHeader={false} />;
-    }
-    if (librarySegment === 'machines') {
-      return <GymHomeScreen navigation={navigation} embedded showHeader={false} />;
-    }
-    return <MusclesHomeScreen navigation={navigation} embedded showHeader={false} />;
-  }, [librarySegment, navigation]);
-
-  const renderContent = () => {
-    if (segment === 'chat') {
-      return <GymChatScreen />;
-    }
-    if (segment === 'logs') {
-      return <GymSessionsScreen />;
-    }
-    if (segment === 'chat_lab') {
-      return <GymChatLabScreen navigation={navigation} />;
-    }
-    return (
-      <View style={styles.libraryWrap}>
-        <View style={styles.libraryTabsWrap}>
-          <SegmentedControl
-            items={LIBRARY_TABS}
-            selectedIndex={LIBRARY_TABS.findIndex((item) => item.key === librarySegment)}
-            onChange={(_, item) => setLibrarySegment(item.key)}
-            variant="secondary"
-          />
-        </View>
-        <View style={styles.libraryContentWrap}>{libraryContent}</View>
-      </View>
-    );
-  };
-
+function GymHubScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.topCard}>
           <Text style={styles.title}>Gym</Text>
-
-          <SegmentedControl
-            items={PRIMARY_TABS}
-            selectedIndex={PRIMARY_TABS.findIndex((item) => item.key === segment)}
-            onChange={(_, item) => setSegment(item.key)}
-          />
         </View>
-
-        <View style={styles.contentWrap}>{renderContent()}</View>
+        <View style={styles.contentWrap}>
+          <GymSessionsScreen />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -136,18 +44,6 @@ const styles = StyleSheet.create({
   contentWrap: {
     flex: 1,
     paddingBottom: UI_TOKENS.spacing.xs,
-  },
-  libraryWrap: {
-    flex: 1,
-  },
-  libraryTabsWrap: {
-    paddingHorizontal: 16,
-    paddingTop: 2,
-    paddingBottom: 2,
-    backgroundColor: COLORS.bg,
-  },
-  libraryContentWrap: {
-    flex: 1,
   },
 });
 

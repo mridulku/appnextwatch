@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import {
+  listCatalogMachinesLite,
+  listMachineExerciseMappingsLite,
   listMuscles,
   listMuscleExerciseMappings,
   listMuscleMachineMappings,
@@ -36,6 +38,8 @@ export default function useMuscleExplorer() {
   const [subgroups, setSubgroups] = useState([]);
   const [exerciseMaps, setExerciseMaps] = useState([]);
   const [machineMaps, setMachineMaps] = useState([]);
+  const [machines, setMachines] = useState([]);
+  const [machineExerciseMappings, setMachineExerciseMappings] = useState([]);
   const [sessionHistory, setSessionHistory] = useState([]);
 
   const hydrate = useCallback(async () => {
@@ -43,12 +47,14 @@ export default function useMuscleExplorer() {
       setLoading(true);
       setError('');
 
-      const [muscleRows, subgroupRows, exerciseMapRows, machineMapRows, historyRows] =
+      const [muscleRows, subgroupRows, exerciseMapRows, machineMapRows, machineRows, machineExerciseRows, historyRows] =
         await Promise.all([
           listMuscles(),
           listMuscleSubgroups(),
           listMuscleExerciseMappings(),
           listMuscleMachineMappings(),
+          listCatalogMachinesLite(),
+          listMachineExerciseMappingsLite(),
           loadSessionHistory(),
         ]);
 
@@ -56,6 +62,8 @@ export default function useMuscleExplorer() {
       setSubgroups(subgroupRows || []);
       setExerciseMaps(exerciseMapRows || []);
       setMachineMaps(machineMapRows || []);
+      setMachines(machineRows || []);
+      setMachineExerciseMappings(machineExerciseRows || []);
       setSessionHistory(historyRows || []);
     } catch (nextError) {
       const tableHint = isTableMissingError(nextError)
@@ -92,6 +100,8 @@ export default function useMuscleExplorer() {
     subgroupById,
     exerciseMaps,
     machineMaps,
+    machines,
+    machineExerciseMappings,
     sessionHistory,
     refresh: hydrate,
   };

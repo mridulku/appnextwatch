@@ -347,3 +347,17 @@
 - Follow-ups / risks: Manual iOS smoke pass recommended for long recordings, interruptions, and network-failure retries.
 - Tag: nw-2026-02-26-1200-data-gym-audio (T1 + T2 + T3)
 - Notes: app/docs/sessions/2026-02-26/1157_data-gym-session-audio-actual.md
+
+## 2026-02-26 - Session navigation-wellness-movies-unified
+- Summary: Converted app to wellness-first entry and embedded Movies as a primary Wellness tab.
+- Changes:
+  - Removed category-based startup routing from root navigator.
+  - Authenticated users now always enter `WellnessApp`.
+  - Added `Movies` tab to Wellness bottom navigation (`Gym`, `Food`, `Movies`, `Test`) using existing movie navigator.
+  - Removed category-switch UI actions from shared settings and movie profile.
+- Files: app/App.js, app/features/shared/settings/SettingsProfileScreen.js, app/features/movies/profile/ProfileScreen.js, app/docs/prd/NEXTWATCH_PRD.md, app/docs/sessions/INDEX.md, app/docs/sessions/2026-02-26/1444_navigation-wellness-movies-unified.md.
+- Behavior impact: User-facing navigation/entrypoint change (T1): no category selector flow; movies accessed as Wellness tab.
+- Validation performed: `node --check` on edited JS files; `npx expo export --platform ios`.
+- Follow-ups / risks: `categoryMode` storage helper remains in repo but unused at runtime; safe cleanup can be done in separate maintenance pass.
+- Tag: TBD
+- Notes: app/docs/sessions/2026-02-26/1444_navigation-wellness-movies-unified.md

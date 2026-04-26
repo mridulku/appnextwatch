@@ -35,10 +35,10 @@ const EXERCISE_RULES = [
   { keywords: ['back extension'], scores: { lower_back: 34, glutes: 14, hamstrings: 8 } },
 
   { keywords: ['squat'], scores: { quads: 28, glutes: 24, hamstrings: 10, lower_back: 10, abs: 8 } },
-  { keywords: ['leg press', 'hack squat'], scores: { quads: 34, glutes: 16 } },
-  { keywords: ['lunge', 'split squat'], scores: { quads: 28, glutes: 22, hamstrings: 10 } },
+  { keywords: ['leg press', 'hack squat'], scores: { quads: 34, glutes: 16, adductors: 8 } },
+  { keywords: ['lunge', 'split squat'], scores: { quads: 28, glutes: 22, hamstrings: 10, adductors: 8, abductors: 8 } },
   { keywords: ['romanian deadlift', 'rdl', 'deadlift', 'hinge'], scores: { hamstrings: 30, glutes: 24, lower_back: 18, traps: 8 } },
-  { keywords: ['hip thrust'], scores: { glutes: 36, hamstrings: 10, lower_back: 8 } },
+  { keywords: ['hip thrust'], scores: { glutes: 36, hamstrings: 10, lower_back: 8, abductors: 10 } },
   { keywords: ['leg extension'], scores: { quads: 40 } },
   { keywords: ['leg curl'], scores: { hamstrings: 40 } },
   { keywords: ['calf raise'], scores: { calves: 40 } },
@@ -71,7 +71,7 @@ const MACHINE_RULES = [
   { keywords: ['leg press', 'hack squat'], scores: { quads: 34, glutes: 16 } },
   { keywords: ['leg extension'], scores: { quads: 40 } },
   { keywords: ['leg curl'], scores: { hamstrings: 40 } },
-  { keywords: ['glute drive'], scores: { glutes: 36, hamstrings: 10 } },
+  { keywords: ['glute drive'], scores: { glutes: 36, hamstrings: 10, abductors: 10 } },
   { keywords: ['calf raise'], scores: { calves: 40 } },
   { keywords: ['shoulder press'], scores: { front_delts: 30, side_delts: 12, triceps: 12 } },
   { keywords: ['lateral raise'], scores: { side_delts: 40 } },
@@ -79,6 +79,8 @@ const MACHINE_RULES = [
   { keywords: ['preacher'], scores: { biceps: 34, forearms: 12 } },
   { keywords: ['dip'], scores: { triceps: 30, lower_chest: 12 } },
   { keywords: ['ab crunch', 'captain chair'], scores: { abs: 30, lower_abs: 20 } },
+  { keywords: ['abduction', 'abductor'], scores: { abductors: 38, glutes: 16 } },
+  { keywords: ['adduction', 'adductor'], scores: { adductors: 38 } },
   { keywords: ['cable tower', 'adjustable pulley'], scores: { mid_chest: 12, lats: 12, side_delts: 12, biceps: 10, triceps: 10, abs: 8, obliques: 40 } },
 ];
 
@@ -144,6 +146,8 @@ function tokenToSubgroupScore(token) {
   if (text.includes('quad')) next.quads = 35;
   if (text.includes('hamstring')) next.hamstrings = 35;
   if (text.includes('glute')) next.glutes = 35;
+  if (text.includes('adductor')) next.adductors = 35;
+  if (text.includes('abductor')) next.abductors = 35;
   if (text.includes('calf')) next.calves = 35;
 
   if (text.includes('front delt')) next.front_delts = 35;

@@ -1,86 +1,121 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
+  Image,
+  Modal,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
-import CatalogItemCard from '../../../../ui/components/CatalogItemCard';
+import { ITEM_PLACEHOLDER_IMAGE } from '../../../../core/placeholders';
+import { listSubgroupMovementMappings } from '../../../../core/api/exerciseMovementsDb';
 import COLORS from '../../../../theme/colors';
 import UI_TOKENS from '../../../../ui/tokens';
-import { buildMuscleStats, sortMappingsByPriorityAndName } from './muscleMapping';
 import { formatScore, getScoreBand } from './scoreBand';
 import useMuscleExplorer from './useMuscleExplorer';
+import ExerciseGroupSection from '../components/ExerciseGroupSection';
 
-function ChevronAction() {
-  return (
-    <View style={styles.chevronAction}>
-      <Ionicons name="chevron-forward" size={16} color={COLORS.text} />
-    </View>
-  );
-}
+const SCORE_TIERS = [
+  {
+    key: 'primary',
+    title: 'Primary movements',
+    subtitle: 'These movements target this muscle directly and should be the main options for biasing it.',
+    minimumScore: 80,
+  },
+  {
+    key: 'secondary',
+    title: 'Secondary movements',
+    subtitle: 'These movements hit the muscle meaningfully, but it is not the main driver of the movement.',
+    minimumScore: 60,
+  },
+  {
+    key: 'assist',
+    title: 'Assist movements',
+    subtitle: 'These movements still involve the muscle, but more as supporting work than as the main target.',
+    minimumScore: 40,
+  },
+];
 
 function MuscleDetailScreen({ navigation, route }) {
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [movementRows, setMovementRows] = useState([]);
+  const [movementLoading, setMovementLoading] = useState(true);
+  const [movementError, setMovementError] = useState('');
   const groupKey = route.params?.groupKey;
   const subKey = route.params?.subKey;
 
-  const {
-    loading,
-    error,
-    muscles,
-    subgroups,
-    exerciseMaps,
-    sessionHistory,
-  } = useMuscleExplorer();
+  const { loading, error, muscles, subgroups } = useMuscleExplorer();
 
   const group = useMemo(
     () => muscles.find((muscle) => muscle.name_key === groupKey) || null,
     [muscles, groupKey],
   );
   const subgroup = useMemo(
-    () =>
-      subgroups.find(
-        (entry) => entry.muscle_id === group?.id && entry.name_key === subKey,
-      ) || null,
+    () => subgroups.find((entry) => entry.muscle_id === group?.id && entry.name_key === subKey) || null,
     [subgroups, group?.id, subKey],
   );
 
-  const mappedExercises = useMemo(() => {
-    if (!subgroup) return [];
-    const bestSubgroupByExerciseId = exerciseMaps.reduce((acc, row) => {
-      const current = acc[row.exercise_id];
-      const score = Number.isFinite(Number(row?.target_score))
-        ? Number(row.target_score)
-        : (row?.is_primary ? 80 : 0);
-      if (!current || score > current.score) {
-        acc[row.exercise_id] = {
-          muscle_subgroup_id: row.muscle_subgroup_id,
-          score,
-        };
+  useEffect(() => {
+    let isActive = true;
+    async function hydrateMovementRows() {
+      if (!subgroup?.id) {
+        setMovementRows([]);
+        setMovementLoading(false);
+        return;
       }
-      return acc;
-    }, {});
 
-    const rows = exerciseMaps.filter((map) => {
-      if (map.muscle_subgroup_id !== subgroup.id) return false;
-      const top = bestSubgroupByExerciseId[map.exercise_id];
-      return top?.muscle_subgroup_id === subgroup.id;
-    });
-    return sortMappingsByPriorityAndName(rows, 'catalog_exercise');
-  }, [exerciseMaps, subgroup]);
+      try {
+        setMovementLoading(true);
+        setMovementError('');
+        const rows = await listSubgroupMovementMappings({ subgroupId: subgroup.id });
+        if (!isActive) return;
+        setMovementRows(rows || []);
+      } catch (nextError) {
+        if (!isActive) return;
+        setMovementError(nextError?.message || 'Could not load movement mappings');
+      } finally {
+        if (isActive) setMovementLoading(false);
+      }
+    }
 
-  const stats = useMemo(
+    hydrateMovementRows();
+    return () => {
+      isActive = false;
+    };
+  }, [subgroup?.id]);
+
+  const mappedMovements = useMemo(
     () =>
-      buildMuscleStats({
-        mappedExercises: mappedExercises.map((map) => map.catalog_exercise).filter(Boolean),
-        sessionHistory,
+      (movementRows || []).map((row) => {
+        const score = Number(row?.target_score || 0);
+        return {
+          ...(row.movement || {}),
+          targetScore: score,
+          scoreBand: getScoreBand(score),
+          muscle: `${row.movement?.primary_muscle_group || group?.name || 'Movement'} • ${formatScore(score)} • ${getScoreBand(score)}`,
+        };
       }),
-    [mappedExercises, sessionHistory],
+    [group?.name, movementRows],
+  );
+
+  const tieredSections = useMemo(
+    () =>
+      SCORE_TIERS.map((tier, index) => {
+        const upperBound = index === 0 ? Infinity : SCORE_TIERS[index - 1].minimumScore;
+        const items = mappedMovements.filter(
+          (row) => Number(row?.targetScore || 0) >= tier.minimumScore && Number(row?.targetScore || 0) < upperBound,
+        );
+        return {
+          ...tier,
+          items,
+        };
+      }).filter((tier) => tier.items.length),
+    [mappedMovements],
   );
 
   if (!group || !subgroup) {
@@ -96,7 +131,7 @@ function MuscleDetailScreen({ navigation, route }) {
     );
   }
 
-  if (loading) {
+  if (loading || movementLoading) {
     return (
       <View style={styles.safeArea}>
         <View style={styles.loadingWrap}>
@@ -107,99 +142,87 @@ function MuscleDetailScreen({ navigation, route }) {
     );
   }
 
+  const heroImageSource = subgroup?.image_url
+    ? { uri: subgroup.image_url }
+    : group?.image_url
+      ? { uri: group.image_url }
+      : ITEM_PLACEHOLDER_IMAGE;
+
   return (
     <View style={styles.safeArea}>
       <FlatList
-        data={mappedExercises}
-        keyExtractor={(item) => item.id}
+        data={tieredSections}
+        keyExtractor={(item) => item.key}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <>
             <View style={styles.heroCard}>
-              <Text style={styles.heroTitle}>Target: {subgroup.name}</Text>
-              <Text style={styles.heroSubtitle}>{group.name} muscle explorer</Text>
-            </View>
-
-            <View style={styles.statsCard}>
-              <Text style={styles.statsTitle}>Stats</Text>
-              <View style={styles.statsGrid}>
-                <View style={styles.statsItem}>
-                  <Text style={styles.statsLabel}>Last trained</Text>
-                  <Text style={styles.statsValue}>{stats.lastTrainedLabel}</Text>
-                </View>
-                <View style={styles.statsItem}>
-                  <Text style={styles.statsLabel}>Sets this week</Text>
-                  <Text style={styles.statsValue}>{stats.setsThisWeek}</Text>
-                </View>
-                <View style={styles.statsItem}>
-                  <Text style={styles.statsLabel}>Weekly volume proxy</Text>
-                  <Text style={styles.statsValue}>{stats.weeklyVolumeProxy} kg</Text>
-                </View>
-                <View style={styles.statsItem}>
-                  <Text style={styles.statsLabel}>Suggested focus</Text>
-                  <Text style={styles.statsValue}>{stats.suggestedFocus}</Text>
-                </View>
+              <TouchableOpacity activeOpacity={0.92} onPress={() => setImageViewerVisible(true)}>
+                <Image source={heroImageSource} style={styles.heroImage} resizeMode="cover" />
+              </TouchableOpacity>
+              <View style={styles.heroTextWrap}>
+                <Text style={styles.heroTitle}>Target: {subgroup.name}</Text>
+                <Text style={styles.heroSubtitle}>{group.name} muscle explorer</Text>
+                <Text style={styles.heroHint}>Tap image to enlarge</Text>
               </View>
             </View>
 
-            {error ? (
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionEyebrow}>Exercises</Text>
+              <Text style={styles.sectionTitle}>Movements that target {subgroup.name}</Text>
+              <Text style={styles.sectionSubtitle}>
+                Open a movement, then choose the exact variant you want to inspect.
+              </Text>
+            </View>
+
+            {error || movementError ? (
               <View style={styles.errorCard}>
-                <Text style={styles.errorText}>{error}</Text>
+                <Text style={styles.errorText}>{error || movementError}</Text>
               </View>
             ) : null}
           </>
         }
-        renderItem={({ item }) => {
-          const mapped = item.catalog_exercise;
-          const title = mapped?.name || 'Exercise';
-          const score = Number.isFinite(Number(item?.target_score))
-            ? Number(item.target_score)
-            : (item?.is_primary ? 80 : 0);
-          const subtitle = `${mapped?.primary_muscle_group || group.name} • ${mapped?.type || 'exercise'} • ${mapped?.equipment || 'bodyweight'} • ${formatScore(score)}`;
-
-          return (
-            <CatalogItemCard
-              title={title}
-              subtitle={subtitle}
-              badges={[
-                { label: formatScore(score), tone: 'muted' },
-                { label: getScoreBand(score), tone: score >= 80 ? 'warn' : 'info' },
-              ]}
-              actionLabel="View"
-              actionVariant="muted"
-              onPress={() =>
-                navigation.navigate('ExerciseDetail', {
-                  itemId: item.exercise_id,
-                  item: mapped,
-                  exerciseName: mapped?.name,
-                  fromCatalog: true,
-                  isAdded: false,
-                })
-              }
-              rightAction={<ChevronAction />}
+        renderItem={({ item }) => (
+          <View style={styles.tierSection}>
+            <View style={styles.tierHeader}>
+              <Text style={styles.tierTitle}>{item.title}</Text>
+              <Text style={styles.tierSubtitle}>{item.subtitle}</Text>
+            </View>
+            <ExerciseGroupSection
+              section={{ type: 'flat', items: item.items }}
+              navigation={navigation}
+              selectedCatalogIdSet={new Set()}
             />
-          );
-        }}
+          </View>
+        )}
         ListEmptyComponent={
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyCardTitle}>No exercises mapped yet for this muscle.</Text>
-            <TouchableOpacity
-              style={styles.emptyCardCta}
-              activeOpacity={0.9}
-              onPress={() =>
-                Alert.alert(
-                  'Add mappings',
-                  'Run from repo root:\nnode scripts/seed_muscles_and_mappings.js',
-                )
-              }
-            >
-              <Text style={styles.emptyCardCtaText}>Add mappings</Text>
-            </TouchableOpacity>
+            <Text style={styles.emptyCardTitle}>No movements mapped yet for this muscle.</Text>
+            <Text style={styles.emptyCardText}>Run the movement rollup seed to populate muscle-to-movement mappings.</Text>
           </View>
         }
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
+
+      <Modal visible={imageViewerVisible} transparent animationType="fade" onRequestClose={() => setImageViewerVisible(false)}>
+        <View style={styles.viewerRoot}>
+          <Pressable style={styles.viewerBackdrop} onPress={() => setImageViewerVisible(false)} />
+          <View style={styles.viewerCard}>
+            <View style={styles.viewerHeader}>
+              <Text style={styles.viewerTitle}>{subgroup.name}</Text>
+              <TouchableOpacity
+                style={styles.viewerCloseButton}
+                activeOpacity={0.9}
+                onPress={() => setImageViewerVisible(false)}
+              >
+                <Ionicons name="close" size={18} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+            <Image source={heroImageSource} style={styles.viewerImage} resizeMode="contain" />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -217,10 +240,23 @@ const styles = StyleSheet.create({
   heroCard: {
     borderRadius: UI_TOKENS.radius.lg,
     borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.24)',
-    backgroundColor: COLORS.card,
+    borderColor: 'rgba(245,201,106,0.34)',
+    backgroundColor: 'rgba(245,201,106,0.08)',
     padding: UI_TOKENS.spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: UI_TOKENS.spacing.sm,
     marginBottom: UI_TOKENS.spacing.sm,
+  },
+  heroImage: {
+    width: 72,
+    height: 72,
+    borderRadius: UI_TOKENS.card.imageRadius,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.24)',
+  },
+  heroTextWrap: {
+    flex: 1,
   },
   heroTitle: {
     color: COLORS.text,
@@ -232,93 +268,52 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.subtitle,
   },
-  statsCard: {
-    borderRadius: UI_TOKENS.radius.md,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.24)',
-    backgroundColor: COLORS.card,
-    padding: UI_TOKENS.spacing.md,
+  heroHint: {
+    marginTop: 6,
+    color: COLORS.accent,
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '600',
+  },
+  sectionHeader: {
+    marginBottom: UI_TOKENS.spacing.sm,
+    paddingHorizontal: 2,
+  },
+  sectionEyebrow: {
+    color: COLORS.accent,
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  sectionTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.title - 2,
+    fontWeight: '700',
+    marginTop: 3,
+  },
+  sectionSubtitle: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+    marginTop: 5,
+    lineHeight: 18,
+  },
+  tierSection: {
     marginBottom: UI_TOKENS.spacing.sm,
   },
-  statsTitle: {
+  tierHeader: {
+    marginBottom: UI_TOKENS.spacing.xs,
+    paddingHorizontal: 2,
+  },
+  tierTitle: {
     color: COLORS.text,
     fontSize: UI_TOKENS.typography.subtitle + 1,
     fontWeight: '700',
   },
-  statsGrid: {
-    marginTop: UI_TOKENS.spacing.sm,
-    gap: UI_TOKENS.spacing.xs,
-  },
-  statsItem: {
-    borderRadius: UI_TOKENS.radius.sm,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.2)',
-    backgroundColor: COLORS.cardSoft,
-    paddingHorizontal: UI_TOKENS.spacing.sm,
-    paddingVertical: UI_TOKENS.spacing.xs,
-  },
-  statsLabel: {
+  tierSubtitle: {
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.meta,
-  },
-  statsValue: {
-    marginTop: 2,
-    color: COLORS.text,
-    fontSize: UI_TOKENS.typography.subtitle,
-    fontWeight: '700',
-  },
-  separator: {
-    height: UI_TOKENS.spacing.sm,
-  },
-  chevronAction: {
-    width: UI_TOKENS.control.iconButton,
-    height: UI_TOKENS.control.iconButton,
-    borderRadius: UI_TOKENS.radius.sm,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.32)',
-    backgroundColor: COLORS.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyCard: {
-    borderRadius: UI_TOKENS.radius.md,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.24)',
-    backgroundColor: COLORS.card,
-    padding: UI_TOKENS.spacing.md,
-    marginTop: UI_TOKENS.spacing.xs,
-  },
-  emptyCardTitle: {
-    color: COLORS.muted,
-    fontSize: UI_TOKENS.typography.subtitle,
-  },
-  emptyCardCta: {
-    marginTop: UI_TOKENS.spacing.sm,
-    borderRadius: UI_TOKENS.radius.md,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(245,201,106,0.45)',
-    backgroundColor: 'rgba(245,201,106,0.16)',
-    minHeight: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: UI_TOKENS.spacing.sm,
-  },
-  emptyCardCtaText: {
-    color: COLORS.accent,
-    fontSize: UI_TOKENS.typography.meta + 1,
-    fontWeight: '700',
-  },
-  errorCard: {
-    borderRadius: UI_TOKENS.radius.md,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(255,124,123,0.42)',
-    backgroundColor: 'rgba(255,124,123,0.12)',
-    padding: UI_TOKENS.spacing.sm,
-    marginBottom: UI_TOKENS.spacing.sm,
-  },
-  errorText: {
-    color: '#FFB4A8',
-    fontSize: UI_TOKENS.typography.meta,
+    marginTop: 3,
+    lineHeight: 18,
   },
   loadingWrap: {
     flex: 1,
@@ -330,6 +325,18 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.subtitle,
   },
+  errorCard: {
+    borderRadius: UI_TOKENS.radius.md,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(255,124,123,0.36)',
+    backgroundColor: 'rgba(255,124,123,0.12)',
+    padding: UI_TOKENS.spacing.md,
+    marginBottom: UI_TOKENS.spacing.sm,
+  },
+  errorText: {
+    color: '#FFB4A8',
+    fontSize: UI_TOKENS.typography.meta,
+  },
   emptyWrap: {
     flex: 1,
     alignItems: 'center',
@@ -340,22 +347,87 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: UI_TOKENS.typography.title,
     fontWeight: '700',
+    textAlign: 'center',
   },
   backButton: {
     marginTop: UI_TOKENS.spacing.md,
-    minHeight: 42,
     borderRadius: UI_TOKENS.radius.md,
     borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.35)',
+    borderColor: 'rgba(162,167,179,0.24)',
     backgroundColor: COLORS.card,
     paddingHorizontal: UI_TOKENS.spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: UI_TOKENS.spacing.sm,
   },
   backText: {
     color: COLORS.text,
     fontSize: UI_TOKENS.typography.subtitle,
     fontWeight: '700',
+  },
+  emptyCard: {
+    borderRadius: UI_TOKENS.radius.md,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.2)',
+    backgroundColor: COLORS.card,
+    padding: UI_TOKENS.spacing.md,
+  },
+  emptyCardTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.subtitle + 1,
+    fontWeight: '700',
+  },
+  emptyCardText: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+    marginTop: 6,
+  },
+  separator: {
+    height: 2,
+  },
+  viewerRoot: {
+    flex: 1,
+    backgroundColor: 'rgba(3,7,18,0.74)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: UI_TOKENS.spacing.md,
+  },
+  viewerBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  viewerCard: {
+    width: '100%',
+    maxWidth: 420,
+    borderRadius: UI_TOKENS.radius.lg,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.24)',
+    backgroundColor: COLORS.card,
+    padding: UI_TOKENS.spacing.md,
+    gap: UI_TOKENS.spacing.sm,
+  },
+  viewerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: UI_TOKENS.spacing.sm,
+  },
+  viewerTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.subtitle + 2,
+    fontWeight: '700',
+    flex: 1,
+  },
+  viewerCloseButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.24)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  viewerImage: {
+    width: '100%',
+    height: 320,
+    borderRadius: UI_TOKENS.radius.md,
   },
 });
 

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Modal,
   Platform,
   Pressable,
@@ -49,6 +50,19 @@ function formatDateTitle(value) {
     month: 'short',
     day: 'numeric',
   });
+}
+
+function getSessionStatusMeta(displayStatus) {
+  if (displayStatus === 'ongoing') {
+    return { label: 'Ongoing', tone: 'warn', icon: 'play' };
+  }
+  if (displayStatus === 'complete') {
+    return { label: 'Complete', tone: 'success', icon: 'checkmark' };
+  }
+  if (displayStatus === 'expired') {
+    return { label: 'Expired', tone: 'expired', icon: 'time' };
+  }
+  return { label: 'Upcoming', tone: 'default', icon: 'calendar' };
 }
 
 function toNumber(value, fallback = 0) {
@@ -142,6 +156,8 @@ function normalizeExercises(exercises = []) {
     id: exercise?.id || `exercise_${index + 1}`,
     exerciseCatalogId: exercise?.exerciseCatalogId || exercise?.exerciseId || null,
     name: exercise?.name || `Exercise ${index + 1}`,
+    movementName: exercise?.movementName || '',
+    variantLabel: exercise?.variantLabel || '',
     muscleGroup: exercise?.primaryGroup || exercise?.muscleGroup || 'Muscle',
     equipment: exercise?.equipment || 'Equipment',
     image: exercise?.image || null,
@@ -159,6 +175,60 @@ function normalizeExercises(exercises = []) {
         sets: exercise?.planned_sets || exercise?.plannedSets || exercise?.planned || exercise?.sets,
       }),
   }));
+}
+
+function classifyPlannedExerciseSection(exercise) {
+  const normalizedName = String(exercise?.name || '').trim().toLowerCase();
+
+  if (['treadmill run', 'rowing sprint', 'bike sprint', 'jump rope', 'stair climb'].includes(normalizedName)) {
+    return 'cardio';
+  }
+
+  if (['push-up', 'dynamic hip mobility'].includes(normalizedName)) {
+    return 'warmup';
+  }
+
+  if (['thoracic rotation mobility'].includes(normalizedName)) {
+    return 'stretching';
+  }
+
+  return 'exercises';
+}
+
+function buildPlannedExerciseSections(exercises = []) {
+  const buckets = {
+    cardio: [],
+    warmup: [],
+    exercises: [],
+    stretching: [],
+  };
+
+  exercises.forEach((exercise) => {
+    buckets[classifyPlannedExerciseSection(exercise)].push(exercise);
+  });
+
+  return [
+    {
+      key: 'cardio',
+      title: 'Cardio',
+      items: buckets.cardio,
+    },
+    {
+      key: 'warmup',
+      title: 'Warm-up',
+      items: buckets.warmup,
+    },
+    {
+      key: 'exercises',
+      title: 'Exercises',
+      items: buckets.exercises,
+    },
+    {
+      key: 'stretching',
+      title: 'Stretching',
+      items: buckets.stretching,
+    },
+  ].filter((section) => section.items.length > 0);
 }
 
 function sumSets(exercises = [], actualByExerciseId = {}) {
@@ -203,6 +273,15 @@ function SetsRow({ setRow }) {
   );
 }
 
+function buildCompactSetSummaryRows(sets = []) {
+  return (sets || [])
+    .filter((setRow) => toNumber(setRow?.reps) > 0 || toNumber(setRow?.weight) > 0)
+    .map((setRow, index) => ({
+      key: `summary_${index + 1}`,
+      label: `${toNumber(setRow.reps)} reps · ${toNumber(setRow.weight)} kg`,
+    }));
+}
+
 function ExerciseAccordionCard({
   exercise,
   expanded,
@@ -213,23 +292,36 @@ function ExerciseAccordionCard({
   onOpenExercise,
 }) {
   const hasActual = Array.isArray(exercise.actualSets) && exercise.actualSets.length > 0;
+  const collapsedSetSummaryRows = buildCompactSetSummaryRows(
+    mode === 'session'
+      ? (hasActual ? exercise.actualSets : exercise.plannedSets)
+      : (hasActual ? exercise.actualSets : exercise.plannedSets),
+  );
 
   return (
     <View style={styles.exerciseCardWrap}>
       <Pressable onPress={onToggle} style={({ pressed }) => [styles.exerciseCard, pressed && styles.exerciseCardPressed]}>
         <View style={styles.exerciseThumbWrap}>
           <View style={styles.exerciseThumbFrame}>
-            <Ionicons name="barbell-outline" size={20} color={COLORS.muted} />
+            {exercise.image ? (
+              <Image source={{ uri: exercise.image }} style={styles.exerciseThumbImage} resizeMode="cover" />
+            ) : (
+              <Ionicons name="barbell-outline" size={20} color={COLORS.muted} />
+            )}
           </View>
         </View>
 
         <View style={styles.exerciseMain}>
           <Text style={styles.exerciseTitle}>{exercise.name}</Text>
-          <Text style={styles.exerciseMeta}>
-            {exercise.muscleGroup} • {exercise.equipment}
-            {exercise.estimatedDurationMin ? ` • est ${exercise.estimatedDurationMin} min` : ''}
-          </Text>
-
+          {!expanded && collapsedSetSummaryRows.length ? (
+            <View style={styles.exerciseSummaryWrap}>
+              {collapsedSetSummaryRows.map((row) => (
+                <View key={row.key} style={styles.exerciseSummaryChip}>
+                  <Text style={styles.exerciseSummaryChipText}>{row.label}</Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
           {mode === 'actual' && !hasActual ? (
             <Text style={styles.notLoggedText}>Not logged</Text>
           ) : null}
@@ -255,7 +347,7 @@ function ExerciseAccordionCard({
             </View>
           ) : null}
           <View style={styles.viewSetsPill}>
-            <Text style={styles.viewSetsText}>View sets</Text>
+            <Text style={styles.viewSetsText}>{expanded ? 'Hide' : 'Sets'}</Text>
             <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={12} color={COLORS.muted} />
           </View>
         </View>
@@ -263,7 +355,27 @@ function ExerciseAccordionCard({
 
       {expanded ? (
         <View style={styles.exerciseExpandPanel}>
-          {mode === 'planned' ? (
+          {mode === 'session' ? (
+            <>
+              <View style={styles.setsSection}>
+                <Text style={styles.setsSectionTitle}>Planned</Text>
+                {exercise.plannedSets.map((setRow) => (
+                  <SetsRow key={`planned_${exercise.id}_${setRow.set}`} setRow={setRow} />
+                ))}
+              </View>
+
+              <View style={styles.setsSection}>
+                <Text style={styles.setsSectionTitle}>Actual</Text>
+                {hasActual ? (
+                  exercise.actualSets.map((setRow) => (
+                    <SetsRow key={`actual_${exercise.id}_${setRow.set}`} setRow={setRow} />
+                  ))
+                ) : (
+                  <Text style={styles.actualEmptyText}>No actual logged</Text>
+                )}
+              </View>
+            </>
+          ) : mode === 'planned' ? (
             <>
               {exercise.plannedSets.map((setRow) => (
                 <SetsRow key={`planned_${exercise.id}_${setRow.set}`} setRow={setRow} />
@@ -428,6 +540,7 @@ function GymLogDetailScreen({
   route,
   navigation,
   sessionRecordingSessionId = '',
+  onRequestStartSession,
   onSessionStatusChange,
   onLoggedCountChange,
   onActualSetsSave,
@@ -449,6 +562,9 @@ function GymLogDetailScreen({
   const isFutureDay = dayDate.getTime() > today.getTime();
   const isPastDay = dayDate.getTime() < today.getTime();
   const isRestDay = /rest/i.test(String(sourceLog?.dayType || sourceLog?.workoutType || ''));
+  const isSessionLog = Boolean(sourceLog?.isSessionLog);
+  const sessionMeta = sourceLog?.sessionMeta || null;
+  const sessionStatusMeta = getSessionStatusMeta(sessionMeta?.displayStatus);
 
   const [activeTab, setActiveTab] = useState('planned');
   const [whyExpanded, setWhyExpanded] = useState(false);
@@ -470,7 +586,7 @@ function GymLogDetailScreen({
     })(),
   );
   const [editingExerciseId, setEditingExerciseId] = useState(null);
-  const [actualRecordingExpanded, setActualRecordingExpanded] = useState(true);
+  const [actualRecordingExpanded, setActualRecordingExpanded] = useState(false);
   const [actualExercisesExpanded, setActualExercisesExpanded] = useState(true);
   const [appUserId, setAppUserId] = useState('');
   const [sessionClips, setSessionClips] = useState([]);
@@ -497,6 +613,10 @@ function GymLogDetailScreen({
   const exercises = useMemo(
     () => initialExercises.map((exercise) => ({ ...exercise, actualSets: actualByExerciseId[exercise.id] || exercise.actualSets || null })),
     [initialExercises, actualByExerciseId],
+  );
+  const plannedSections = useMemo(
+    () => (isSessionLog ? buildPlannedExerciseSections(exercises) : []),
+    [exercises, isSessionLog],
   );
 
   const editingExercise = useMemo(() => exercises.find((exercise) => exercise.id === editingExerciseId) || null, [exercises, editingExerciseId]);
@@ -1086,10 +1206,17 @@ function GymLogDetailScreen({
         <View style={styles.heroCard}>
           <View style={styles.heroTopRow}>
             <View style={styles.heroTextWrap}>
-              <Text style={styles.heroTitle}>{sourceLog?.dayType || 'Workout Day'}</Text>
-              <Text style={styles.heroSubtitle}>{formatDateTitle(sourceLog?.dateISO)}</Text>
+              <Text style={styles.heroTitle}>
+                {isSessionLog ? sourceLog?.dayType || 'Session' : sourceLog?.dayType || 'Workout Day'}
+              </Text>
+              {!isSessionLog ? <Text style={styles.heroSubtitle}>{formatDateTitle(sourceLog?.dateISO)}</Text> : null}
             </View>
             <View style={styles.heroActions}>
+              {isSessionLog && onRequestStartSession && ['Upcoming', 'Ongoing'].includes(sessionStatusMeta.label) ? (
+                <TouchableOpacity style={styles.heroIconButtonStart} activeOpacity={0.9} onPress={onRequestStartSession}>
+                  <Ionicons name="play" size={15} color={COLORS.accent} />
+                </TouchableOpacity>
+              ) : null}
               {onRequestDuplicate ? (
                 <TouchableOpacity style={styles.heroIconButton} activeOpacity={0.9} onPress={onRequestDuplicate}>
                   <Ionicons name="copy-outline" size={15} color={COLORS.accent2} />
@@ -1102,8 +1229,66 @@ function GymLogDetailScreen({
               ) : null}
             </View>
           </View>
+
+          {isSessionLog ? (
+            <View style={styles.sessionHeroPillWrap}>
+              {sessionMeta?.dayLabel ? (
+                <View style={styles.sessionHeroPill}>
+                  <Ionicons name="sparkles-outline" size={12} color={COLORS.accent} />
+                  <Text style={styles.sessionHeroPillText}>{sessionMeta.dayLabel}</Text>
+                </View>
+              ) : null}
+              <View style={styles.sessionHeroPill}>
+                <Ionicons name="barbell-outline" size={12} color={COLORS.text} />
+                <Text style={styles.sessionHeroPillText}>
+                  {sessionMeta?.exerciseCount || 0} exercise{(sessionMeta?.exerciseCount || 0) === 1 ? '' : 's'}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.sessionHeroStatusPill,
+                  sessionStatusMeta.tone === 'warn'
+                    ? styles.sessionHeroStatusPillWarn
+                    : sessionStatusMeta.tone === 'success'
+                      ? styles.sessionHeroStatusPillSuccess
+                      : sessionStatusMeta.tone === 'expired'
+                        ? styles.sessionHeroStatusPillExpired
+                        : styles.sessionHeroStatusPillDefault,
+                ]}
+              >
+                <Ionicons
+                  name={sessionStatusMeta.icon}
+                  size={12}
+                  color={
+                    sessionStatusMeta.tone === 'warn'
+                      ? '#FFB98F'
+                      : sessionStatusMeta.tone === 'success'
+                        ? '#9FE3B0'
+                        : sessionStatusMeta.tone === 'expired'
+                          ? '#FFB4A8'
+                          : COLORS.muted
+                  }
+                />
+                <Text
+                  style={[
+                    styles.sessionHeroStatusPillText,
+                    sessionStatusMeta.tone === 'warn'
+                      ? styles.sessionHeroStatusPillTextWarn
+                      : sessionStatusMeta.tone === 'success'
+                        ? styles.sessionHeroStatusPillTextSuccess
+                        : sessionStatusMeta.tone === 'expired'
+                          ? styles.sessionHeroStatusPillTextExpired
+                          : styles.sessionHeroStatusPillTextDefault,
+                  ]}
+                >
+                  {sessionStatusMeta.label}
+                </Text>
+              </View>
+            </View>
+          ) : null}
         </View>
 
+        {!sourceLog?.hideSummaryStrip ? (
         <View style={styles.summaryStrip}>
           <View style={styles.summaryCell}>
             <Text style={styles.summaryLabel}>Duration</Text>
@@ -1122,7 +1307,9 @@ function GymLogDetailScreen({
             <Text style={styles.summaryValue}>{sourceLog?.summary?.estCalories ?? '—'}</Text>
           </View>
         </View>
+        ) : null}
 
+        {!sourceLog?.hideWhyCard ? (
         <View style={styles.whyCard}>
           <TouchableOpacity style={styles.whyHeader} activeOpacity={0.9} onPress={() => setWhyExpanded((prev) => !prev)}>
             <Text style={styles.whyTitle}>Why this plan?</Text>
@@ -1142,23 +1329,26 @@ function GymLogDetailScreen({
             </View>
           ) : null}
         </View>
+        ) : null}
 
-        <View style={styles.tabsRow}>
-          <TouchableOpacity
-            style={[styles.tabButton, activeTab === 'planned' ? styles.tabButtonActive : null]}
-            activeOpacity={0.9}
-            onPress={() => setActiveTab('planned')}
-          >
-            <Text style={[styles.tabButtonText, activeTab === 'planned' ? styles.tabButtonTextActive : null]}>Planned</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tabButton, activeTab === 'actual' ? styles.tabButtonActive : null]}
-            activeOpacity={0.9}
-            onPress={() => setActiveTab('actual')}
-          >
-            <Text style={[styles.tabButtonText, activeTab === 'actual' ? styles.tabButtonTextActive : null]}>Actual</Text>
-          </TouchableOpacity>
-        </View>
+        {!isSessionLog ? (
+          <View style={styles.tabsRow}>
+            <TouchableOpacity
+              style={[styles.tabButton, activeTab === 'planned' ? styles.tabButtonActive : null]}
+              activeOpacity={0.9}
+              onPress={() => setActiveTab('planned')}
+            >
+              <Text style={[styles.tabButtonText, activeTab === 'planned' ? styles.tabButtonTextActive : null]}>Planned</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tabButton, activeTab === 'actual' ? styles.tabButtonActive : null]}
+              activeOpacity={0.9}
+              onPress={() => setActiveTab('actual')}
+            >
+              <Text style={[styles.tabButtonText, activeTab === 'actual' ? styles.tabButtonTextActive : null]}>Actual</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
 
         {isRestDay ? (
           <View style={styles.restCard}>
@@ -1174,235 +1364,32 @@ function GymLogDetailScreen({
           </View>
         ) : null}
 
-        {activeTab === 'actual' && !isRestDay && sessionRecordingSessionId ? (
-          <View style={styles.actualWidgetWrap}>
-            <View style={styles.actualWidgetCard}>
-              <TouchableOpacity style={styles.actualWidgetHeader} activeOpacity={0.9} onPress={() => setActualRecordingExpanded((prev) => !prev)}>
-                <Text style={styles.actualWidgetTitle}>Session Recording</Text>
-                <Ionicons name={actualRecordingExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={COLORS.muted} />
-              </TouchableOpacity>
-
-              {actualRecordingExpanded ? (
-                <View style={styles.actualWidgetBody}>
-                  <Text style={styles.statusText}>Status: {recorderStatusText}</Text>
-                  {recorderError ? <Text style={styles.errorText}>{recorderError}</Text> : null}
-                  {transcribeStatus ? <Text style={styles.statusText}>{transcribeStatus}</Text> : null}
-                  {transcribeError ? <Text style={styles.errorText}>{transcribeError}</Text> : null}
-                  {failedSegments.length > 0 ? <Text style={styles.errorText}>{failedSegments.length} pending upload(s)</Text> : null}
-
-                  <View style={styles.controlsRow}>
-                    <TouchableOpacity
-                      style={[styles.controlButton, !canRecord && styles.controlButtonDisabled]}
-                      onPress={onPressRecordSession}
-                      disabled={!canRecord}
-                      activeOpacity={0.9}
-                    >
-                      <Ionicons name="mic" size={14} color={COLORS.bg} />
-                      <Text style={styles.controlText}>Record</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.controlButtonAlt, !canPause && styles.controlButtonDisabled]}
-                      onPress={onPressPauseSession}
-                      disabled={!canPause}
-                      activeOpacity={0.9}
-                    >
-                      <Ionicons name="pause" size={14} color={COLORS.text} />
-                      <Text style={styles.controlTextAlt}>Pause</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.controlButtonAlt, !canResume && styles.controlButtonDisabled]}
-                      onPress={onPressResumeSession}
-                      disabled={!canResume}
-                      activeOpacity={0.9}
-                    >
-                      <Ionicons name="play" size={14} color={COLORS.text} />
-                      <Text style={styles.controlTextAlt}>Resume</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.completeSessionButton, !canComplete && styles.controlButtonDisabled]}
-                      onPress={onPressCompleteSessionRecording}
-                      disabled={!canComplete}
-                      activeOpacity={0.9}
-                    >
-                      {['stopping', 'uploading', 'finalizing'].includes(recorderState) ? (
-                        <ActivityIndicator color={COLORS.bg} size="small" />
-                      ) : (
-                        <Ionicons name="checkmark-done-outline" size={14} color={COLORS.bg} />
-                      )}
-                      <Text style={styles.completeSessionText}>Complete session</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {failedSegments.length > 0 ? (
-                    <TouchableOpacity style={styles.retryButton} activeOpacity={0.9} onPress={retryPendingSegmentUploads}>
-                      <Ionicons name="refresh" size={13} color={COLORS.text} />
-                      <Text style={styles.retryButtonText}>Retry pending uploads</Text>
-                    </TouchableOpacity>
-                  ) : null}
-
-                  <View style={styles.savedRecordingsWrap}>
-                    <Text style={styles.savedRecordingsTitle}>Saved session recordings ({sessionClips.length})</Text>
-                    {sessionClips.length === 0 ? (
-                      <Text style={styles.metaText}>No session recordings yet.</Text>
-                    ) : null}
-
-                    {sessionClips.map((clip) => {
-                      const expanded = expandedClipId === clip.id;
-                      const segments = segmentsByClipId[clip.id] || [];
-                      const segmentsLoading = Boolean(segmentsLoadingByClipId[clip.id]);
-                      const combinedExpanded = expandedCombinedTranscriptClipId === clip.id;
-                      const combinedReady = Boolean(String(clip.transcript_text || '').trim());
-                      return (
-                        <View key={clip.id} style={styles.clipRow}>
-                          <View style={styles.clipHeaderRow}>
-                            <View style={styles.clipMetaWrap}>
-                              <Text style={styles.clipName} numberOfLines={1}>{clip.file_name}</Text>
-                              <Text style={styles.metaText}>
-                                {formatDuration(clip.total_duration_ms || clip.duration_ms)} • {Number(clip.parts_count) || 0} parts
-                              </Text>
-                              {clip.started_at && clip.ended_at ? <Text style={styles.metaText}>{formatRange(clip.started_at, clip.ended_at)}</Text> : null}
-                            </View>
-                            <View style={styles.clipActionsWrap}>
-                              <TouchableOpacity style={styles.iconButton} activeOpacity={0.9} onPress={() => playAllSegments(clip.id)}>
-                                <Ionicons
-                                  name={activePlayClipId === clip.id ? 'radio' : 'play-forward'}
-                                  size={15}
-                                  color={activePlayClipId === clip.id ? COLORS.accent2 : COLORS.text}
-                                />
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                style={styles.iconButton}
-                                activeOpacity={0.9}
-                                onPress={() => onPressCombinedTranscript(clip)}
-                                disabled={Boolean(buildingCombinedClipId && buildingCombinedClipId !== clip.id)}
-                              >
-                                {buildingCombinedClipId === clip.id ? (
-                                  <ActivityIndicator color={COLORS.text} size="small" />
-                                ) : combinedReady ? (
-                                  <Ionicons
-                                    name={combinedExpanded ? 'document-text' : 'document-text-outline'}
-                                    size={15}
-                                    color={COLORS.accent2}
-                                  />
-                                ) : (
-                                  <Ionicons name="documents-outline" size={15} color={COLORS.text} />
-                                )}
-                              </TouchableOpacity>
-                              <TouchableOpacity style={styles.iconButton} activeOpacity={0.9} onPress={() => toggleClipExpand(clip)}>
-                                <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={15} color={COLORS.text} />
-                              </TouchableOpacity>
-                              <TouchableOpacity style={styles.iconButton} activeOpacity={0.9} onPress={() => onPressDeleteClip(clip)}>
-                                <Ionicons name="trash-outline" size={15} color="#ff8787" />
-                              </TouchableOpacity>
-                            </View>
-                          </View>
-
-                          {expanded ? (
-                            <View style={styles.clipBody}>
-                              {segmentsLoading ? <ActivityIndicator color={COLORS.accent} /> : null}
-
-                              {!segmentsLoading && segments.length === 0 ? (
-                                <Text style={styles.metaText}>No parts found for this recording.</Text>
-                              ) : null}
-
-                              {!segmentsLoading ? segments.map((segment) => {
-                                const transcriptExpanded = expandedSegmentTranscriptId === segment.id;
-                                return (
-                                  <View key={segment.id} style={styles.segmentRow}>
-                                    <View style={styles.segmentHeaderRow}>
-                                      <View style={styles.segmentMetaWrap}>
-                                        <Text style={styles.segmentTitle}>Part {segment.segment_index}</Text>
-                                        <Text style={styles.metaText}>{formatRange(segment.started_at, segment.ended_at)}</Text>
-                                        <Text style={styles.metaText}>{formatDuration(segment.duration_ms)}</Text>
-                                      </View>
-                                      <View style={styles.segmentActionsWrap}>
-                                        <TouchableOpacity style={styles.iconButton} activeOpacity={0.9} onPress={() => playSegment(segment, clip.id)}>
-                                          <Ionicons
-                                            name={activePlaySegmentId === segment.id ? 'radio' : 'play'}
-                                            size={15}
-                                            color={activePlaySegmentId === segment.id ? COLORS.accent2 : COLORS.text}
-                                          />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                          style={styles.iconButton}
-                                          activeOpacity={0.9}
-                                          onPress={() => onPressTranscribeSegment(clip.id, segment)}
-                                          disabled={Boolean(transcribingSegmentId && transcribingSegmentId !== segment.id)}
-                                        >
-                                          {transcribingSegmentId === segment.id ? (
-                                            <ActivityIndicator color={COLORS.text} size="small" />
-                                          ) : segment.transcript_text ? (
-                                            <Ionicons
-                                              name={transcriptExpanded ? 'document-text' : 'document-text-outline'}
-                                              size={15}
-                                              color={COLORS.accent2}
-                                            />
-                                          ) : (
-                                            <Ionicons name="language-outline" size={15} color={COLORS.text} />
-                                          )}
-                                        </TouchableOpacity>
-                                      </View>
-                                    </View>
-
-                                    {transcriptExpanded && segment.transcript_text ? (
-                                      <View style={styles.transcriptWrap}>
-                                        <Text style={styles.transcriptTitle}>Transcript</Text>
-                                        <Text style={styles.transcriptText}>{segment.transcript_text}</Text>
-                                      </View>
-                                    ) : null}
-                                  </View>
-                                );
-                              }) : null}
-
-                              {combinedExpanded && combinedReady ? (
-                                <View style={styles.transcriptWrap}>
-                                  <Text style={styles.transcriptTitle}>Combined transcript</Text>
-                                  <Text style={styles.transcriptText}>{clip.transcript_text}</Text>
-                                </View>
-                              ) : null}
-                            </View>
-                          ) : null}
-                        </View>
-                      );
-                    })}
-                  </View>
+        {!isRestDay && isSessionLog
+          ? plannedSections.map((section) => (
+              <View key={section.key} style={styles.planSectionWrap}>
+                <View style={styles.planSectionHeader}>
+                  <Text style={styles.planSectionTitle}>{section.title}</Text>
                 </View>
-              ) : null}
-            </View>
+                {section.items.map((exercise) => {
+                  const expanded = Boolean(expandedMap[exercise.id]);
+                  return (
+                    <ExerciseAccordionCard
+                      key={exercise.id}
+                      exercise={exercise}
+                      expanded={expanded}
+                      mode="session"
+                      dayIsFuture={isFutureDay}
+                      onLogPress={openLogModal}
+                      onOpenExercise={openExerciseDetail}
+                      onToggle={() => setExpandedMap((prev) => ({ ...prev, [exercise.id]: !prev[exercise.id] }))}
+                    />
+                  );
+                })}
+              </View>
+            ))
+          : null}
 
-            <View style={styles.actualWidgetCard}>
-              <TouchableOpacity style={styles.actualWidgetHeader} activeOpacity={0.9} onPress={() => setActualExercisesExpanded((prev) => !prev)}>
-                <Text style={styles.actualWidgetTitle}>Session Exercises</Text>
-                <Ionicons name={actualExercisesExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={COLORS.muted} />
-              </TouchableOpacity>
-
-              {actualExercisesExpanded ? (
-                <View style={styles.actualWidgetBody}>
-                  {exercises.map((exercise) => {
-                    const expanded = Boolean(expandedMap[exercise.id]);
-                    return (
-                      <ExerciseAccordionCard
-                        key={exercise.id}
-                        exercise={exercise}
-                        expanded={expanded}
-                        mode={activeTab}
-                        dayIsFuture={isFutureDay}
-                        onLogPress={openLogModal}
-                        onOpenExercise={openExerciseDetail}
-                        onToggle={() => setExpandedMap((prev) => ({ ...prev, [exercise.id]: !prev[exercise.id] }))}
-                      />
-                    );
-                  })}
-                </View>
-              ) : null}
-            </View>
-          </View>
-        ) : null}
-
-        {!isRestDay && activeTab !== 'actual'
+        {!isRestDay && activeTab !== 'actual' && !isSessionLog
           ? exercises.map((exercise) => {
               const expanded = Boolean(expandedMap[exercise.id]);
               return (
@@ -1440,7 +1427,7 @@ function GymLogDetailScreen({
 
         {!isFutureDay && !isRestDay ? (
           <View style={styles.sessionActionsWrap}>
-            {loggedCount > 0 ? (
+            {(isSessionLog ? sessionStatusMeta.label !== 'Complete' : loggedCount > 0) ? (
               <TouchableOpacity
                 style={styles.sessionActionPrimary}
                 activeOpacity={0.9}
@@ -1460,8 +1447,10 @@ function GymLogDetailScreen({
               </TouchableOpacity>
             ) : null}
 
-            <Text style={styles.sessionStateText}>Session status: {sessionStatus === 'completed' ? 'Completed' : sessionStatus === 'skipped' ? 'Skipped' : 'Planned'}</Text>
-            {activeTab === 'actual' ? (
+            <Text style={styles.sessionStateText}>
+              Session status: {isSessionLog ? sessionStatusMeta.label : sessionStatus === 'completed' ? 'Completed' : sessionStatus === 'skipped' ? 'Skipped' : 'Planned'}
+            </Text>
+            {!isSessionLog && activeTab === 'actual' ? (
               <Text style={styles.actualSummaryText}>Actual summary: {actualSetCount} sets • {actualVolume} kg</Text>
             ) : null}
           </View>
@@ -1521,6 +1510,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  heroIconButtonStart: {
+    width: UI_TOKENS.control.iconButton,
+    height: UI_TOKENS.control.iconButton,
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(245,201,106,0.45)',
+    backgroundColor: 'rgba(245,201,106,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   heroIconButtonDanger: {
     width: UI_TOKENS.control.iconButton,
     height: UI_TOKENS.control.iconButton,
@@ -1540,6 +1539,69 @@ const styles = StyleSheet.create({
     marginTop: 4,
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.subtitle,
+  },
+  sessionHeroPillWrap: {
+    marginTop: UI_TOKENS.spacing.sm,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  sessionHeroPill: {
+    minHeight: 28,
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(162,167,179,0.28)',
+    backgroundColor: COLORS.cardSoft,
+    paddingHorizontal: UI_TOKENS.spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  sessionHeroPillText: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+  },
+  sessionHeroStatusPill: {
+    minHeight: 28,
+    borderRadius: UI_TOKENS.radius.sm,
+    borderWidth: UI_TOKENS.border.hairline,
+    paddingHorizontal: UI_TOKENS.spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  sessionHeroStatusPillDefault: {
+    borderColor: 'rgba(162,167,179,0.3)',
+    backgroundColor: 'rgba(162,167,179,0.12)',
+  },
+  sessionHeroStatusPillWarn: {
+    borderColor: 'rgba(255,164,116,0.45)',
+    backgroundColor: 'rgba(255,164,116,0.16)',
+  },
+  sessionHeroStatusPillSuccess: {
+    borderColor: 'rgba(110,214,144,0.4)',
+    backgroundColor: 'rgba(110,214,144,0.14)',
+  },
+  sessionHeroStatusPillExpired: {
+    borderColor: 'rgba(255,124,123,0.35)',
+    backgroundColor: 'rgba(255,124,123,0.12)',
+  },
+  sessionHeroStatusPillText: {
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
+  },
+  sessionHeroStatusPillTextDefault: {
+    color: COLORS.muted,
+  },
+  sessionHeroStatusPillTextWarn: {
+    color: '#FFB98F',
+  },
+  sessionHeroStatusPillTextSuccess: {
+    color: '#9FE3B0',
+  },
+  sessionHeroStatusPillTextExpired: {
+    color: '#FFB4A8',
   },
   summaryStrip: {
     marginTop: UI_TOKENS.spacing.sm,
@@ -1647,6 +1709,23 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: UI_TOKENS.typography.meta,
   },
+  planSectionWrap: {
+    marginTop: UI_TOKENS.spacing.sm,
+    gap: 8,
+  },
+  planSectionHeader: {
+    paddingHorizontal: 2,
+    gap: 2,
+  },
+  planSectionTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.subtitle + 1,
+    fontWeight: '700',
+  },
+  planSectionSubtitle: {
+    color: COLORS.muted,
+    fontSize: UI_TOKENS.typography.meta,
+  },
   actualEmptyCard: {
     marginTop: UI_TOKENS.spacing.sm,
     borderRadius: UI_TOKENS.radius.md,
@@ -1685,16 +1764,21 @@ const styles = StyleSheet.create({
     width: UI_TOKENS.card.imageSize,
     alignItems: 'center',
   },
-  exerciseThumbFrame: {
-    width: UI_TOKENS.card.imageSize,
-    height: UI_TOKENS.card.imageSize,
-    borderRadius: UI_TOKENS.card.imageRadius,
-    borderWidth: UI_TOKENS.border.hairline,
-    borderColor: 'rgba(162,167,179,0.24)',
-    backgroundColor: 'rgba(162,167,179,0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+exerciseThumbFrame: {
+  width: UI_TOKENS.card.imageSize,
+  height: UI_TOKENS.card.imageSize,
+  borderRadius: UI_TOKENS.card.imageRadius,
+  borderWidth: UI_TOKENS.border.hairline,
+  borderColor: 'rgba(162,167,179,0.24)',
+  backgroundColor: 'rgba(162,167,179,0.1)',
+  overflow: 'hidden',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+exerciseThumbImage: {
+  width: '100%',
+  height: '100%',
+},
   exerciseMain: {
     flex: 1,
     minWidth: 0,
@@ -1704,10 +1788,24 @@ const styles = StyleSheet.create({
     fontSize: UI_TOKENS.typography.subtitle + 2,
     fontWeight: '700',
   },
-  exerciseMeta: {
-    marginTop: 2,
-    color: COLORS.muted,
+  exerciseSummaryWrap: {
+    marginTop: 6,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  exerciseSummaryChip: {
+    borderRadius: 999,
+    borderWidth: UI_TOKENS.border.hairline,
+    borderColor: 'rgba(245,201,106,0.24)',
+    backgroundColor: 'rgba(245,201,106,0.08)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  exerciseSummaryChipText: {
+    color: COLORS.text,
     fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '600',
   },
   notLoggedText: {
     marginTop: 2,
@@ -1850,6 +1948,14 @@ const styles = StyleSheet.create({
   },
   actualEmptyWrap: {
     gap: 6,
+  },
+  setsSection: {
+    gap: 6,
+  },
+  setsSectionTitle: {
+    color: COLORS.text,
+    fontSize: UI_TOKENS.typography.meta,
+    fontWeight: '700',
   },
   actualEmptyText: {
     color: COLORS.muted,

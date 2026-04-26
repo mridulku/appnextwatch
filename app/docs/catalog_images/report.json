@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-02-27T07:50:47.779Z",
+  "coverage": {
+    "exercises": {
+      "total": 72,
+      "found": 59,
+      "pending": 13,
+      "missing": 0,
+      "rejected": 0,
+      "found_pct": 81.94
+    },
+    "machines": {
+      "total": 36,
+      "found": 34,
+      "pending": 2,
+      "missing": 0,
+      "rejected": 0,
+      "found_pct": 94.44
+    },
+    "muscles": {
+      "total": 6,
+      "found": 5,
+      "pending": 1,
+      "missing": 0,
+      "rejected": 0,
+      "found_pct": 83.33
+    },
+    "subgroups": {
+      "total": 21,
+      "found": 16,
+      "pending": 5,
+      "missing": 0,
+      "rejected": 0,
+      "found_pct": 76.19
+    }
+  }
+}

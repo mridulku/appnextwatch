@@ -64,9 +64,10 @@ function GymMachineDetailScreen({ route, navigation }) {
 
   const openExercise = (exercise) => {
     const currentRoutes = navigation.getState?.()?.routeNames ?? [];
-    if (currentRoutes.includes('ExerciseDetail')) {
-      navigation.navigate('ExerciseDetail', {
+    if (currentRoutes.includes('ExerciseVariants')) {
+      navigation.navigate('ExerciseVariants', {
         exerciseId: exercise.id,
+        movementName: exercise.name,
         exerciseName: exercise.name,
       });
       return;
@@ -81,9 +82,10 @@ function GymMachineDetailScreen({ route, navigation }) {
     const parentRoutes = parent.getState?.()?.routeNames ?? [];
     if (parentRoutes.includes('Library')) {
       parent.navigate('Library', {
-        screen: 'ExerciseDetail',
+        screen: 'ExerciseVariants',
         params: {
           exerciseId: exercise.id,
+          movementName: exercise.name,
           exerciseName: exercise.name,
         },
       });
@@ -92,9 +94,10 @@ function GymMachineDetailScreen({ route, navigation }) {
 
     if (parentRoutes.includes('Exercises')) {
       parent.navigate('Exercises', {
-        screen: 'ExerciseDetail',
+        screen: 'ExerciseVariants',
         params: {
           exerciseId: exercise.id,
+          movementName: exercise.name,
           exerciseName: exercise.name,
         },
       });

@@ -35,97 +35,87 @@ function CollapsibleGroup({ title, subtitle, expanded, onToggle, children }) {
 }
 
 function TestHomeScreen({ navigation }) {
-  const [showOnboarding, setShowOnboarding] = useState(true);
-  const [showFutureHomeNav, setShowFutureHomeNav] = useState(true);
-  const [showFutureGymNav, setShowFutureGymNav] = useState(true);
+  const [showInfra, setShowInfra] = useState(true);
+  const [showGymExperiments, setShowGymExperiments] = useState(true);
+  const [showMovieTools, setShowMovieTools] = useState(true);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Test Tools</Text>
-        <Text style={styles.subtitle}>Validate environment setup and service connectivity.</Text>
-
-        <ToolCard
-          title="Tables"
-          subtitle="Supabase config, connection, and table probes"
-          icon="server-outline"
-          onPress={() => navigation.navigate('TestTables')}
-        />
-
-        <ToolCard
-          title="OpenAI test connection"
-          subtitle="OpenAI config and message round-trip"
-          icon="chatbubble-ellipses-outline"
-          onPress={() => navigation.navigate('TestChat')}
-        />
-
-        <ToolCard
-          title="Audio Recorder"
-          subtitle="Record, pause, stop, play, and upload to Supabase"
-          icon="mic-outline"
-          onPress={() => navigation.navigate('TestAudioRecorder')}
-        />
-
         <CollapsibleGroup
-          title="Onboarding interfaces"
-          subtitle="Sandbox onboarding variants"
-          expanded={showOnboarding}
-          onToggle={() => setShowOnboarding((prev) => !prev)}
+          title="Infra"
+          subtitle="Environment and connectivity tools"
+          expanded={showInfra}
+          onToggle={() => setShowInfra((prev) => !prev)}
         >
           <ToolCard
-            title="Chat Onboarding"
-            subtitle="Chat-based onboarding sandbox"
-            icon="sparkles-outline"
-            onPress={() => navigation.navigate('TestOnboardingSandbox')}
+            title="Tables"
+            subtitle="Supabase config, connection, and table probes"
+            icon="server-outline"
+            onPress={() => navigation.navigate('TestTables')}
           />
 
           <ToolCard
-            title="Form Onboarding"
-            subtitle="Structured inputs + algorithm seed"
-            icon="list-outline"
-            onPress={() => navigation.navigate('TestFormOnboardingSandbox')}
+            title="OpenAI test connection"
+            subtitle="OpenAI config and message round-trip"
+            icon="chatbubble-ellipses-outline"
+            onPress={() => navigation.navigate('TestChat')}
           />
         </CollapsibleGroup>
 
         <CollapsibleGroup
-          title="Future navigation home"
-          subtitle="Screens moved from main wellness tabs"
-          expanded={showFutureHomeNav}
-          onToggle={() => setShowFutureHomeNav((prev) => !prev)}
+          title="Gym experiments"
+          subtitle="Gym chat and workout-session experiment surfaces"
+          expanded={showGymExperiments}
+          onToggle={() => setShowGymExperiments((prev) => !prev)}
         >
           <ToolCard
-            title="Home (Later)"
-            subtitle="Moved from main wellness tabs"
-            icon="home-outline"
-            onPress={() => navigation.navigate('TestHomeLater')}
+            title="Audio Recorder"
+            subtitle="Record, pause, stop, play, and upload to Supabase"
+            icon="mic-outline"
+            onPress={() => navigation.navigate('TestAudioRecorder')}
           />
 
           <ToolCard
-            title="Sessions (Later)"
-            subtitle="Moved from main wellness tabs"
-            icon="pulse-outline"
-            onPress={() => navigation.navigate('TestSessionsLater')}
+            title="Voice Gym Coach"
+            subtitle="Hands-free gym logging prototype"
+            icon="ear-outline"
+            onPress={() => navigation.navigate('TestVoiceGymCoach')}
+          />
+
+          <ToolCard
+            title="Basic Chat"
+            subtitle="Legacy gym chat experiment"
+            icon="chatbubble-ellipses-outline"
+            onPress={() => navigation.navigate('TestGymBasicChat')}
+          />
+
+          <ToolCard
+            title="Create Workout Session"
+            subtitle="Gym workout-session experiment"
+            icon="flask-outline"
+            onPress={() => navigation.navigate('TestGymCreateWorkoutSession')}
           />
         </CollapsibleGroup>
 
         <CollapsibleGroup
-          title="Future navigation gym"
-          subtitle="Legacy gym tabs kept as reference"
-          expanded={showFutureGymNav}
-          onToggle={() => setShowFutureGymNav((prev) => !prev)}
+          title="Movie tools"
+          subtitle="New logger and legacy browser"
+          expanded={showMovieTools}
+          onToggle={() => setShowMovieTools((prev) => !prev)}
         >
           <ToolCard
-            title="Gym Sessions (Later)"
-            subtitle="Legacy gym sessions tab reference"
-            icon="reader-outline"
-            onPress={() => navigation.navigate('TestGymSessionsLater')}
+            title="Movies"
+            subtitle="Date-based watch log"
+            icon="calendar-outline"
+            onPress={() => navigation.navigate('TestMoviesLogger')}
           />
 
           <ToolCard
-            title="Gym Plan (Later)"
-            subtitle="Legacy gym plan tab reference"
-            icon="compass-outline"
-            onPress={() => navigation.navigate('TestGymPlanLater')}
+            title="Legacy Movies"
+            subtitle="Original 5-tab movies experience"
+            icon="film-outline"
+            onPress={() => navigation.navigate('LegacyMovies')}
           />
         </CollapsibleGroup>
       </ScrollView>
@@ -146,17 +136,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 18,
-  },
-  title: {
-    color: COLORS.text,
-    fontSize: 30,
-    fontWeight: '700',
-  },
-  subtitle: {
-    color: COLORS.muted,
-    fontSize: 13,
-    marginTop: 4,
-    marginBottom: 12,
   },
   card: {
     borderRadius: 14,

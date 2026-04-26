@@ -2,6 +2,7 @@
 
 | Date | Time | Tag | Commit | Title (1 line) | Notes link |
 |---|---|---|---|---|---|
+| 2026-02-26 | 14:44 | TBD | TBD | wellness-first shell with movies embedded as primary tab | [1444_navigation-wellness-movies-unified.md](2026-02-26/1444_navigation-wellness-movies-unified.md) |
 | 2026-02-26 | 11:57 | nw-2026-02-26-1200-data-gym-audio | 6e58bdd | gym session actual tab recording + transcript integration | [1157_data-gym-session-audio-actual.md](2026-02-26/1157_data-gym-session-audio-actual.md) |
 | 2026-02-25 | 10:20 | TBD | TBD | gym chat lab unstructured text to session-action parser (v1) | [1020_chat-lab-session-actions.md](2026-02-25/1020_chat-lab-session-actions.md) |
 | 2026-02-24 | 17:58 | nw-2026-02-24-1758-data-gym-sessions | TBD | gym sessions+templates+mapping checkpoint and chat voice transcription | [1758_data-gym-sessions-chat-voice.md](2026-02-24/1758_data-gym-sessions-chat-voice.md) |

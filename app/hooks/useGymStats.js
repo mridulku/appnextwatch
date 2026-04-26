@@ -36,6 +36,7 @@ function hasGymStatContent(stats) {
     profile.heightCm
       || profile.waistCm
       || profile.bodyFatPct
+      || (Array.isArray(stats.gymBodyCompositionTests) && stats.gymBodyCompositionTests.length > 0)
       || targets.goalType
       || targets.trainingFrequencyPerWeek
       || targets.timelineLabel

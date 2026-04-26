@@ -3,34 +3,23 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
-  Modal,
-  Pressable,
   SafeAreaView,
   SectionList,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {
-  applyVoiceActions,
-  getRandomSampleVoicePhrase,
-  parseVoiceCommand,
-} from '../../../core/foodVoiceParser';
 import CollapsibleSection from '../../../components/CollapsibleSection';
 import SelectedCatalogItemCard from '../../../components/cards/SelectedCatalogItemCard';
 import { useAuth } from '../../../context/AuthContext';
 import {
   getOrCreateAppUser,
   listUserIngredients,
-  updateUserIngredientQuantity,
 } from '../../../core/api/foodInventoryDb';
-import { MODULE_KEYS } from '../../../core/api/userModuleStateDb';
-import ModuleReadyChip from '../../../ui/components/ModuleReadyChip';
 import COLORS from '../../../theme/colors';
 
 const CATEGORY_META = {
@@ -92,39 +81,6 @@ function formatQuantity(quantity, unitType) {
   return `${normalized} ${formatUnit(unitType, value)}`;
 }
 
-function convertAmount(amount, fromUnit, toUnit) {
-  if (!fromUnit || !toUnit || fromUnit === toUnit) return amount;
-  if (fromUnit === 'g' && toUnit === 'kg') return amount / 1000;
-  if (fromUnit === 'kg' && toUnit === 'g') return amount * 1000;
-  if (fromUnit === 'ml' && toUnit === 'litre') return amount / 1000;
-  if (fromUnit === 'litre' && toUnit === 'ml') return amount * 1000;
-  return amount;
-}
-
-function getPreviewWarnings(actions, inventoryItems) {
-  const warnings = [];
-
-  actions.forEach((action) => {
-    if (action.action !== 'remove' || action.isNewItem) return;
-    const item = inventoryItems.find((entry) => entry.id === action.itemId);
-    if (!item) return;
-
-    const amount = convertAmount(
-      action.amount,
-      action.inputUnit || item.unitType,
-      item.unitType,
-    );
-
-    if (amount > item.quantity) {
-      warnings.push(
-        `${item.name}: remove amount exceeds stock. Quantity will be clamped to 0.`,
-      );
-    }
-  });
-
-  return warnings;
-}
-
 function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -134,16 +90,9 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
   const [loading, setLoading] = useState(true);
   const [inlineError, setInlineError] = useState('');
   const [expandedCategories, setExpandedCategories] = useState({});
-  const [voiceVisible, setVoiceVisible] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [recognizedText, setRecognizedText] = useState('');
-  const [interpretation, setInterpretation] = useState({ actions: [], warnings: [] });
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const pulseAnim = useRef(new Animated.Value(1)).current;
   const snackbarAnim = useRef(new Animated.Value(0)).current;
-  const listenTimeoutRef = useRef(null);
-  const autoInterpretTimeoutRef = useRef(null);
   const snackbarTimeoutRef = useRef(null);
 
   const mapInventoryRows = (rows) =>
@@ -219,38 +168,10 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
 
   useEffect(
     () => () => {
-      if (listenTimeoutRef.current) clearTimeout(listenTimeoutRef.current);
-      if (autoInterpretTimeoutRef.current) clearTimeout(autoInterpretTimeoutRef.current);
       if (snackbarTimeoutRef.current) clearTimeout(snackbarTimeoutRef.current);
     },
     [],
   );
-
-  useEffect(() => {
-    if (!voiceVisible) return undefined;
-
-    pulseAnim.setValue(1);
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.12,
-          duration: 520,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 520,
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-
-    loop.start();
-    return () => {
-      loop.stop();
-      pulseAnim.setValue(1);
-    };
-  }, [voiceVisible, pulseAnim]);
 
   const totalItems = inventory.length;
   const lowStockItems = useMemo(
@@ -305,81 +226,6 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
         useNativeDriver: true,
       }).start();
     }, 2400);
-  };
-
-  const interpretCommand = (text) => {
-    const command = text.trim();
-    if (!command) {
-      setInterpretation({
-        actions: [],
-        warnings: ['No recognized text yet. Try speaking again or type a command.'],
-      });
-      return;
-    }
-
-    const parsed = parseVoiceCommand(command, inventory);
-    const actionWarnings = parsed.actions.flatMap((action) => action.warnings ?? []);
-    const previewWarnings = getPreviewWarnings(parsed.actions, inventory);
-
-    setInterpretation({
-      actions: parsed.actions,
-      warnings: [...parsed.warnings, ...actionWarnings, ...previewWarnings],
-    });
-  };
-
-  const openVoiceModal = () => {
-    if (listenTimeoutRef.current) clearTimeout(listenTimeoutRef.current);
-    if (autoInterpretTimeoutRef.current) clearTimeout(autoInterpretTimeoutRef.current);
-
-    const phrase = getRandomSampleVoicePhrase();
-    setVoiceVisible(true);
-    setIsListening(true);
-    setRecognizedText(phrase);
-    setInterpretation({ actions: [], warnings: [] });
-
-    listenTimeoutRef.current = setTimeout(() => {
-      setIsListening(false);
-    }, 1150);
-
-    autoInterpretTimeoutRef.current = setTimeout(() => {
-      interpretCommand(phrase);
-    }, 1300);
-  };
-
-  const closeVoiceModal = () => {
-    if (listenTimeoutRef.current) clearTimeout(listenTimeoutRef.current);
-    if (autoInterpretTimeoutRef.current) clearTimeout(autoInterpretTimeoutRef.current);
-
-    setVoiceVisible(false);
-    setIsListening(false);
-  };
-
-  const confirmVoiceActions = async () => {
-    if (interpretation.actions.length === 0) return;
-
-    const { nextInventory, warnings } = applyVoiceActions(inventory, interpretation.actions);
-    setInventory(nextInventory);
-    closeVoiceModal();
-
-    const existingRowsById = new Map(inventory.map((item) => [item.id, item]));
-    const updates = nextInventory
-      .filter((item) => existingRowsById.has(item.id))
-      .map(async (item) => {
-        const previous = existingRowsById.get(item.id);
-        if (Number(previous.quantity) === Number(item.quantity)) return null;
-        return updateUserIngredientQuantity({ rowId: item.id, quantity: item.quantity });
-      });
-
-    try {
-      await Promise.all(updates);
-      if (warnings.length > 0) {
-        showSnackbar(`Inventory updated. ${warnings[0]}`);
-      } else {
-        showSnackbar('Inventory updated');
-      }
-    } catch (error) {
-      showSnackbar(error?.message || 'Inventory synced with partial errors');
-    }
   };
 
   const openAddItemModal = () => {
@@ -462,7 +308,7 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
           <View style={styles.heroCard}>
             <View>
               <Text style={styles.heroTitle}>Inventory</Text>
-              <Text style={styles.heroSubtitle}>Track pantry stock and update hands-free.</Text>
+              <Text style={styles.heroSubtitle}>Track pantry stock and keep kitchen basics current.</Text>
             </View>
             <View style={styles.heroStatsRow}>
               <View style={styles.heroStatPill}>
@@ -516,13 +362,6 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
       </View>
 
       <View style={[styles.bottomBar, { bottom: Math.max(insets.bottom, 10) }]}>
-        <ModuleReadyChip moduleKey={MODULE_KEYS.FOOD_INVENTORY} />
-
-        <TouchableOpacity style={styles.voiceButton} activeOpacity={0.92} onPress={openVoiceModal}>
-          <Ionicons name="mic" size={18} color={COLORS.bg} />
-          <Text style={styles.voiceButtonText}>Voice Command</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.addButton} activeOpacity={0.9} onPress={openAddItemModal}>
           <Ionicons name="add-circle-outline" size={16} color={COLORS.text} />
           <Text style={styles.addButtonText}>Add Item</Text>
@@ -542,102 +381,6 @@ function FoodInventoryScreen({ navigation, embedded = false, showHero = true }) 
       >
         <Text style={styles.snackbarText}>{snackbarMessage}</Text>
       </Animated.View>
-
-      <Modal visible={voiceVisible} transparent animationType="fade" onRequestClose={closeVoiceModal}>
-        <View style={styles.modalRoot}>
-          <Pressable style={styles.modalBackdrop} onPress={closeVoiceModal} />
-          <View style={[styles.voiceSheet, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-            <View style={styles.sheetHandle} />
-            <Text style={styles.sheetTitle}>Voice Command</Text>
-            <Text style={styles.sheetSubtitle}>Speak naturally. We will confirm before applying.</Text>
-
-            <View style={styles.listenRow}>
-              <Animated.View style={[styles.listenOrb, { transform: [{ scale: pulseAnim }] }]}>
-                <Ionicons name="mic" size={18} color={COLORS.accent} />
-              </Animated.View>
-              <View>
-                <Text style={styles.listenTitle}>{isListening ? 'Listening...' : 'Ready to interpret'}</Text>
-                <Text style={styles.listenHint}>
-                  {isListening ? 'Capturing your command' : 'Edit text if needed before confirm'}
-                </Text>
-              </View>
-            </View>
-
-            <Text style={styles.fieldLabel}>Recognized text</Text>
-            <TextInput
-              style={styles.commandInput}
-              multiline
-              value={recognizedText}
-              onChangeText={setRecognizedText}
-              placeholder="e.g. add 3 tomatoes"
-              placeholderTextColor={COLORS.muted}
-              autoCapitalize="none"
-            />
-
-            <TouchableOpacity
-              style={styles.interpretButton}
-              activeOpacity={0.9}
-              onPress={() => interpretCommand(recognizedText)}
-            >
-              <Text style={styles.interpretButtonText}>Interpret</Text>
-            </TouchableOpacity>
-
-            <View style={styles.previewCard}>
-              <Text style={styles.previewTitle}>Interpretation Preview</Text>
-              {interpretation.actions.length === 0 ? (
-                <Text style={styles.previewEmpty}>No interpreted actions yet.</Text>
-              ) : (
-                interpretation.actions.map((action, index) => {
-                  const unit = action.inputUnit || action.itemUnitType;
-                  const commandText = `Will ${action.action.toUpperCase()} ${formatQuantity(
-                    action.amount,
-                    unit,
-                  )} ${action.itemName}`;
-                  return (
-                    <View key={`${action.itemName}_${index}`} style={styles.previewRow}>
-                      <Text style={styles.previewRowText}>{commandText}</Text>
-                      {action.isNewItem ? (
-                        <Text style={styles.previewHint}>Create new item if missing</Text>
-                      ) : null}
-                    </View>
-                  );
-                })
-              )}
-
-              {interpretation.warnings.length > 0 ? (
-                <View style={styles.warningWrap}>
-                  {interpretation.warnings.map((warning, idx) => (
-                    <Text key={`${warning}_${idx}`} style={styles.warningText}>
-                      • {warning}
-                    </Text>
-                  ))}
-                </View>
-              ) : null}
-            </View>
-
-            <View style={styles.sheetActions}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                activeOpacity={0.9}
-                onPress={closeVoiceModal}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.confirmButton,
-                  interpretation.actions.length === 0 && styles.confirmButtonDisabled,
-                ]}
-                activeOpacity={0.9}
-                onPress={confirmVoiceActions}
-                disabled={interpretation.actions.length === 0}
-              >
-                <Text style={styles.confirmButtonText}>Confirm</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
 
     </RootContainer>
   );
@@ -958,8 +701,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(162,167,179,0.24)',
     padding: 10,
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+    justifyContent: 'flex-end',
   },
   voiceButton: {
     flex: 1,

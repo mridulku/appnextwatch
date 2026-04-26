@@ -1,0 +1,483 @@
+{
+  "generated_at": "2026-03-08T02:46:00.795Z",
+  "count": 14,
+  "min_confidence": 75,
+  "missing_exercises": [
+    {
+      "exercise_id": "43b0676c-deda-452c-aee5-34f4e2e90fad",
+      "exercise_name": "Close Grip Lat Pulldown"
+    },
+    {
+      "exercise_id": "32598229-d69b-4be2-ae4e-99cd00769a92",
+      "exercise_name": "Decline Press"
+    },
+    {
+      "exercise_id": "ff2138d0-d62d-468f-a473-728f7c19f529",
+      "exercise_name": "Reverse Pec Deck"
+    },
+    {
+      "exercise_id": "0a7f6eff-7c79-4b81-af98-1c09ad85cef0",
+      "exercise_name": "Skull Crusher"
+    },
+    {
+      "exercise_id": "660fdce6-4f13-42c1-ad8b-c91ff87e79b8",
+      "exercise_name": "Wrist Curl"
+    }
+  ],
+  "items": [
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.19.47 AM.png",
+      "match": {
+        "detected_exercise_name": "Incline Barbell Press",
+        "best_match_name": "Incline Dumbbell Press",
+        "best_match_id": "f90a1f8b-c3d6-4c74-8dbc-be06acbc4804",
+        "confidence": 50,
+        "alternates": [
+          {
+            "name": "Decline Bench Press",
+            "id": "47f5090a-cff4-443c-babd-ddd89e674689",
+            "confidence": 30
+          },
+          {
+            "name": "Bench Press",
+            "id": "22da0254-d5d7-48f9-839b-9235a8135926",
+            "confidence": 20
+          }
+        ],
+        "reasoning": "The person is lying on an inclined bench pressing a barbell. Although the catalog lists Incline Dumbbell Press rather than barbell, this appears to be the closest match geographically and in muscle group worked (chest). This indicates some uncertainty since the equipment is a barbell not dumbbells and the catalog does not list Incline Barbell Press specifically.",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 5485,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": null,
+      "final_match_name": null,
+      "final_confidence": 0
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.29.25 AM.png",
+      "match": {
+        "detected_exercise_name": "Dumbbell Biceps Curl",
+        "best_match_name": "Biceps Curl",
+        "best_match_id": "68a08b31-7829-42a8-aae7-bd0bdc499fdc",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Hammer Curl",
+            "id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+            "confidence": 70
+          },
+          {
+            "name": "Preacher Curl",
+            "id": "f47cc1a3-1510-4667-9416-77332df2a107",
+            "confidence": 60
+          }
+        ],
+        "reasoning": "The image shows a person holding dumbbells curling them upwards, highlighting the biceps muscles. This matches the 'Biceps Curl' exercise in the catalog which is an isolation arm exercise using dumbbells. The alternate 'Hammer Curl' is similar but usually involves a neutral grip, which is less clear here. The exercise is clearly demonstrated, and dumbbells are being used, fitting well with the Biceps Curl description.",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 3902,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+      "final_match_name": "Hammer Curl",
+      "final_confidence": 70
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.33.51 AM.png",
+      "match": {
+        "detected_exercise_name": "Cable Crunch",
+        "best_match_name": "Cable Crunch",
+        "best_match_id": "283f705a-9a71-424b-b581-0719a46c4079",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Cable Rope Overhead Extension",
+            "id": "2d264680-33d2-438c-898c-21b0ef986050",
+            "confidence": 40
+          },
+          {
+            "name": "Pallof Press",
+            "id": "76eda93c-586b-48bf-a299-edb88d60b9a8",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The exercise shown involves using a cable machine with a motion that primarily targets the core muscles, especially the abdominal area, indicated by the forward flexion and muscle highlights. This matches the Cable Crunch in the catalog, which is a core isolation exercise performed on a cable machine. The cable is held and pulled downward in a crunching motion, consistent with the image.",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 3986,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "76eda93c-586b-48bf-a299-edb88d60b9a8",
+      "final_match_name": "Pallof Press",
+      "final_confidence": 30
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.36.54 AM.png",
+      "match": {
+        "detected_exercise_name": "Seated Cable Row",
+        "best_match_name": "Seated Cable Row",
+        "best_match_id": "1ee66934-90a6-4825-9b76-2965d0d95720",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Cable Curl",
+            "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+            "confidence": 40
+          },
+          {
+            "name": "Cable Rope Overhead Extension",
+            "id": "2d264680-33d2-438c-898c-21b0ef986050",
+            "confidence": 30
+          },
+          {
+            "name": "Single Arm Dumbbell Row",
+            "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+            "confidence": 25
+          }
+        ],
+        "reasoning": "The exercise shown involves sitting on a bench, pulling a cable attachment towards the torso, targeting the back muscles such as latissimus dorsi, trapezius, and rhomboids. The equipment is a cable machine. This matches closely with Seated Cable Row in the catalog.",
+        "visible_text": "www.WEIGHTTRAINING.GUIDE @WEIGHTTRAININGGUIDE WEIGHTTRAININGG Trapezius (middle and lower) Infraspinatus Rhomboids (deep) Latissimus dorsi Erector spinae (deep) Teres minor Posterior deltoid Teres major Triceps brachii (long head) Lower pectoralis major Brachialis Biceps brachii Brachioradialis",
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 5547,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": null,
+      "final_match_name": null,
+      "final_confidence": 0
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.38.06 AM.png",
+      "match": {
+        "detected_exercise_name": "Leg Curl",
+        "best_match_name": "Lying Leg Curl",
+        "best_match_id": "e419037e-04fb-43d9-86af-92c1fe8b350a",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Seated Leg Curl",
+            "id": "cd4d6a20-0732-4cde-91e1-8197587ef506",
+            "confidence": 70
+          },
+          {
+            "name": "Leg Curl",
+            "id": "0bd52984-ef5a-4adc-9fd4-3e3363fc1414",
+            "confidence": 50
+          }
+        ],
+        "reasoning": "The image shows a seated leg curl exercise targeting the hamstrings, gastrocnemius, gracilis, and sartorius muscles using a machine with a pad pressing against the lower leg. The seated position and mechanics match the 'Seated Leg Curl' type from the catalog closely, although lying leg curls are similar. The best confident match from the catalog is 'Lying Leg Curl' due to the presence of leg curling motion with a hamstring focus using machine equipment.",
+        "visible_text": "Sartorius\nGracilis\nGastrocnemius\nHamstrings\nwww.WEIGHTTRAINING.GUIDE\n@WEIGHTTRAININGGUIDE\nWEIGHTTRAININGG",
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 5146,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "cd4d6a20-0732-4cde-91e1-8197587ef506",
+      "final_match_name": "Seated Leg Curl",
+      "final_confidence": 70
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.38.26 AM.png",
+      "match": {
+        "detected_exercise_name": "Seated Shoulder Press on Machine",
+        "best_match_name": "Overhead Press",
+        "best_match_id": "86c586db-8e3f-4cd8-9c48-a6002ca4c8ac",
+        "confidence": 80,
+        "alternates": [
+          {
+            "name": "Shoulder Press",
+            "id": "2ee1c63a-5e2f-44f3-a572-4aaaeebfdc44",
+            "confidence": 60
+          },
+          {
+            "name": "Arnold Press",
+            "id": "7a51d583-b26a-466d-aec0-0d0c8ee711cf",
+            "confidence": 40
+          },
+          {
+            "name": "Upright Row",
+            "id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The exercise shows a seated machine press targeting the shoulders, involving a pressing motion overhead. Among catalog items, 'Overhead Press' is the closest match, although typically with barbell instead of machine, but this is the best match to an overhead shoulder press movement. No exact machine press named in catalog, so confidence is not maximum.",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 3948,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "7a51d583-b26a-466d-aec0-0d0c8ee711cf",
+      "final_match_name": "Arnold Press",
+      "final_confidence": 40
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.38.42 AM.png",
+      "match": {
+        "detected_exercise_name": "Dumbbell Shrug",
+        "best_match_name": "Shrug",
+        "best_match_id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+        "confidence": 85,
+        "alternates": [
+          {
+            "name": "Upright Row",
+            "id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+            "confidence": 60
+          },
+          {
+            "name": "Single Arm Dumbbell Row",
+            "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The image shows a person holding dumbbells with a focus on trapezius muscle activation, which is characteristic of the Shrug exercise. The use of dumbbells aligns with the Shrug in the catalog.",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 3377,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+      "final_match_name": "Upright Row",
+      "final_confidence": 60
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.38.58 AM.png",
+      "match": {
+        "detected_exercise_name": "Side Plank",
+        "best_match_name": "Side Plank",
+        "best_match_id": "e2da5aef-d786-4076-91fc-0b0092f86355",
+        "confidence": 70,
+        "alternates": [
+          {
+            "name": "Plank",
+            "id": "1c52ff88-c9b9-4179-bf6e-8ab0f457dbb8",
+            "confidence": 40
+          },
+          {
+            "name": "Russian Twist",
+            "id": "c40bd626-4879-4eb3-a284-2c5254e3503a",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The exercise shown involves holding the body in a side-lying position supported by one arm, characteristic of the Side Plank. The catalog includes 'Side Plank' as an exercise targeting the core with bodyweight, aligning with the depicted exercise, although no explicit ID is provided in the catalog.",
+        "visible_text": "SIDE PLANK",
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 2930,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "e2da5aef-d786-4076-91fc-0b0092f86355",
+      "final_match_name": "Side Plank",
+      "final_confidence": 70
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.57.32 AM.png",
+      "match": {
+        "detected_exercise_name": "Single Arm Dumbbell Row",
+        "best_match_name": "Single Arm Dumbbell Row",
+        "best_match_id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Bent Over Barbell Row",
+            "id": "3e84990c-9e7e-40ef-a5d7-ccaad308d8fe",
+            "confidence": 70
+          },
+          {
+            "name": "Shrugs",
+            "id": "4ca0c50d-28a4-4d3e-9e8c-eb76e665052b",
+            "confidence": 40
+          },
+          {
+            "name": "Chest Supported Row",
+            "id": "33ce5ff2-224a-4587-a932-fee6d0a3b51c",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The image shows a one-arm row exercise performed with a dumbbell and supported by a bench, targeting the back muscles. This matches the 'Single Arm Dumbbell Row' in the catalog based on equipment (dumbbell) and muscle group (back).",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 4118,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "4ca0c50d-28a4-4d3e-9e8c-eb76e665052b",
+      "final_match_name": "Shrugs",
+      "final_confidence": 40
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.58.01 AM.png",
+      "match": {
+        "detected_exercise_name": "Dumbbell Standing Calf Raise",
+        "best_match_name": "Standing Calf Raise",
+        "best_match_id": "4d3f2601-78a3-4ccd-8fc1-630235658161",
+        "confidence": 85,
+        "alternates": [
+          {
+            "name": "Calf Raise",
+            "id": "6b5e6ef3-d5a1-49ce-a740-6a2f89b4d7f7",
+            "confidence": 60
+          }
+        ],
+        "reasoning": "The exercise depicts a person holding dumbbells while performing a heel raise on a step, targeting the calf muscles. This matches closely with the 'Standing Calf Raise' in the catalog which involves calf isolation using a machine or weights. The visible dumbbells and body position align better with Standing Calf Raise than the machine-based Calf Raise.",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 2846,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "6b5e6ef3-d5a1-49ce-a740-6a2f89b4d7f7",
+      "final_match_name": "Calf Raise",
+      "final_confidence": 60
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.58.20 AM.png",
+      "match": {
+        "detected_exercise_name": "Hip Thrust (variation with rotation)",
+        "best_match_name": "Hip Thrust",
+        "best_match_id": "f603c63e-2b00-4561-8579-3e113d98ad3e",
+        "confidence": 75,
+        "alternates": [
+          {
+            "name": "Dynamic Hip Mobility",
+            "id": "712405c7-7d8c-4b90-95ba-dc4294ac4c9a",
+            "confidence": 50
+          },
+          {
+            "name": "Thoracic Rotation Mobility",
+            "id": "36336e54-6d1a-46a2-9b47-420cb834bf5b",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The exercise shows a hip hinge and thrust motion with a rotational element. The position involves one knee on the ground and the other leg bent forward, which is common in hip thrust variations that target glutes and hips. The rotation suggests mobility or dynamic variations but the core and hip focus aligns most closely with Hip Thrust from the catalog.",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 3606,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "36336e54-6d1a-46a2-9b47-420cb834bf5b",
+      "final_match_name": "Thoracic Rotation Mobility",
+      "final_confidence": 40
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.58.49 AM.png",
+      "match": {
+        "detected_exercise_name": "Cable Rope Overhead Extension",
+        "best_match_name": "Cable Rope Overhead Extension",
+        "best_match_id": "2d264680-33d2-438c-898c-21b0ef986050",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Triceps Pushdown",
+            "id": "251920ae-4b93-4da4-b873-5adf0657d489",
+            "confidence": 70
+          },
+          {
+            "name": "Cable Curl",
+            "id": "7b25425f-417f-478c-b944-b515e58e21cc",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The image shows a person performing a tricep extension exercise using a cable machine and rope attachment. This closely matches 'Cable Rope Overhead Extension' from the catalog which targets arms using cable equipment. The arm position and cable attachment support this classification, even though the image view is slightly different from common depictions.",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 3983,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": "251920ae-4b93-4da4-b873-5adf0657d489",
+      "final_match_name": "Triceps Pushdown",
+      "final_confidence": 70
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.59.03 AM.png",
+      "match": {
+        "detected_exercise_name": "Dumbbell Upright Row",
+        "best_match_name": "Upright Row",
+        "best_match_id": "31c9065e-6d62-424f-be39-3709a9b30a04",
+        "confidence": 85,
+        "alternates": [
+          {
+            "name": "Shrug",
+            "id": "38e427f3-b9e2-4537-a442-876fed4ed1a9",
+            "confidence": 40
+          },
+          {
+            "name": "Shrugs",
+            "id": "4ca0c50d-28a4-4d3e-9e8c-eb76e665052b",
+            "confidence": 40
+          },
+          {
+            "name": "Single Arm Dumbbell Row",
+            "id": "cebd0222-df4b-44e7-a87d-28c87a4d2385",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The exercise shown involves holding dumbbells and pulling them upwards close to the body with elbows leading, targeting deltoids and trapezius muscles. This matches the 'Upright Row' in the catalog, which uses a barbell but is conceptually closest to this dumbbell variation. The muscle groups and motion align closely.",
+        "visible_text": "Middle and lower trapezius, Anterior deltoid, Supraspinatus (deep), Lateral deltoid, Serratus anterior, Brachialis, Biceps brachii, Brachioradialis",
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 4459,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": null,
+      "final_match_name": null,
+      "final_confidence": 0
+    },
+    {
+      "file_name": "Screenshot 2026-03-08 at 7.59.57 AM.png",
+      "match": {
+        "detected_exercise_name": "Preacher Curl",
+        "best_match_name": "Preacher Curl",
+        "best_match_id": "f47cc1a3-1510-4667-9416-77332df2a107",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Barbell Curl",
+            "id": "187395e4-7568-4a88-adf8-42dc9fcecd3f",
+            "confidence": 40
+          },
+          {
+            "name": "Hammer Curl",
+            "id": "b7227237-0c33-4583-90e0-f3ee2cd2c5f0",
+            "confidence": 30
+          },
+          {
+            "name": "Biceps Curl",
+            "id": "68a08b31-7829-42a8-aae7-bd0bdc499fdc",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The user is performing an arm curl exercise with dumbbells while resting the elbows on a bench inclined surface, which matches the classic Preacher Curl position and equipment used (bench and dumbbells). The bent elbows and focused bicep movement align with Preacher Curl more than other curls.",
+        "visible_text": null,
+        "is_exercise_image": true
+      },
+      "meta": {
+        "ms": 4143,
+        "model": "gpt-4.1-mini"
+      },
+      "final_match_id": null,
+      "final_match_name": null,
+      "final_confidence": 0
+    }
+  ]
+}

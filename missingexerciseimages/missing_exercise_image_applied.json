@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-03-08T03:11:33.886Z",
+  "count": 3,
+  "items": [
+    {
+      "exercise_id": "32598229-d69b-4be2-ae4e-99cd00769a92",
+      "exercise_name": "Decline Press",
+      "source_file": "Screenshot 2026-03-08 at 8.37.18 AM.png",
+      "storage_path": "catalog/exercises/32598229-d69b-4be2-ae4e-99cd00769a92.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/32598229-d69b-4be2-ae4e-99cd00769a92.png"
+    },
+    {
+      "exercise_id": "ff2138d0-d62d-468f-a473-728f7c19f529",
+      "exercise_name": "Reverse Pec Deck",
+      "source_file": "Screenshot 2026-03-08 at 8.37.38 AM.png",
+      "storage_path": "catalog/exercises/ff2138d0-d62d-468f-a473-728f7c19f529.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/ff2138d0-d62d-468f-a473-728f7c19f529.png"
+    },
+    {
+      "exercise_id": "660fdce6-4f13-42c1-ad8b-c91ff87e79b8",
+      "exercise_name": "Wrist Curl",
+      "source_file": "Screenshot 2026-03-08 at 8.37.49 AM.png",
+      "storage_path": "catalog/exercises/660fdce6-4f13-42c1-ad8b-c91ff87e79b8.png",
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/exercises/660fdce6-4f13-42c1-ad8b-c91ff87e79b8.png"
+    }
+  ]
+}

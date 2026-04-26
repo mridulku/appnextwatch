@@ -69,6 +69,23 @@ export async function addUserSelection({
   return { mode: 'inserted', id: response.data?.id };
 }
 
+export async function getNextUserSelectionSortOrder({
+  table,
+  userId,
+}) {
+  const client = getClientOrThrow();
+  const response = await client
+    .from(table)
+    .select('sort_order')
+    .eq('user_id', userId)
+    .order('sort_order', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (response.error) throw response.error;
+  return Number(response.data?.sort_order || 0) + 1;
+}
+
 export async function removeUserSelection({
   table,
   userId,
@@ -84,4 +101,39 @@ export async function removeUserSelection({
 
   if (response.error) throw response.error;
   return true;
+}
+
+export async function hasUserSelection({
+  table,
+  userId,
+  fkColumn,
+  fkValue,
+}) {
+  const client = getClientOrThrow();
+  const response = await client
+    .from(table)
+    .select('id')
+    .eq('user_id', userId)
+    .eq(fkColumn, fkValue)
+    .maybeSingle();
+
+  if (response.error) throw response.error;
+  return Boolean(response.data?.id);
+}
+
+export async function updateUserSelectionSortOrder({
+  table,
+  rowId,
+  sortOrder,
+}) {
+  const client = getClientOrThrow();
+  const response = await client
+    .from(table)
+    .update({ sort_order: sortOrder })
+    .eq('id', rowId)
+    .select('id')
+    .single();
+
+  if (response.error) throw response.error;
+  return response.data;
 }

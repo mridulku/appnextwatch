@@ -4,17 +4,19 @@ import { Pressable, StyleSheet, Text, View, Image, TouchableOpacity } from 'reac
 import { ITEM_PLACEHOLDER_IMAGE } from '../../../../core/placeholders';
 import COLORS from '../../../../theme/colors';
 import UI_TOKENS from '../../../../ui/tokens';
+import { formatMeasuredSetRow } from '../exerciseMeasurement';
 
 function asNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function getVolume(sets = []) {
+function getVolume(sets = [], measurement) {
+  if (!measurement?.secondaryKey) return 0;
   return (sets || []).reduce((sum, setRow) => sum + asNumber(setRow.reps) * asNumber(setRow.weight), 0);
 }
 
-function SetsList({ sets, tone = 'planned' }) {
+function SetsList({ sets, tone = 'planned', measurement }) {
   return (
     <View style={styles.setsList}>
       {(sets || []).map((setRow) => (
@@ -24,9 +26,7 @@ function SetsList({ sets, tone = 'planned' }) {
               Set {setRow.set}
             </Text>
           </View>
-          <Text style={styles.setRowText}>{asNumber(setRow.reps)} reps</Text>
-          <Text style={styles.setRowDot}>•</Text>
-          <Text style={styles.setRowText}>{asNumber(setRow.weight)} kg</Text>
+          <Text style={styles.setRowText}>{formatMeasuredSetRow(setRow, measurement)}</Text>
         </View>
       ))}
     </View>
@@ -38,8 +38,9 @@ function LogExerciseCard({ exercise, expanded, onToggle, onLogPress }) {
   const actualSets = exercise?.actual_sets;
   const isLogged = exercise?.status === 'logged' || (Array.isArray(actualSets) && actualSets.length > 0);
 
-  const plannedVolume = getVolume(plannedSets);
-  const actualVolume = getVolume(actualSets || []);
+  const measurement = exercise?.measurement;
+  const plannedVolume = getVolume(plannedSets, measurement);
+  const actualVolume = getVolume(actualSets || [], measurement);
   const deltaVolume = isLogged ? actualVolume - plannedVolume : null;
 
   return (
@@ -80,20 +81,20 @@ function LogExerciseCard({ exercise, expanded, onToggle, onLogPress }) {
             <Ionicons name="list-outline" size={14} color={COLORS.muted} />
             <Text style={styles.sectionHeaderText}>Planned</Text>
           </View>
-          <SetsList sets={plannedSets} tone="planned" />
+          <SetsList sets={plannedSets} tone="planned" measurement={measurement} />
 
           {isLogged ? (
             <>
               <View style={styles.sectionHeaderRow}>
                 <Ionicons name="checkmark-done-outline" size={14} color="#79E3B9" />
                 <Text style={styles.sectionHeaderText}>Actual</Text>
-                {deltaVolume !== null && deltaVolume !== 0 ? (
+                {measurement?.secondaryKey && deltaVolume !== null && deltaVolume !== 0 ? (
                   <View style={styles.deltaPill}>
                     <Text style={styles.deltaPillText}>{deltaVolume > 0 ? '+' : ''}{Math.round(deltaVolume)} kg volume</Text>
                   </View>
                 ) : null}
               </View>
-              <SetsList sets={actualSets || []} tone="actual" />
+              <SetsList sets={actualSets || []} tone="actual" measurement={measurement} />
             </>
           ) : (
             <TouchableOpacity style={styles.inlineLogCta} activeOpacity={0.92} onPress={onLogPress}>

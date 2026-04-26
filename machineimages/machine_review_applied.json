@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-03-07T14:32:01.151Z",
+  "count": 4,
+  "items": [
+    {
+      "source_file": "IMG_6634.HEIC",
+      "machine_id": "46c9f583-50dc-4d71-8746-5e73ab671b44",
+      "machine_name": "Abduction/Adduction Machine",
+      "confidence": 90,
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/46c9f583-50dc-4d71-8746-5e73ab671b44.jpg"
+    },
+    {
+      "source_file": "IMG_6637.HEIC",
+      "machine_id": "67141a91-aca5-4b31-b605-2a48ce8534ea",
+      "machine_name": "Stair Climber",
+      "confidence": 90,
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/67141a91-aca5-4b31-b605-2a48ce8534ea.jpg"
+    },
+    {
+      "source_file": "IMG_6647.HEIC",
+      "machine_id": "447a4cae-e89a-4ea1-b9e3-cfb09c383f52",
+      "machine_name": "Decline Bench",
+      "confidence": 85,
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/447a4cae-e89a-4ea1-b9e3-cfb09c383f52.jpg"
+    },
+    {
+      "source_file": "IMG_6657.HEIC",
+      "machine_id": "0aaedbdb-600e-41cc-8c7f-efe8583dc80f",
+      "machine_name": "Free Weights Platform",
+      "confidence": 80,
+      "image_url": "https://ytkuqigyltxusbiuxuyn.supabase.co/storage/v1/object/public/gym-catalog-images/catalog/machines/0aaedbdb-600e-41cc-8c7f-efe8583dc80f.jpg"
+    }
+  ]
+}

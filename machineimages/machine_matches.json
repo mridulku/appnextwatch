@@ -1,0 +1,798 @@
+{
+  "generated_at": "2026-03-07T14:21:35.051Z",
+  "count": 26,
+  "items": [
+    {
+      "filename": "01_IMG_6632.jpg",
+      "source_file": "IMG_6632.HEIC",
+      "converted_path": "machineimages/converted/01_IMG_6632.jpg",
+      "match": {
+        "detected_machine_name": "Pec Deck",
+        "best_match_name": "Pec Deck",
+        "best_match_id": "b4a71ccd-3b3a-4662-a439-2c18835df137",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Chest Press Machine",
+            "id": "Flat Chest Press Machine",
+            "confidence": 40
+          },
+          {
+            "name": "Cable Crossover",
+            "id": "f310b13f-f9a4-4903-a6bf-631e66ec7ef6",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The machine has a seat and backrest with arms that pivot inward, designed for chest fly exercises. The design and arm placement match the typical pec deck machine used for chest isolation. The brand 'Cybex' is visible which is known for making such machines. The configuration does not match pressing types or cable types fully, so pec deck is the best fit.",
+        "visible_brand_or_model": "Cybex",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 4781,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "02_IMG_6633.jpg",
+      "source_file": "IMG_6633.HEIC",
+      "converted_path": "machineimages/converted/02_IMG_6633.jpg",
+      "match": {
+        "detected_machine_name": "Shoulder Press Machine",
+        "best_match_name": "Shoulder Press Machine",
+        "best_match_id": "de80976f-a037-45fa-acf8-2159c1161dd7",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Incline Chest Press Machine",
+            "id": "617d1f38-136b-4896-9733-9c321d8a0fe2",
+            "confidence": 20
+          },
+          {
+            "name": "Flat Chest Press Machine",
+            "id": "a86cc3b0-0f91-441f-b310-a6fec3e70e87",
+            "confidence": 15
+          }
+        ],
+        "reasoning": "The machine is designed with handles and a seat that support a shoulder pressing motion, targeting front and side delts as well as triceps. It closely matches the structure of the Shoulder Press Machine in the catalog. Other bench/chest press machines have different handle orientations and backrest positions.",
+        "visible_brand_or_model": null,
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5064,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "03_IMG_6634.jpg",
+      "source_file": "IMG_6634.HEIC",
+      "converted_path": "machineimages/converted/03_IMG_6634.jpg",
+      "match": {
+        "detected_machine_name": "Abduction/Adduction Machine",
+        "best_match_name": "Abduction/Adduction Machine",
+        "best_match_id": null,
+        "confidence": 40,
+        "alternates": [
+          {
+            "name": "Calf Raise Machine",
+            "id": "3eb1a230-32d4-4b02-9b9c-c5b3a40568f6",
+            "confidence": 10
+          },
+          {
+            "name": "Leg Press Machine",
+            "id": "7e2c9841-6cfd-470b-8705-3188f9148814",
+            "confidence": 10
+          },
+          {
+            "name": "Glute Drive Machine",
+            "id": "c1b2a68f-7145-4d8b-99c9-80b9510e7c75",
+            "confidence": 10
+          }
+        ],
+        "reasoning": "The machine shown is designed for hip abduction and adduction exercises based on the handles and seat position, targeting inner and outer thigh muscles. The catalog does not list a specific 'Abduction/Adduction Machine' by name, so no exact catalog ID can be matched. Closest alternate matches have lower confidence as the machine is distinct from calf raise, leg press, or glute drive machines.",
+        "visible_brand_or_model": "cult.sport",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 6271,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "04_IMG_6635.jpg",
+      "source_file": "IMG_6635.HEIC",
+      "converted_path": "machineimages/converted/04_IMG_6635.jpg",
+      "match": {
+        "detected_machine_name": "Treadmill",
+        "best_match_name": "Treadmill",
+        "best_match_id": "cf9c117b-0840-44f5-b42c-84a75240be52",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Air Bike",
+            "id": "45a7e0ea-116c-46f1-ac34-c8ae915a59e3",
+            "confidence": 10
+          }
+        ],
+        "reasoning": "The machine has a long running belt surface with side rails and a console at the front, which matches the typical design of a treadmill. The brand 'Cybex' can be seen faintly on the machine, which is a known manufacturer of treadmills and fitness equipment. There are no visible features indicating it belongs to other categories like cardio bikes or cable machines, making treadmill the best match.",
+        "visible_brand_or_model": "Cybex",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5113,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "05_IMG_6636.jpg",
+      "source_file": "IMG_6636.HEIC",
+      "converted_path": "machineimages/converted/05_IMG_6636.jpg",
+      "match": {
+        "detected_machine_name": "Cable Tower",
+        "best_match_name": "Cable Tower",
+        "best_match_id": "ac034e61-b4f0-4cc4-ac65-4f24a0a7644f",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Dual Adjustable Pulley",
+            "id": "92f615a5-c5ea-47f2-8243-11bb1f724416",
+            "confidence": 70
+          },
+          {
+            "name": "Functional Trainer",
+            "id": "a330e332-4134-405a-9494-4c232def19e0",
+            "confidence": 60
+          },
+          {
+            "name": "Seated Row Machine",
+            "id": "5543c7f2-1f72-4f4a-8bed-9ff4eda92255",
+            "confidence": 50
+          }
+        ],
+        "reasoning": "The machine shown has two weight stacks and multiple pulley systems with adjustable heights, consistent with a Cable Tower used for a variety of cable exercises involving chest, back, shoulders, arms, and core muscles. It has the typical frame and layout of a Cable Tower and the brand 'CYBEX' is visible on the machine, a known manufacturer of such equipment.",
+        "visible_brand_or_model": "CYBEX",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 4854,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "06_IMG_6637.jpg",
+      "source_file": "IMG_6637.HEIC",
+      "converted_path": "machineimages/converted/06_IMG_6637.jpg",
+      "match": {
+        "detected_machine_name": "Stair Climber",
+        "best_match_name": null,
+        "best_match_id": null,
+        "confidence": 0,
+        "alternates": [],
+        "reasoning": "The machine in the image appears to be a stair climber or stepper machine, but no exact match for such a machine exists in the provided catalog. Hence, no confident match can be made.",
+        "visible_brand_or_model": null,
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 3957,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "07_IMG_6638.jpg",
+      "source_file": "IMG_6638.HEIC",
+      "converted_path": "machineimages/converted/07_IMG_6638.jpg",
+      "match": {
+        "detected_machine_name": "Rowing Machine",
+        "best_match_name": "Rowing Machine",
+        "best_match_id": "8bf6bdd9-40d3-43a8-b9a4-069f97c8330e",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Air Bike",
+            "id": "45a7e0ea-116c-46f1-ac34-c8ae915a59e3",
+            "confidence": 30
+          },
+          {
+            "name": "Functional Trainer",
+            "id": "a330e332-4134-405a-9494-4c232def19e0",
+            "confidence": 20
+          },
+          {
+            "name": "Assisted Pull-up Machine",
+            "id": "aa8f3bbd-3105-40de-9e85-956fbfbbe7b7",
+            "confidence": 10
+          }
+        ],
+        "reasoning": "The machine in the image has a long central rail with a slide seat and footrests, typical of a rowing machine designed for back and cardio workout. The shape and structure strongly match the Rowing Machine from the catalog. Other machines in the catalog do not fit this configuration.",
+        "visible_brand_or_model": "Cybex",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 4848,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "08_IMG_6639.jpg",
+      "source_file": "IMG_6639.HEIC",
+      "converted_path": "machineimages/converted/08_IMG_6639.jpg",
+      "match": {
+        "detected_machine_name": "Recumbent Bike",
+        "best_match_name": "Air Bike",
+        "best_match_id": "45a7e0ea-116c-46f1-ac34-c8ae915a59e3",
+        "confidence": 85,
+        "alternates": [],
+        "reasoning": "This is a recumbent bike style exercise machine from Cybex brand, primarily used for cardio. The catalog item 'Air Bike' is the closest match in the cardio zone for legs/shoulders/cardio workout, though this model is specifically recumbent which is a subtype of stationary bike. No exact recumbent bike is listed in the catalog, so Air Bike is the best match with medium-high confidence.",
+        "visible_brand_or_model": "Cybex",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5299,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "09_IMG_6640.jpg",
+      "source_file": "IMG_6640.HEIC",
+      "converted_path": "machineimages/converted/09_IMG_6640.jpg",
+      "match": {
+        "detected_machine_name": "Air Bike",
+        "best_match_name": "Air Bike",
+        "best_match_id": "45a7e0ea-116c-46f1-ac34-c8ae915a59e3",
+        "confidence": 85,
+        "alternates": [
+          {
+            "name": "Rowing Machine",
+            "id": "8bf6bdd9-40d3-43a8-b9a4-069f97c8330e",
+            "confidence": 10
+          },
+          {
+            "name": "Treadmill",
+            "id": "cf9c117b-0840-44f5-b42c-84a75240be52",
+            "confidence": 5
+          }
+        ],
+        "reasoning": "The machine shown is a stationary exercise bike with a seat, pedals, and handlebars, used primarily for cardio workouts. Among the catalog options, the Air Bike is the closest match since it is categorized as a cardio machine involving legs, shoulders, and cardio. The handlebars and seat configuration support this identification. Other machines like the Rowing Machine or Treadmill do not fit the shape or usage.",
+        "visible_brand_or_model": null,
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5259,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "10_IMG_6641.jpg",
+      "source_file": "IMG_6641.HEIC",
+      "converted_path": "machineimages/converted/10_IMG_6641.jpg",
+      "match": {
+        "detected_machine_name": "Lat Pulldown Machine",
+        "best_match_name": "Lat Pulldown Machine",
+        "best_match_id": "bf43bda0-cd08-40ac-a833-4a759d7f6980",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "High Row Machine",
+            "id": "e8aed90f-a95f-43d8-84f3-0e4b2f5c7f86",
+            "confidence": 60
+          },
+          {
+            "name": "Seated Row Machine",
+            "id": "5543c7f2-1f72-4f4a-8bed-9ff4eda92255",
+            "confidence": 50
+          }
+        ],
+        "reasoning": "The machine has a wide overhead bar and a seated position with a padded support for legs, typical of Lat Pulldown Machines. The visible brand 'CYBEX' and 'Prestige' model indicate professional gym equipment. The posture of the user and machine setup most closely resembles a Lat Pulldown Machine used for lats and upper back exercises.",
+        "visible_brand_or_model": "CYBEX Prestige",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5308,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "11_IMG_6642.jpg",
+      "source_file": "IMG_6642.HEIC",
+      "converted_path": "machineimages/converted/11_IMG_6642.jpg",
+      "match": {
+        "detected_machine_name": "Leg Extension Machine",
+        "best_match_name": "Leg Extension Machine",
+        "best_match_id": "e93f04b6-f2e2-4f51-b127-96d1b6fc5c9c",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Leg Curl Machine",
+            "id": "415e8c59-29c7-4b9a-89c4-3707144f7b2b",
+            "confidence": 40
+          },
+          {
+            "name": "Seated Leg Curl Machine",
+            "id": "c52b4494-3f88-4548-939c-47feafbd7e39",
+            "confidence": 30
+          },
+          {
+            "name": "Hack Squat Machine",
+            "id": "b490478b-9ab1-4288-ad7d-0a762de5380a",
+            "confidence": 20
+          }
+        ],
+        "reasoning": "The machine in the image has a seat with a padded area in front to push against, which is characteristic of a Leg Extension Machine designed to exercise the quadriceps. The shape and positioning closely match the Leg Extension Machine from the catalog.",
+        "visible_brand_or_model": "Synergy",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 4543,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "12_IMG_6643.jpg",
+      "source_file": "IMG_6643.HEIC",
+      "converted_path": "machineimages/converted/12_IMG_6643.jpg",
+      "match": {
+        "detected_machine_name": "Leg Extension Machine",
+        "best_match_name": "Leg Extension Machine",
+        "best_match_id": "e93f04b6-f2e2-4f51-b127-96d1b6fc5c9c",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Seated Leg Curl Machine",
+            "id": "c52b4494-3f88-4548-939c-47feafbd7e39",
+            "confidence": 60
+          },
+          {
+            "name": "Leg Curl Machine",
+            "id": "415e8c59-29c7-4b9a-89c4-3707144f7b2b",
+            "confidence": 50
+          },
+          {
+            "name": "Lying Leg Curl Machine",
+            "id": "b99f6ab5-24da-4e5f-bbf0-b08d2af00756",
+            "confidence": 45
+          }
+        ],
+        "reasoning": "The machine has padded seating and a padded lever positioned in front of the legs, consistent with a Leg Extension Machine used to train the quadriceps. The brand Cybex is visible on the machine, which is a known manufacturer of gym machines but does not affect classification confidence in this context. The structure and function align best with the Leg Extension Machine in the catalog.",
+        "visible_brand_or_model": "Cybex",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 7270,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "13_IMG_6644.jpg",
+      "source_file": "IMG_6644.HEIC",
+      "converted_path": "machineimages/converted/13_IMG_6644.jpg",
+      "match": {
+        "detected_machine_name": "Bench Press Station",
+        "best_match_name": "Bench Press Station",
+        "best_match_id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Flat Chest Press Machine",
+            "id": "a86cc3b0-0f91-441f-b310-a6fec3e70e87",
+            "confidence": 60
+          },
+          {
+            "name": "Smith Machine",
+            "id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+            "confidence": 50
+          },
+          {
+            "name": "Incline Bench",
+            "id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The machine in the photo is a classic bench with a barbell rack for pressing exercises, matching the description of a Bench Press Station which is designed for chest and triceps workouts. The presence of a flat bench and barbell setup strongly indicates this is a Bench Press Station from the catalog, and it does not have the guided bar typical of a Smith Machine, nor the cable components of other machines.",
+        "visible_brand_or_model": "CULTSPORT",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 6096,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "14_IMG_6645.jpg",
+      "source_file": "IMG_6645.HEIC",
+      "converted_path": "machineimages/converted/14_IMG_6645.jpg",
+      "match": {
+        "detected_machine_name": "Assisted Pull-up Machine",
+        "best_match_name": "Assisted Pull-up Machine",
+        "best_match_id": "aa8f3bbd-3105-40de-9e85-956fbfbbe7b7",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Lat Pulldown Machine",
+            "id": "bf43bda0-cd08-40ac-a833-4a759d7f6980",
+            "confidence": 60
+          },
+          {
+            "name": "Dip Assist Machine",
+            "id": "40caa3aa-353f-439a-bd3b-66eff1dbc807",
+            "confidence": 50
+          },
+          {
+            "name": "Captain Chair",
+            "id": "510be77b-f315-4783-bee8-c7579fe7cab2",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "This machine has distinctive handles and a platform design that aligns with assisted pull-up machines, supporting the user to perform pull-ups or chin-ups. It is designed for lats and upper back muscles. It does not closely match other machines for other muscle groups such as lat pulldown or dip assist, although these are somewhat visually similar.",
+        "visible_brand_or_model": "Cybex",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5204,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "15_IMG_6646.jpg",
+      "source_file": "IMG_6646.HEIC",
+      "converted_path": "machineimages/converted/15_IMG_6646.jpg",
+      "match": {
+        "detected_machine_name": "Back Extension Bench",
+        "best_match_name": "Back Extension Bench",
+        "best_match_id": "c2c9e70a-3e75-4ec6-b9ad-bbb1c2bc10f5",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Roman Chair",
+            "id": "2d7746c0-ff1c-4cb1-b424-b8f2eb787b1d",
+            "confidence": 60
+          },
+          {
+            "name": "Glute Drive Machine",
+            "id": "c1b2a68f-7145-4d8b-99c9-80b9510e7c75",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The machine has padded supports for the thighs and a lower footrest which is typical for a Back Extension Bench used for lower back exercises. The overall design matches the Back Extension Bench more closely than other similar machines like the Roman Chair.",
+        "visible_brand_or_model": "cult.sport",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5523,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "16_IMG_6647.jpg",
+      "source_file": "IMG_6647.HEIC",
+      "converted_path": "machineimages/converted/16_IMG_6647.jpg",
+      "match": {
+        "detected_machine_name": "Decline Bench/Decline Sit-up Bench",
+        "best_match_name": null,
+        "best_match_id": null,
+        "confidence": 0,
+        "alternates": [],
+        "reasoning": "The machine shown is a decline bench typically used for decline sit-ups or decline bench exercises. This type of bench is not explicitly listed in the provided catalog, so there is no confident match.",
+        "visible_brand_or_model": "None visible",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5035,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "17_IMG_6648.jpg",
+      "source_file": "IMG_6648.HEIC",
+      "converted_path": "machineimages/converted/17_IMG_6648.jpg",
+      "match": {
+        "detected_machine_name": "Incline Bench",
+        "best_match_name": "Incline Bench",
+        "best_match_id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Bench Press Station",
+            "id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+            "confidence": 60
+          },
+          {
+            "name": "Flat Chest Press Machine",
+            "id": "a86cc3b0-0f91-441f-b310-a6fec3e70e87",
+            "confidence": 50
+          }
+        ],
+        "reasoning": "The machine in the image is a simple incline bench with padded back and seat for weight lifting exercises, matching the general appearance and design of an 'Incline Bench'. It lacks cables or specific attachments that would classify it as a press or cable machine.",
+        "visible_brand_or_model": null,
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 6116,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "18_IMG_6649.jpg",
+      "source_file": "IMG_6649.HEIC",
+      "converted_path": "machineimages/converted/18_IMG_6649.jpg",
+      "match": {
+        "detected_machine_name": "Incline Bench",
+        "best_match_name": "Incline Bench",
+        "best_match_id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+        "confidence": 75,
+        "alternates": [
+          {
+            "name": "Flat Chest Press Machine",
+            "id": "a86cc3b0-0f91-441f-b310-a6fec3e70e87",
+            "confidence": 20
+          },
+          {
+            "name": "Bench Press Station",
+            "id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+            "confidence": 10
+          }
+        ],
+        "reasoning": "This is a bench with an inclined backrest used for exercises like incline bench press or incline dumbbell press. It closely matches the catalog entry 'Incline Bench,' which is a free weights station for chest and shoulders. There is no indication of mechanical or cable components to classify it as a machine from the catalog.",
+        "visible_brand_or_model": "Life Fitness",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5633,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "19_IMG_6650.jpg",
+      "source_file": "IMG_6650.HEIC",
+      "converted_path": "machineimages/converted/19_IMG_6650.jpg",
+      "match": {
+        "detected_machine_name": "Incline Bench",
+        "best_match_name": "Incline Bench",
+        "best_match_id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Bench Press Station",
+            "id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+            "confidence": 50
+          },
+          {
+            "name": "Smith Machine",
+            "id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The machine in the image is a bench with an adjustable backrest set at an incline and no visible cables or weight stacks, consistent with an Incline Bench used for free weight exercises. No cables or machines parts identify it as other catalog machines.",
+        "visible_brand_or_model": "CYBEX",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 4631,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "20_IMG_6651.jpg",
+      "source_file": "IMG_6651.HEIC",
+      "converted_path": "machineimages/converted/20_IMG_6651.jpg",
+      "match": {
+        "detected_machine_name": "Incline Chest Press Machine",
+        "best_match_name": "Incline Chest Press Machine",
+        "best_match_id": "617d1f38-136b-4896-9733-9c321d8a0fe2",
+        "confidence": 85,
+        "alternates": [
+          {
+            "name": "Flat Chest Press Machine",
+            "id": "a86cc3b0-0f91-441f-b310-a6fec3e70e87",
+            "confidence": 40
+          },
+          {
+            "name": "Smith Machine",
+            "id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+            "confidence": 30
+          }
+        ],
+        "reasoning": "The machine in the image features an incline bench with a barbell rack that is characteristic of an Incline Chest Press Machine, designed for chest and triceps. The barbell and positioning align more closely with this machine rather than a flat or smith machine, although some features overlap.",
+        "visible_brand_or_model": null,
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5220,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "21_IMG_6652.jpg",
+      "source_file": "IMG_6652.HEIC",
+      "converted_path": "machineimages/converted/21_IMG_6652.jpg",
+      "match": {
+        "detected_machine_name": "Preacher Curl Machine",
+        "best_match_name": "Preacher Curl Machine",
+        "best_match_id": "a1d12e71-cd17-4db9-b75e-df746a4e8c4c",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Incline Bench",
+            "id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+            "confidence": 30
+          },
+          {
+            "name": "Bench Press Station",
+            "id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+            "confidence": 20
+          }
+        ],
+        "reasoning": "The machine in the image has a distinctive padded angled surface and arm rests typical of a Preacher Curl Machine used for bicep exercises. The frame shape and seat height also match this type of machine. The brand 'Cybex' is visible on the frame, which makes it a quality gym machine. Other machines like Incline Bench or Bench Press Station are less likely due to the arm rests and angled pad.",
+        "visible_brand_or_model": "Cybex",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 6018,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "22_IMG_6653.jpg",
+      "source_file": "IMG_6653.HEIC",
+      "converted_path": "machineimages/converted/22_IMG_6653.jpg",
+      "match": {
+        "detected_machine_name": "Smith Machine",
+        "best_match_name": "Smith Machine",
+        "best_match_id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Cable Tower",
+            "id": "ac034e61-b4f0-4cc4-ac65-4f24a0a7644f",
+            "confidence": 30
+          },
+          {
+            "name": "Functional Trainer",
+            "id": "a330e332-4134-405a-9494-4c232def19e0",
+            "confidence": 20
+          },
+          {
+            "name": "Dual Adjustable Pulley",
+            "id": "92f615a5-c5ea-47f2-8243-11bb1f724416",
+            "confidence": 15
+          }
+        ],
+        "reasoning": "The machine has a barbell fixed on vertical rails with weight plates attached, typical of a Smith Machine. The structure and design align closely with gym equipment used for guided barbell lifting exercises. The visible Cybex branding supports that it's a quality machine but does not alter the match.",
+        "visible_brand_or_model": "Cybex",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5723,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "23_IMG_6654.jpg",
+      "source_file": "IMG_6654.HEIC",
+      "converted_path": "machineimages/converted/23_IMG_6654.jpg",
+      "match": {
+        "detected_machine_name": "Leg Press Machine",
+        "best_match_name": "Leg Press Machine",
+        "best_match_id": "7e2c9841-6cfd-470b-8705-3188f9148814",
+        "confidence": 95,
+        "alternates": [
+          {
+            "name": "Hack Squat Machine",
+            "id": "b490478b-9ab1-4288-ad7d-0a762de5380a",
+            "confidence": 60
+          },
+          {
+            "name": "Smith Machine",
+            "id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+            "confidence": 40
+          }
+        ],
+        "reasoning": "The machine in the image is a seated leg press with a backrest and footplate, commonly used for leg pressing exercises targeting quads and glutes. The shape and plate loading style match the Leg Press Machine from the catalog closely. It is not a free weight or cable machine, and does not align well with other machines in the list.",
+        "visible_brand_or_model": "Cult Sport",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5053,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "24_IMG_6655.jpg",
+      "source_file": "IMG_6655.HEIC",
+      "converted_path": "machineimages/converted/24_IMG_6655.jpg",
+      "match": {
+        "detected_machine_name": "Glute Drive Machine",
+        "best_match_name": "Glute Drive Machine",
+        "best_match_id": "c1b2a68f-7145-4d8b-99c9-80b9510e7c75",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Leg Press Machine",
+            "id": "7e2c9841-6cfd-470b-8705-3188f9148814",
+            "confidence": 40
+          },
+          {
+            "name": "Hack Squat Machine",
+            "id": "b490478b-9ab1-4288-ad7d-0a762de5380a",
+            "confidence": 30
+          },
+          {
+            "name": "Roman Chair",
+            "id": "2d7746c0-ff1c-4cb1-b424-b8f2eb787b1d",
+            "confidence": 10
+          }
+        ],
+        "reasoning": "The machine has a low platform for foot placement and padded levers for resistance, aligning closest with the Glute Drive Machine which targets glutes and hamstrings. The presence of a barbell plate indicates weighted resistance training typical of glute drive machines. Other leg machines like Leg Press or Hack Squat typically have different structural designs for foot placements and seating. Roman Chair is less likely given the design and lack of positions for back support.",
+        "visible_brand_or_model": null,
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5803,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "25_IMG_6656.jpg",
+      "source_file": "IMG_6656.HEIC",
+      "converted_path": "machineimages/converted/25_IMG_6656.jpg",
+      "match": {
+        "detected_machine_name": "Smith Machine",
+        "best_match_name": "Smith Machine",
+        "best_match_id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+        "confidence": 90,
+        "alternates": [
+          {
+            "name": "Bench Press Station",
+            "id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+            "confidence": 40
+          },
+          {
+            "name": "Incline Bench",
+            "id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+            "confidence": 30
+          },
+          {
+            "name": "Squat Rack",
+            "id": null,
+            "confidence": 0
+          }
+        ],
+        "reasoning": "The machine shown is a rack with an attached barbell on fixed rails commonly used for guided barbell lifts, matching the characteristics of a Smith Machine from the catalog. The presence of the barbell and fixed vertical frame confirms this, although it could also resemble free weight benches or racks, but those are less guided and without the fixed bar path. No visible brand or model is identifiable.",
+        "visible_brand_or_model": null,
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 5501,
+        "model": "gpt-4.1-mini"
+      }
+    },
+    {
+      "filename": "26_IMG_6657.jpg",
+      "source_file": "IMG_6657.HEIC",
+      "converted_path": "machineimages/converted/26_IMG_6657.jpg",
+      "match": {
+        "detected_machine_name": "Free weights setup with barbell and plates on platform",
+        "best_match_name": "Smith Machine",
+        "best_match_id": "efacd40d-c4d6-4479-b295-3819b1f1c21b",
+        "confidence": 20,
+        "alternates": [
+          {
+            "name": "Bench Press Station",
+            "id": "bff771ff-c971-4bbf-bda2-238c12fa512f",
+            "confidence": 10
+          },
+          {
+            "name": "Incline Bench",
+            "id": "0f45fd9b-9c71-4432-b1d2-f87fb76a1283",
+            "confidence": 10
+          }
+        ],
+        "reasoning": "The image shows a barbell and plates on a lifting platform which is typical for free weight workouts like deadlifts or squats. There is no visible guided barbell or machine frame typical to a Smith Machine. Since the catalog includes Smith Machine but not explicitly a platform setup or free weights category, the closest match in the catalog by association of barbell exercises is Smith Machine, but confidence is low as this is not a machine, more free weights setup.",
+        "visible_brand_or_model": "CULTSPORT",
+        "is_machine_photo": true
+      },
+      "meta": {
+        "ms": 6175,
+        "model": "gpt-4.1-mini"
+      }
+    }
+  ]
+}

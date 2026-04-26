@@ -6,7 +6,8 @@ const { spawnSync } = require('child_process');
 const steps = [
   'scripts/gym_mapping/seed_catalog_and_taxonomy.js',
   'scripts/gym_mapping/generate_scores.js',
-  'scripts/gym_mapping/derive_machine_exercise_map.js',
+  'scripts/gym_mapping/generate_machine_exercise_map_from_catalog.js',
+  'scripts/gym_mapping/generate_movement_rollups.js',
   'scripts/gym_mapping/validate_coverage.js',
 ];
 
